@@ -1,0 +1,22 @@
+# Logs
+logs
+*.log
+npm-debug.log*
+
+# Dependency directories
+node_modules/
+
+# Environment variables
+.env
+
+# Prisma-related files
+prisma/.env
+
+# Build output
+dist/
+build/
+
+# IDE-specific files
+.vscode/
+.idea/
+*.iml
