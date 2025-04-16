@@ -2,6 +2,7 @@
 logs
 *.log
 npm-debug.log*
+
 yarn-debug.log*
 yarn-error.log*
 lerna-debug.log*
@@ -128,3 +129,21 @@ dist
 .yarn/build-state.yml
 .yarn/install-state.gz
 .pnp.*
+
+# Dependency directories
+node_modules/
+
+# Environment variables
+.env
+
+# Prisma-related files
+prisma/.env
+
+# Build output
+dist/
+build/
+
+# IDE-specific files
+.vscode/
+.idea/
+*.iml
