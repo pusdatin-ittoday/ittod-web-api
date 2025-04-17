@@ -1,20 +1,97 @@
-// This is your Prisma schema file,
-// learn more about it in the docs: https://pris.ly/d/prisma-schema
-
-// Looking for ways to speed up your queries, or scale easily with your serverless or edge functions?
-// Try Prisma Accelerate: https://pris.ly/cli/accelerate-init
+generator client {
+  provider = "prisma-client-js"
+}
 
 datasource db {
   provider = "postgresql"
   url      = env("DATABASE_URL")
 }
 
-generator client {
-  provider = "prisma-client-js"
+model bootcamp {
+  id_bootcamp     String    @id @db.VarChar(50)
+  pertemuan2_date DateTime? @db.Date
+  pertemuan3_date DateTime? @db.Date
+  pertemuan4_date DateTime? @db.Date
+  pertemuan5_date DateTime? @db.Date
+  event_bootcamp  String?   @db.VarChar(50)
+  event           event?    @relation(fields: [event_bootcamp], references: [id_event], onDelete: NoAction, onUpdate: NoAction)
 }
 
-model users {
-  id    Int     @id @default(autoincrement())
-  name  String
-  email String  @unique
+model competition {
+  id_competition      String    @id @db.VarChar(50)
+  title               String?   @db.VarChar(50)
+  description         String?
+  registration_start  DateTime? @db.Date
+  registration_end    DateTime? @db.Date
+  submission_deadline DateTime? @db.Timestamp(6)
+  guideline_url       String?   @db.VarChar(255)
+  contact_person      String?   @db.VarChar(50)
+  status              Boolean?  @default(true)
+  prize_details       Json?     @db.Json
+  payment             payment[]
+  team                team[]
+}
+
+model dokum_tahun_lalu {
+  id_foto  Int     @id @default(autoincrement())
+  foto_url String?
+}
+
+model event {
+  id_event          String              @id @db.VarChar(50)
+  title             String?             @db.VarChar(50)
+  description       String?
+  category          String?             @db.VarChar(20)
+  regis_date        DateTime?           @db.Date
+  pelaksanaan1_date DateTime?           @db.Date
+  available_slot    Int?
+  bootcamp          bootcamp[]
+  event_participant event_participant[]
+}
+
+model event_participant {
+  id_participant   String    @id @db.VarChar(50)
+  event_registered String?   @db.VarChar(50)
+  participant      String?   @db.VarChar(50)
+  registered_at    DateTime? @db.Timestamp(6)
+  event            event?    @relation(fields: [event_registered], references: [id_event], onDelete: NoAction, onUpdate: NoAction)
+  user             user?     @relation(fields: [participant], references: [id_user], onDelete: NoAction, onUpdate: NoAction)
+}
+
+model payment {
+  id_payment          String       @id @db.VarChar(50)
+  payment_team        String?      @db.VarChar(50)
+  payment_competition String?      @db.VarChar(50)
+  payment_status      Int?         @db.SmallInt
+  payment_proof_url   String?      @db.VarChar(255)
+  submitted_at        DateTime?    @db.Timestamp(6)
+  verified_by         String?      @db.VarChar(50)
+  competition         competition? @relation(fields: [payment_competition], references: [id_competition], onDelete: NoAction, onUpdate: NoAction)
+  team                team?        @relation(fields: [payment_team], references: [id_team], onDelete: NoAction, onUpdate: NoAction)
+  user                user?        @relation(fields: [verified_by], references: [id_user], onDelete: NoAction, onUpdate: NoAction)
+}
+
+model team {
+  id_team                    String       @id @db.VarChar(50)
+  nama_tim                   String?      @db.VarChar(50)
+  competition_team           String?      @db.VarChar(50)
+  anggota                    String?      @db.VarChar(50)
+  created_by                 String?      @db.VarChar(50)
+  payment                    payment[]
+  user_team_anggotaTouser    user?        @relation("team_anggotaTouser", fields: [anggota], references: [id_user], onDelete: NoAction, onUpdate: NoAction)
+  competition                competition? @relation(fields: [competition_team], references: [id_competition], onDelete: NoAction, onUpdate: NoAction)
+  user_team_created_byTouser user?        @relation("team_created_byTouser", fields: [created_by], references: [id_user], onDelete: NoAction, onUpdate: NoAction)
+}
+
+model user {
+  id_user                    String              @id @db.VarChar(50)
+  nama                       String?             @db.VarChar(100)
+  email                      String?             @db.VarChar(100)
+  password_hash              String?
+  role                       String?             @db.VarChar(20)
+  is_verified                Boolean?            @default(false)
+  event_participant          event_participant[]
+  payment                    payment[]
+  team_team_anggotaTouser    team[]              @relation("team_anggotaTouser")
+  team_team_created_byTouser team[]              @relation("team_created_byTouser")
 }
