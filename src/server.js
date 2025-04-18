@@ -1,6 +1,6 @@
 // CARA JALANIN: 1. MASUKIN KEY DI .ENV (kecuali yg supabase)
 // 2. MASUKIN CLIENT_SECRET.JSON DI CONFIG 
-// 3. JALANIN SERVER.JS, COMMAND : node src/server.js
+// 3. JALANIN INDEX.JS, COMMAND : node src/index.js
 // 4. BUKA BROWSER, BUKA localhost:3000
 // 5. KLIK LOGIN DENGAN GOOGLE, DAN SELESAI
 

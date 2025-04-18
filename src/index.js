@@ -4,6 +4,8 @@ const { PrismaClient } = require('@prisma/client');
 const app = express();
 const prisma = new PrismaClient();
 
+require('./server');
+
 app.use(express.json());
 
 app.get('/users', async (req, res) => {
