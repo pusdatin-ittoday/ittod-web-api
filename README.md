@@ -70,7 +70,7 @@ _More endpoints will be added soon._
 - **PostgreSQL**
 - **Prisma ORM**
 - **Supabase** (for object storage)
-
+- **Prettier** (as linter)
 ---
 
 ## 📄 License
