@@ -3,18 +3,8 @@ generator client {
 }
 
 datasource db {
-  provider = "postgresql"
+  provider = "mysql"
   url      = env("DATABASE_URL")
-}
-
-model bootcamp {
-  id_bootcamp     String    @id @db.VarChar(50)
-  pertemuan2_date DateTime? @db.Date
-  pertemuan3_date DateTime? @db.Date
-  pertemuan4_date DateTime? @db.Date
-  pertemuan5_date DateTime? @db.Date
-  event_bootcamp  String?   @db.VarChar(50)
-  event           event?    @relation(fields: [event_bootcamp], references: [id_event], onDelete: NoAction, onUpdate: NoAction)
 }
 
 model competition {
@@ -33,65 +23,92 @@ model competition {
 }
 
 model dokum_tahun_lalu {
-  id_foto  Int     @id @default(autoincrement())
-  foto_url String?
+  id_foto  Int    @id @default(autoincrement())
+  foto_url String? @db.VarChar(255)
 }
 
 model event {
-  id_event          String              @id @db.VarChar(50)
-  title             String?             @db.VarChar(50)
-  description       String?
-  category          String?             @db.VarChar(20)
-  regis_date        DateTime?           @db.Date
-  pelaksanaan1_date DateTime?           @db.Date
-  available_slot    Int?
-  bootcamp          bootcamp[]
-  event_participant event_participant[]
+  id_event           String   @id @db.VarChar(50)
+  title              String?  @db.VarChar(50)
+  description        String?
+  category           EventCategory?
+  regis_date         DateTime? @db.Date
+  pelaksanaan1_date  DateTime? @db.Date
+  available_slot     Int?
+
+  participants event_participant[]
+}
+
+enum EventCategory {
+  workshop
+  seminar
+  bootcamp
 }
 
 model event_participant {
-  id_participant   String    @id @db.VarChar(50)
-  event_registered String?   @db.VarChar(50)
-  participant      String?   @db.VarChar(50)
-  registered_at    DateTime? @db.Timestamp(6)
-  event            event?    @relation(fields: [event_registered], references: [id_event], onDelete: NoAction, onUpdate: NoAction)
-  user             user?     @relation(fields: [participant], references: [id_user], onDelete: NoAction, onUpdate: NoAction)
+  id_participant     String   @id @db.VarChar(50)
+  event_registeredId String?  @db.VarChar(50)
+  participantId      String?  @db.VarChar(50)
+  registered_at      DateTime?
+
+  event_registered event? @relation(fields: [event_registeredId], references: [id_event])
+  participant      user?  @relation(fields: [participantId], references: [id_user])
 }
 
 model payment {
-  id_payment          String       @id @db.VarChar(50)
-  payment_team        String?      @db.VarChar(50)
-  payment_competition String?      @db.VarChar(50)
-  payment_status      Int?         @db.SmallInt
-  payment_proof_url   String?      @db.VarChar(255)
-  submitted_at        DateTime?    @db.Timestamp(6)
-  verified_by         String?      @db.VarChar(50)
-  competition         competition? @relation(fields: [payment_competition], references: [id_competition], onDelete: NoAction, onUpdate: NoAction)
-  team                team?        @relation(fields: [payment_team], references: [id_team], onDelete: NoAction, onUpdate: NoAction)
-  user                user?        @relation(fields: [verified_by], references: [id_user], onDelete: NoAction, onUpdate: NoAction)
+  id_payment            String       @id @db.VarChar(50)
+  payment_teamId        String?      @db.VarChar(50)
+  payment_competitionId String?      @db.VarChar(50)
+  payment_status        Int?         @db.TinyInt
+  payment_proof_url     String?      @db.VarChar(255)
+  submitted_at          DateTime?    @db.Timestamp(6)
+  verified_byId         String?      @db.VarChar(50)
+
+  payment_team        team?        @relation(fields: [payment_teamId], references: [id_team])
+  payment_competition competition? @relation(fields: [payment_competitionId], references: [id_competition])
+  verified_by         user?        @relation("VerifiedByRelation", fields: [verified_byId], references: [id_user])
 }
 
 model team {
-  id_team                    String       @id @db.VarChar(50)
-  nama_tim                   String?      @db.VarChar(50)
-  competition_team           String?      @db.VarChar(50)
-  anggota                    String?      @db.VarChar(50)
-  created_by                 String?      @db.VarChar(50)
-  payment                    payment[]
-  user_team_anggotaTouser    user?        @relation("team_anggotaTouser", fields: [anggota], references: [id_user], onDelete: NoAction, onUpdate: NoAction)
-  competition                competition? @relation(fields: [competition_team], references: [id_competition], onDelete: NoAction, onUpdate: NoAction)
-  user_team_created_byTouser user?        @relation("team_created_byTouser", fields: [created_by], references: [id_user], onDelete: NoAction, onUpdate: NoAction)
+  id_team          String   @id @db.VarChar(50)
+  nama_tim         String?  @db.VarChar(50)
+  competition_team String?  @db.VarChar(50)
+  anggotaId        String?  @db.VarChar(50)
+  created_byId     String?  @db.VarChar(50)
+
+  competition_team_competition competition? @relation(fields: [competition_team], references: [id_competition])
+  anggota      user? @relation("AnggotaRelation", fields: [anggotaId], references: [id_user])
+  created_by   user? @relation("CreatedByRelation", fields: [created_byId], references: [id_user])
+
+  payments     payment[]
 }
 
 model user {
-  id_user                    String              @id @db.VarChar(50)
-  nama                       String?             @db.VarChar(100)
-  email                      String?             @db.VarChar(100)
-  password_hash              String?
-  role                       String?             @db.VarChar(20)
-  is_verified                Boolean?            @default(false)
-  event_participant          event_participant[]
-  payment                    payment[]
-  team_team_anggotaTouser    team[]              @relation("team_anggotaTouser")
-  team_team_created_byTouser team[]              @relation("team_created_byTouser")
+  id_user      String   @id @db.VarChar(50)
+  nama         String?  @db.VarChar(100)
+  email        String?  @db.VarChar(100)
+  password_hash String? @db.VarChar(100)
+  role         Role?
+  is_verified  Boolean  @default(false)
+
+  team_anggota  team[] @relation("AnggotaRelation")
+  team_creator  team[] @relation("CreatedByRelation")
+  event_participant event_participant[]
+  payment_verified   payment[] @relation("VerifiedByRelation")
+}
+
+enum Role {
+  participant
+  admin
+  committee
+}
+
+model timeline {
+  id_tahap      String   @id @db.VarChar(50)
+  tahap_date    DateTime? @db.Date
+  tahap_eventId String?  @db.VarChar(50)
+  tahap_compeId String?  @db.VarChar(50)
+
+  tahap_event   event?      @relation(fields: [tahap_eventId], references: [id_event])
+  tahap_compe   competition? @relation(fields: [tahap_compeId], references: [id_competition])
 }
