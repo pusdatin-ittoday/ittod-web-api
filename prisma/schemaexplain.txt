@@ -1,0 +1,27 @@
+enum media_grouping_enum              : Specifies where media is stored or grouped (e.g., "competition-registration").
+
+enum media_type_enum                  : specifies type of media (e.g., "pdf", "image")
+
+enum team_member_role_renum           : Distinguishes roles within a team (e.g., leader or member).
+
+enum user_identity_provider_enum      : Identifies authentication providers (e.g., Google or basic).
+
+enum user_identity_role_enum          : Defines user roles in the system (e.g., admin, user).
+
+competition               : Stores data about a competition, like its title, description, participant limits, and guidebook URL.
+
+competition_announcement  : Holds announcements related to a competition, including author and timestamps.
+
+competition_submission    : Records submissions made by teams for competitions, including submission type and media file.
+
+competition_timeline      : Details timeline events for a competition (e.g., deadlines, milestones), with visibility options.
+
+media         : Contains uploaded media (images, files, etc.) with metadata like creator, bucket, and URL.
+
+team          : Stores data about competition teams, including name, code, verification status, and timestamps.
+
+team_member   : Lists users in a team, their role (leader/member), submission media, and verification status.
+
+user          : Contains core user profile data like email, full name, education, birthdate, and social IDs.
+
+user_identity : Manages login credentials and authentication status for users, including tokens and roles.
