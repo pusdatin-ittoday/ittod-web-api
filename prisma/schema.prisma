@@ -7,108 +7,161 @@ datasource db {
   url      = env("DATABASE_URL")
 }
 
+
+enum team_member_role_renum {
+  leader
+  member
+}
+
+enum user_identity_provider_enum {
+  google
+  basic
+}
+
+enum user_identity_role_enum {
+  admin
+  user
+}
+
+enum media_grouping_enum {
+  payments
+  competition_submission
+  twibbon
+}
+
+enum media_type_enum {
+  image
+  pdf
+}
+
 model competition {
-  id_competition      String    @id @db.VarChar(50)
-  title               String?   @db.VarChar(50)
-  description         String?
-  registration_start  DateTime? @db.Date
-  registration_end    DateTime? @db.Date
-  submission_deadline DateTime? @db.Timestamp(6)
-  guideline_url       String?   @db.VarChar(255)
-  contact_person      String?   @db.VarChar(50)
-  status              Boolean?  @default(true)
-  prize_details       Json?     @db.Json
-  payment             payment[]
-  team                team[]
+  id               String                @id @db.Text
+  title            String                @db.Text
+  description      String                @db.Text
+  max_participants Int
+  max_team_member  Int
+  guide_book_url   String?              @db.Text
+  announcements    competition_announcement[]
+  submissions      competition_submission[]
+  timelines        competition_timeline[]
+  teams            team[]
 }
 
-model dokum_tahun_lalu {
-  id_foto  Int    @id @default(autoincrement())
-  foto_url String? @db.VarChar(255)
+model competition_announcement {
+  id             String     @id @db.Text
+  competition_id String     @db.Text
+  author_id      String     @db.Text
+  title          String     @db.Text
+  description    String     @db.Text
+  created_at     DateTime   @default(now())
+  updated_at     DateTime?
+
+  competition competition @relation(fields: [competition_id], references: [id])
+  author      user        @relation(fields: [author_id], references: [id])
 }
 
-model event {
-  id_event           String   @id @db.VarChar(50)
-  title              String?  @db.VarChar(50)
-  description        String?
-  category           EventCategory?
-  regis_date         DateTime? @db.Date
-  pelaksanaan1_date  DateTime? @db.Date
-  available_slot     Int?
+model competition_submission {
+  team_id        String
+  competition_id String
+  media_id       String
+  created_at     DateTime   @default(now())
+  updated_at     DateTime?
 
-  participants event_participant[]
+  team        user        @relation(fields: [team_id], references: [id])
+  competition competition @relation(fields: [competition_id], references: [id])
+  media       media       @relation(fields: [media_id], references: [id])
+
+  @@id([team_id, type])
 }
 
-enum EventCategory {
-  workshop
-  seminar
-  bootcamp
+model competition_timeline {
+  id                 String     @id @db.Text
+  competition_id     String     @db.Text
+  title              String     @db.Text
+  date               DateTime
+
+  competition competition @relation(fields: [competition_id], references: [id])
 }
 
-model event_participant {
-  id_participant     String   @id @db.VarChar(50)
-  event_registeredId String?  @db.VarChar(50)
-  participantId      String?  @db.VarChar(50)
-  registered_at      DateTime?
+model media {
+  id         String   @id @db.Text
+  creator_id String   @db.Text
+  name       String   @unique
+  grouping   media_grouping_enum
+  type       media_type_enum
+  url        String
+  created_at DateTime @default(now())
 
-  event_registered event? @relation(fields: [event_registeredId], references: [id_event])
-  participant      user?  @relation(fields: [participantId], references: [id_user])
-}
-
-model payment {
-  id_payment            String       @id @db.VarChar(50)
-  payment_teamId        String?      @db.VarChar(50)
-  payment_competitionId String?      @db.VarChar(50)
-  payment_status        Int?         @db.TinyInt
-  payment_proof_url     String?      @db.VarChar(255)
-  submitted_at          DateTime?    @db.Timestamp(6)
-  verified_byId         String?      @db.VarChar(50)
-
-  payment_team        team?        @relation(fields: [payment_teamId], references: [id_team])
-  payment_competition competition? @relation(fields: [payment_competitionId], references: [id_competition])
-  verified_by         user?        @relation("VerifiedByRelation", fields: [verified_byId], references: [id_user])
+  // Relations will be defined by referencing models
 }
 
 model team {
-  id_team          String   @id @db.VarChar(50)
-  nama_tim         String?  @db.VarChar(50)
-  competition_team String?  @db.VarChar(50)
-  anggotaId        String?  @db.VarChar(50)
-  created_byId     String?  @db.VarChar(50)
+  id                     String   @id @db.Text
+  competition_id         String   @db.Text
+  team_name              String   @db.Text
+  team_code              String   @unique
+  payment_proof_media_id String?  @db.Text
+  is_verified            Boolean  @default(false)
+  verification_error     String?  @db.Text
+  created_at             DateTime @default(now())
+  updated_at             DateTime?
 
-  competition_team_competition competition? @relation(fields: [competition_team], references: [id_competition])
-  anggota      user? @relation("AnggotaRelation", fields: [anggotaId], references: [id_user])
-  created_by   user? @relation("CreatedByRelation", fields: [created_byId], references: [id_user])
+  competition competition @relation(fields: [competition_id], references: [id])
+  paymentProof media?     @relation("TeamPaymentProof", fields: [payment_proof_media_id], references: [id])
+  members      team_member[]
+}
 
-  payments     payment[]
+model team_member {
+  user_id             String
+  team_id             String
+  role                team_member_role_renum
+  kartu_media_id      String? @db.Text
+  twibbon_media_id    String? @db.Text
+  is_verified         Boolean @default(false)
+  verification_error  String? @db.Text
+
+  user     user  @relation(fields: [user_id], references: [id])
+  team     team  @relation(fields: [team_id], references: [id])
+  twibbon  media? @relation("TwibbonMedia", fields: [twibbon_media_id], references: [id])
+
+  @@id([user_id, team_id])
 }
 
 model user {
-  id_user      String   @id @db.VarChar(50)
-  nama         String?  @db.VarChar(100)
-  email        String?  @db.VarChar(100)
-  password_hash String? @db.VarChar(100)
-  role         Role?
-  is_verified  Boolean  @default(false)
+  id                        String   @id @db.Text
+  email                     String   @unique
+  full_name                 String?
+  birth_date                DateTime?
+  entry_source              String?
+  instance                  String?
+  phone_number              String?
+  id_line                   String?
+  id_discord                String?
+  id_instagram              String?
+  consent                   Boolean  @default(false)
+  is_registration_complete  Boolean  @default(false)
+  created_at                DateTime @default(now())
+  updated_at                DateTime?
 
-  team_anggota  team[] @relation("AnggotaRelation")
-  team_creator  team[] @relation("CreatedByRelation")
-  event_participant event_participant[]
-  payment_verified   payment[] @relation("VerifiedByRelation")
+  identity                  user_identity?
+  announcements             competition_announcement[] user_identity_provider_enum@relation("UserAnnouncements")
+  submissions               competition_submission[] @relation("UserSubmissions")
 }
 
-enum Role {
-  participant
-  admin
-  committee
-}
+model user_identity {
+  id                                  String   @id @db.Text
+  email                               String   @unique
+  provider                            
+  hash                                String
+  is_verified                         Boolean  @default(false)
+  verification_token                  String
+  verification_token_expiration       DateTime
+  password_recovery_token             String?
+  password_recovery_token_expiration  DateTime?
+  refresh_token                       String?
+  role                                user_identity_role_enum @default(user)
+  created_at                          DateTime @default(now())
+  updated_at                          DateTime?
 
-model timeline {
-  id_tahap      String   @id @db.VarChar(50)
-  tahap_date    DateTime? @db.Date
-  tahap_eventId String?  @db.VarChar(50)
-  tahap_compeId String?  @db.VarChar(50)
-
-  tahap_event   event?      @relation(fields: [tahap_eventId], references: [id_event])
-  tahap_compe   competition? @relation(fields: [tahap_compeId], references: [id_competition])
-}
+  user user @relation(fields: [id], references: [id])
+} 
