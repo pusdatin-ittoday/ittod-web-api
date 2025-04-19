@@ -81,7 +81,6 @@ This project is licensed under the [MIT License](LICENSE).
 
 ## 👨‍💻 Maintainers
 
-- Aldi Pramudya – [@steezydi](https://github.com/steezydi)
 - Divisi PDI – IT-TODAY 2025
 
 ```
