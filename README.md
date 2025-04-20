@@ -63,6 +63,11 @@ _More endpoints will be added soon._
 
 ---
 
+## 🗺️ Entity Relationship Diagram
+![ERD ITTODAY 2025](https://github.com/user-attachments/assets/fe28b0cc-7612-4428-9c02-779fb133d91f)
+
+---
+
 ## ⚙️ Tech Stack
 
 - **Node.js**
@@ -86,3 +91,7 @@ This project is licensed under the [MIT License](LICENSE).
 ```
 - Walid Nadirul ahnaf
 ```
+
+
+
+
