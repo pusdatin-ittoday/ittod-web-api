@@ -25,6 +25,7 @@ enum user_identity_role_enum {
 
 enum media_grouping_enum {
   payments
+  dokum_tahun_lalu
   competition_submission
   twibbon
 }
