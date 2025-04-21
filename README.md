@@ -90,6 +90,10 @@ This project is licensed under the [MIT License](LICENSE).
 
 ```
 - Walid Nadirul ahnaf
+- Aldi Pramudya
+- Ilham Edgar Maulana Goesasi 
+- Qois Firosi
+- Jeremy Tjahjana
 ```
 
 
