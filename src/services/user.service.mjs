@@ -2,7 +2,7 @@ import prisma from "../prisma.mjs";
 
 export async function changeUsername(oldUsername, newUsername) {
     try {
-        const result = await prisma.$transaction(async (prisma) => {
+        const result = await prisma.$transaction(async prisma => {
             const existingUser = await prisma.user.findUnique({
                 where: { username: newUsername },
             });

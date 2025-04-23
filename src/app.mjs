@@ -5,7 +5,7 @@ import cookieParser from "cookie-parser";
 import "@dotenvx/dotenvx/config";
 
 import routes from "./routes/index.mjs";
-import sessionConfig from "./config/session.config.mjs"
+import sessionConfig from "./config/session.config.mjs";
 
 const app = express();
 

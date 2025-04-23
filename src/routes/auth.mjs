@@ -5,13 +5,11 @@ import passport from "passport";
 
 const authRouter = Router();
 
-// Google OAuth login route
 authRouter.get(
     "/auth/google",
     passport.authenticate("google", { scope: ["profile", "email"] })
 );
 
-// Google OAuth callback route
 authRouter.get(
     "/auth/google/redirect",
     passport.authenticate("google", { failureRedirect: "/login" }),
@@ -21,9 +19,8 @@ authRouter.get(
     }
 );
 
-// Logout route
 authRouter.get("/logout", (req, res) => {
-    req.logout((err) => {
+    req.logout(err => {
         if (err) {
             return res.status(500).send("Error logging out.");
         }
