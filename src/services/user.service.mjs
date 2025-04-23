@@ -10,15 +10,17 @@ export async function changeUsername(oldUsername, newUsername) {
                 throw new Error("Username is already taken.");
             }
 
-            await prisma.user.update({
-                where: { username: oldUsername },
-                data: { username: newUsername },
-            });
-
-            await prisma.user_identity.update({
-                where: { username: oldUsername },
-                data: { username: newUsername },
-            });
+            // Use a transaction to ensure both updates succeed or both fail atomically
+            await prisma.$transaction([
+                prisma.user.update({
+                    where: { username: oldUsername },
+                    data: { username: newUsername },
+                }),
+                prisma.user_identity.update({
+                    where: { username: oldUsername },
+                    data: { username: newUsername },
+                }),
+            ]);
 
             return { success: true, message: "Username updated successfully." };
         });
