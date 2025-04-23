@@ -1,0 +1,60 @@
+// Enums
+Enum user_education_enum {
+  SMA
+  D3
+  S1
+  S2
+  S3
+  Lainnya
+}
+
+Enum user_identity_provider_enum {
+  email
+  google
+  github
+}
+
+Enum user_identity_role_enum {
+  user
+  admin
+  superadmin
+}
+
+// Tables
+Table user {
+  id text [pk, not null]
+  email text [not null, unique]
+  full_name text
+  birth_date date
+  education user_education_enum
+  entry_source text
+  instance text
+  phone_number text
+  id_line text
+  id_discord text
+  id_instagram text
+  consent boolean [not null, default: false]
+  is_registration_complete boolean [not null, default: false]
+  created_at timestamp [default: `now()`]
+  updated_at timestamp [default: `now()`]
+}
+
+Table user_identity {
+  id text [pk, not null]
+  user_id text [not null]
+  email text [not null]
+  provider user_identity_provider_enum [not null]
+  hash text [not null]
+  is_verified boolean [not null, default: false]
+  verification_token text
+  verification_token_expiration timestamp
+  password_recovery_token text
+  password_recovery_token_expiration timestamp
+  refresh_token text
+  role user_identity_role_enum [not null, default: 'user']
+  created_at timestamp [default: `now()`]
+  updated_at timestamp [default: `now()`]
+}
+
+// Relationships
+Ref: user_identity.user_id > user.id
