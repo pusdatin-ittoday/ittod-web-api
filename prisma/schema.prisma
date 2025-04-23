@@ -1,7 +1,6 @@
 generator client {
   provider = "prisma-client-js"
   output   = "app/generated/prisma/client"
-
 }
 
 datasource db {
@@ -10,7 +9,7 @@ datasource db {
 }
 
 model user {
-  username                 String          @id @db.VarChar(36)
+  id                       String          @id @db.VarChar(36)
   email                    String          @unique(map: "unique_email", length: 255) @db.Text
   full_name                String?         @db.Text
   birth_date               DateTime?       @db.Date
@@ -29,11 +28,10 @@ model user {
 }
 
 model user_identity {
-  username                           String                 @id @db.VarChar(36)
-  external_id                        String                 @unique(map: "unique_external_id", length: 255) @db.Text
+  id                                 String                 @id @db.VarChar(36)
   email                              String                 @unique(map: "unique_email", length: 255) @db.Text
   provider                           user_identity_provider
-  hash                               String                 @unique(map: "unique_hash", length: 255) @db.Text
+  hash                               String?                @db.Text
   is_verified                        Boolean                @default(false)
   verification_token                 String?                @db.Text
   verification_token_expiration      DateTime?              @db.Timestamp(0)
@@ -43,7 +41,7 @@ model user_identity {
   role                               user_identity_role     @default(user)
   created_at                         DateTime?              @default(dbgenerated("(now())")) @db.Timestamp(0)
   updated_at                         DateTime?              @default(dbgenerated("(now())")) @db.Timestamp(0)
-  user                               user                   @relation(fields: [username], references: [username], onDelete: NoAction, onUpdate: NoAction, map: "user_identity_ibfk_1")
+  user                               user                   @relation(fields: [id], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "user_identity_ibfk_1")
 }
 
 enum user_identity_provider {

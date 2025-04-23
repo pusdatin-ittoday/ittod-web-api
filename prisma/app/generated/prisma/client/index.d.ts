@@ -79,7 +79,7 @@ export const user_identity_role: typeof $Enums.user_identity_role
  * ```
  * const prisma = new PrismaClient()
  * // Fetch zero or more Users
- * const users.mjs = await prisma.user.findMany()
+ * const users = await prisma.user.findMany()
  * ```
  *
  *
@@ -100,7 +100,7 @@ export class PrismaClient<
    * ```
    * const prisma = new PrismaClient()
    * // Fetch zero or more Users
-   * const users.mjs = await prisma.user.findMany()
+   * const users = await prisma.user.findMany()
    * ```
    *
    *
@@ -201,7 +201,7 @@ export class PrismaClient<
     * Example usage:
     * ```ts
     * // Fetch zero or more Users
-    * const users.mjs = await prisma.user.findMany()
+    * const users = await prisma.user.findMany()
     * ```
     */
   get user(): Prisma.userDelegate<ExtArgs, ClientOptions>;
@@ -1002,7 +1002,7 @@ export namespace Prisma {
   }
 
   export type UserMinAggregateOutputType = {
-    username: string | null
+    id: string | null
     email: string | null
     full_name: string | null
     birth_date: Date | null
@@ -1020,7 +1020,7 @@ export namespace Prisma {
   }
 
   export type UserMaxAggregateOutputType = {
-    username: string | null
+    id: string | null
     email: string | null
     full_name: string | null
     birth_date: Date | null
@@ -1038,7 +1038,7 @@ export namespace Prisma {
   }
 
   export type UserCountAggregateOutputType = {
-    username: number
+    id: number
     email: number
     full_name: number
     birth_date: number
@@ -1058,7 +1058,7 @@ export namespace Prisma {
 
 
   export type UserMinAggregateInputType = {
-    username?: true
+    id?: true
     email?: true
     full_name?: true
     birth_date?: true
@@ -1076,7 +1076,7 @@ export namespace Prisma {
   }
 
   export type UserMaxAggregateInputType = {
-    username?: true
+    id?: true
     email?: true
     full_name?: true
     birth_date?: true
@@ -1094,7 +1094,7 @@ export namespace Prisma {
   }
 
   export type UserCountAggregateInputType = {
-    username?: true
+    id?: true
     email?: true
     full_name?: true
     birth_date?: true
@@ -1120,7 +1120,7 @@ export namespace Prisma {
     /**
      * {@link https://www.prisma.io/docs/concepts/components/prisma-client/sorting Sorting Docs}
      * 
-     * Determine the order of users.mjs to fetch.
+     * Determine the order of users to fetch.
      */
     orderBy?: userOrderByWithRelationInput | userOrderByWithRelationInput[]
     /**
@@ -1132,19 +1132,19 @@ export namespace Prisma {
     /**
      * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
      * 
-     * Take `±n` users.mjs from the position of the cursor.
+     * Take `±n` users from the position of the cursor.
      */
     take?: number
     /**
      * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
      * 
-     * Skip the first `n` users.mjs.
+     * Skip the first `n` users.
      */
     skip?: number
     /**
      * {@link https://www.prisma.io/docs/concepts/components/prisma-client/aggregations Aggregation Docs}
      * 
-     * Count returned users.mjs
+     * Count returned users
     **/
     _count?: true | UserCountAggregateInputType
     /**
@@ -1185,7 +1185,7 @@ export namespace Prisma {
   }
 
   export type UserGroupByOutputType = {
-    username: string
+    id: string
     email: string
     full_name: string | null
     birth_date: Date | null
@@ -1220,7 +1220,7 @@ export namespace Prisma {
 
 
   export type userSelect<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetSelect<{
-    username?: boolean
+    id?: boolean
     email?: boolean
     full_name?: boolean
     birth_date?: boolean
@@ -1241,7 +1241,7 @@ export namespace Prisma {
 
 
   export type userSelectScalar = {
-    username?: boolean
+    id?: boolean
     email?: boolean
     full_name?: boolean
     birth_date?: boolean
@@ -1258,7 +1258,7 @@ export namespace Prisma {
     updated_at?: boolean
   }
 
-  export type userOmit<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetOmit<"username" | "email" | "full_name" | "birth_date" | "education" | "entry_source" | "instance" | "phone_number" | "id_line" | "id_discord" | "id_instagram" | "consent" | "is_registration_complete" | "created_at" | "updated_at", ExtArgs["result"]["user"]>
+  export type userOmit<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetOmit<"id" | "email" | "full_name" | "birth_date" | "education" | "entry_source" | "instance" | "phone_number" | "id_line" | "id_discord" | "id_instagram" | "consent" | "is_registration_complete" | "created_at" | "updated_at", ExtArgs["result"]["user"]>
   export type userInclude<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
     user_identity?: boolean | user$user_identityArgs<ExtArgs>
   }
@@ -1269,7 +1269,7 @@ export namespace Prisma {
       user_identity: Prisma.$user_identityPayload<ExtArgs> | null
     }
     scalars: $Extensions.GetPayloadResult<{
-      username: string
+      id: string
       email: string
       full_name: string | null
       birth_date: Date | null
@@ -1362,13 +1362,13 @@ export namespace Prisma {
      * @param {userFindManyArgs} args - Arguments to filter and select certain fields only.
      * @example
      * // Get all Users
-     * const users.mjs = await prisma.user.findMany()
+     * const users = await prisma.user.findMany()
      * 
      * // Get first 10 Users
-     * const users.mjs = await prisma.user.findMany({ take: 10 })
+     * const users = await prisma.user.findMany({ take: 10 })
      * 
-     * // Only select the `username`
-     * const userWithUsernameOnly = await prisma.user.findMany({ select: { username: true } })
+     * // Only select the `id`
+     * const userWithIdOnly = await prisma.user.findMany({ select: { id: true } })
      * 
      */
     findMany<T extends userFindManyArgs>(args?: SelectSubset<T, userFindManyArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$userPayload<ExtArgs>, T, "findMany", GlobalOmitOptions>>
@@ -1516,7 +1516,7 @@ export namespace Prisma {
      * @example
      * // Ordered by age ascending
      * // Where email contains prisma.io
-     * // Limited to the 10 users.mjs
+     * // Limited to the 10 users
      * const aggregations = await prisma.user.aggregate({
      *   _avg: {
      *     age: true,
@@ -1654,7 +1654,7 @@ export namespace Prisma {
    * Fields of the user model
    */
   interface userFieldRefs {
-    readonly username: FieldRef<"user", 'String'>
+    readonly id: FieldRef<"user", 'String'>
     readonly email: FieldRef<"user", 'String'>
     readonly full_name: FieldRef<"user", 'String'>
     readonly birth_date: FieldRef<"user", 'DateTime'>
@@ -1740,31 +1740,31 @@ export namespace Prisma {
     /**
      * {@link https://www.prisma.io/docs/concepts/components/prisma-client/sorting Sorting Docs}
      * 
-     * Determine the order of users.mjs to fetch.
+     * Determine the order of users to fetch.
      */
     orderBy?: userOrderByWithRelationInput | userOrderByWithRelationInput[]
     /**
      * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination#cursor-based-pagination Cursor Docs}
      * 
-     * Sets the position for searching for users.mjs.
+     * Sets the position for searching for users.
      */
     cursor?: userWhereUniqueInput
     /**
      * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
      * 
-     * Take `±n` users.mjs from the position of the cursor.
+     * Take `±n` users from the position of the cursor.
      */
     take?: number
     /**
      * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
      * 
-     * Skip the first `n` users.mjs.
+     * Skip the first `n` users.
      */
     skip?: number
     /**
      * {@link https://www.prisma.io/docs/concepts/components/prisma-client/distinct Distinct Docs}
      * 
-     * Filter by unique combinations of users.mjs.
+     * Filter by unique combinations of users.
      */
     distinct?: UserScalarFieldEnum | UserScalarFieldEnum[]
   }
@@ -1792,31 +1792,31 @@ export namespace Prisma {
     /**
      * {@link https://www.prisma.io/docs/concepts/components/prisma-client/sorting Sorting Docs}
      * 
-     * Determine the order of users.mjs to fetch.
+     * Determine the order of users to fetch.
      */
     orderBy?: userOrderByWithRelationInput | userOrderByWithRelationInput[]
     /**
      * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination#cursor-based-pagination Cursor Docs}
      * 
-     * Sets the position for searching for users.mjs.
+     * Sets the position for searching for users.
      */
     cursor?: userWhereUniqueInput
     /**
      * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
      * 
-     * Take `±n` users.mjs from the position of the cursor.
+     * Take `±n` users from the position of the cursor.
      */
     take?: number
     /**
      * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
      * 
-     * Skip the first `n` users.mjs.
+     * Skip the first `n` users.
      */
     skip?: number
     /**
      * {@link https://www.prisma.io/docs/concepts/components/prisma-client/distinct Distinct Docs}
      * 
-     * Filter by unique combinations of users.mjs.
+     * Filter by unique combinations of users.
      */
     distinct?: UserScalarFieldEnum | UserScalarFieldEnum[]
   }
@@ -1838,31 +1838,31 @@ export namespace Prisma {
      */
     include?: userInclude<ExtArgs> | null
     /**
-     * Filter, which users.mjs to fetch.
+     * Filter, which users to fetch.
      */
     where?: userWhereInput
     /**
      * {@link https://www.prisma.io/docs/concepts/components/prisma-client/sorting Sorting Docs}
      * 
-     * Determine the order of users.mjs to fetch.
+     * Determine the order of users to fetch.
      */
     orderBy?: userOrderByWithRelationInput | userOrderByWithRelationInput[]
     /**
      * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination#cursor-based-pagination Cursor Docs}
      * 
-     * Sets the position for listing users.mjs.
+     * Sets the position for listing users.
      */
     cursor?: userWhereUniqueInput
     /**
      * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
      * 
-     * Take `±n` users.mjs from the position of the cursor.
+     * Take `±n` users from the position of the cursor.
      */
     take?: number
     /**
      * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
      * 
-     * Skip the first `n` users.mjs.
+     * Skip the first `n` users.
      */
     skip?: number
     distinct?: UserScalarFieldEnum | UserScalarFieldEnum[]
@@ -1895,7 +1895,7 @@ export namespace Prisma {
    */
   export type userCreateManyArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
     /**
-     * The data used to create many users.mjs.
+     * The data used to create many users.
      */
     data: userCreateManyInput | userCreateManyInput[]
     skipDuplicates?: boolean
@@ -1932,15 +1932,15 @@ export namespace Prisma {
    */
   export type userUpdateManyArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
     /**
-     * The data used to update users.mjs.
+     * The data used to update users.
      */
     data: XOR<userUpdateManyMutationInput, userUncheckedUpdateManyInput>
     /**
-     * Filter which users.mjs to update
+     * Filter which users to update
      */
     where?: userWhereInput
     /**
-     * Limit how many users.mjs to update.
+     * Limit how many users to update.
      */
     limit?: number
   }
@@ -2002,11 +2002,11 @@ export namespace Prisma {
    */
   export type userDeleteManyArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
     /**
-     * Filter which users.mjs to delete
+     * Filter which users to delete
      */
     where?: userWhereInput
     /**
-     * Limit how many users.mjs to delete.
+     * Limit how many users to delete.
      */
     limit?: number
   }
@@ -2060,8 +2060,7 @@ export namespace Prisma {
   }
 
   export type User_identityMinAggregateOutputType = {
-    username: string | null
-    external_id: string | null
+    id: string | null
     email: string | null
     provider: $Enums.user_identity_provider | null
     hash: string | null
@@ -2077,8 +2076,7 @@ export namespace Prisma {
   }
 
   export type User_identityMaxAggregateOutputType = {
-    username: string | null
-    external_id: string | null
+    id: string | null
     email: string | null
     provider: $Enums.user_identity_provider | null
     hash: string | null
@@ -2094,8 +2092,7 @@ export namespace Prisma {
   }
 
   export type User_identityCountAggregateOutputType = {
-    username: number
-    external_id: number
+    id: number
     email: number
     provider: number
     hash: number
@@ -2113,8 +2110,7 @@ export namespace Prisma {
 
 
   export type User_identityMinAggregateInputType = {
-    username?: true
-    external_id?: true
+    id?: true
     email?: true
     provider?: true
     hash?: true
@@ -2130,8 +2126,7 @@ export namespace Prisma {
   }
 
   export type User_identityMaxAggregateInputType = {
-    username?: true
-    external_id?: true
+    id?: true
     email?: true
     provider?: true
     hash?: true
@@ -2147,8 +2142,7 @@ export namespace Prisma {
   }
 
   export type User_identityCountAggregateInputType = {
-    username?: true
-    external_id?: true
+    id?: true
     email?: true
     provider?: true
     hash?: true
@@ -2237,11 +2231,10 @@ export namespace Prisma {
   }
 
   export type User_identityGroupByOutputType = {
-    username: string
-    external_id: string
+    id: string
     email: string
     provider: $Enums.user_identity_provider
-    hash: string
+    hash: string | null
     is_verified: boolean
     verification_token: string | null
     verification_token_expiration: Date | null
@@ -2271,8 +2264,7 @@ export namespace Prisma {
 
 
   export type user_identitySelect<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetSelect<{
-    username?: boolean
-    external_id?: boolean
+    id?: boolean
     email?: boolean
     provider?: boolean
     hash?: boolean
@@ -2291,8 +2283,7 @@ export namespace Prisma {
 
 
   export type user_identitySelectScalar = {
-    username?: boolean
-    external_id?: boolean
+    id?: boolean
     email?: boolean
     provider?: boolean
     hash?: boolean
@@ -2307,7 +2298,7 @@ export namespace Prisma {
     updated_at?: boolean
   }
 
-  export type user_identityOmit<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetOmit<"username" | "external_id" | "email" | "provider" | "hash" | "is_verified" | "verification_token" | "verification_token_expiration" | "password_recovery_token" | "password_recovery_token_expiration" | "refresh_token" | "role" | "created_at" | "updated_at", ExtArgs["result"]["user_identity"]>
+  export type user_identityOmit<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetOmit<"id" | "email" | "provider" | "hash" | "is_verified" | "verification_token" | "verification_token_expiration" | "password_recovery_token" | "password_recovery_token_expiration" | "refresh_token" | "role" | "created_at" | "updated_at", ExtArgs["result"]["user_identity"]>
   export type user_identityInclude<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
     user?: boolean | userDefaultArgs<ExtArgs>
   }
@@ -2318,11 +2309,10 @@ export namespace Prisma {
       user: Prisma.$userPayload<ExtArgs>
     }
     scalars: $Extensions.GetPayloadResult<{
-      username: string
-      external_id: string
+      id: string
       email: string
       provider: $Enums.user_identity_provider
-      hash: string
+      hash: string | null
       is_verified: boolean
       verification_token: string | null
       verification_token_expiration: Date | null
@@ -2415,8 +2405,8 @@ export namespace Prisma {
      * // Get first 10 User_identities
      * const user_identities = await prisma.user_identity.findMany({ take: 10 })
      * 
-     * // Only select the `username`
-     * const user_identityWithUsernameOnly = await prisma.user_identity.findMany({ select: { username: true } })
+     * // Only select the `id`
+     * const user_identityWithIdOnly = await prisma.user_identity.findMany({ select: { id: true } })
      * 
      */
     findMany<T extends user_identityFindManyArgs>(args?: SelectSubset<T, user_identityFindManyArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$user_identityPayload<ExtArgs>, T, "findMany", GlobalOmitOptions>>
@@ -2564,7 +2554,7 @@ export namespace Prisma {
      * @example
      * // Ordered by age ascending
      * // Where email contains prisma.io
-     * // Limited to the 10 users.mjs
+     * // Limited to the 10 users
      * const aggregations = await prisma.user.aggregate({
      *   _avg: {
      *     age: true,
@@ -2702,8 +2692,7 @@ export namespace Prisma {
    * Fields of the user_identity model
    */
   interface user_identityFieldRefs {
-    readonly username: FieldRef<"user_identity", 'String'>
-    readonly external_id: FieldRef<"user_identity", 'String'>
+    readonly id: FieldRef<"user_identity", 'String'>
     readonly email: FieldRef<"user_identity", 'String'>
     readonly provider: FieldRef<"user_identity", 'user_identity_provider'>
     readonly hash: FieldRef<"user_identity", 'String'>
@@ -3092,7 +3081,7 @@ export namespace Prisma {
 
 
   export const UserScalarFieldEnum: {
-    username: 'username',
+    id: 'id',
     email: 'email',
     full_name: 'full_name',
     birth_date: 'birth_date',
@@ -3113,8 +3102,7 @@ export namespace Prisma {
 
 
   export const User_identityScalarFieldEnum: {
-    username: 'username',
-    external_id: 'external_id',
+    id: 'id',
     email: 'email',
     provider: 'provider',
     hash: 'hash',
@@ -3149,7 +3137,7 @@ export namespace Prisma {
 
 
   export const userOrderByRelevanceFieldEnum: {
-    username: 'username',
+    id: 'id',
     email: 'email',
     full_name: 'full_name',
     entry_source: 'entry_source',
@@ -3164,8 +3152,7 @@ export namespace Prisma {
 
 
   export const user_identityOrderByRelevanceFieldEnum: {
-    username: 'username',
-    external_id: 'external_id',
+    id: 'id',
     email: 'email',
     hash: 'hash',
     verification_token: 'verification_token',
@@ -3237,7 +3224,7 @@ export namespace Prisma {
     AND?: userWhereInput | userWhereInput[]
     OR?: userWhereInput[]
     NOT?: userWhereInput | userWhereInput[]
-    username?: StringFilter<"user"> | string
+    id?: StringFilter<"user"> | string
     email?: StringFilter<"user"> | string
     full_name?: StringNullableFilter<"user"> | string | null
     birth_date?: DateTimeNullableFilter<"user"> | Date | string | null
@@ -3256,7 +3243,7 @@ export namespace Prisma {
   }
 
   export type userOrderByWithRelationInput = {
-    username?: SortOrder
+    id?: SortOrder
     email?: SortOrder
     full_name?: SortOrderInput | SortOrder
     birth_date?: SortOrderInput | SortOrder
@@ -3276,7 +3263,7 @@ export namespace Prisma {
   }
 
   export type userWhereUniqueInput = Prisma.AtLeast<{
-    username?: string
+    id?: string
     email?: string
     AND?: userWhereInput | userWhereInput[]
     OR?: userWhereInput[]
@@ -3295,10 +3282,10 @@ export namespace Prisma {
     created_at?: DateTimeNullableFilter<"user"> | Date | string | null
     updated_at?: DateTimeNullableFilter<"user"> | Date | string | null
     user_identity?: XOR<User_identityNullableScalarRelationFilter, user_identityWhereInput> | null
-  }, "username" | "email">
+  }, "id" | "email">
 
   export type userOrderByWithAggregationInput = {
-    username?: SortOrder
+    id?: SortOrder
     email?: SortOrder
     full_name?: SortOrderInput | SortOrder
     birth_date?: SortOrderInput | SortOrder
@@ -3322,7 +3309,7 @@ export namespace Prisma {
     AND?: userScalarWhereWithAggregatesInput | userScalarWhereWithAggregatesInput[]
     OR?: userScalarWhereWithAggregatesInput[]
     NOT?: userScalarWhereWithAggregatesInput | userScalarWhereWithAggregatesInput[]
-    username?: StringWithAggregatesFilter<"user"> | string
+    id?: StringWithAggregatesFilter<"user"> | string
     email?: StringWithAggregatesFilter<"user"> | string
     full_name?: StringNullableWithAggregatesFilter<"user"> | string | null
     birth_date?: DateTimeNullableWithAggregatesFilter<"user"> | Date | string | null
@@ -3343,11 +3330,10 @@ export namespace Prisma {
     AND?: user_identityWhereInput | user_identityWhereInput[]
     OR?: user_identityWhereInput[]
     NOT?: user_identityWhereInput | user_identityWhereInput[]
-    username?: StringFilter<"user_identity"> | string
-    external_id?: StringFilter<"user_identity"> | string
+    id?: StringFilter<"user_identity"> | string
     email?: StringFilter<"user_identity"> | string
     provider?: Enumuser_identity_providerFilter<"user_identity"> | $Enums.user_identity_provider
-    hash?: StringFilter<"user_identity"> | string
+    hash?: StringNullableFilter<"user_identity"> | string | null
     is_verified?: BoolFilter<"user_identity"> | boolean
     verification_token?: StringNullableFilter<"user_identity"> | string | null
     verification_token_expiration?: DateTimeNullableFilter<"user_identity"> | Date | string | null
@@ -3361,11 +3347,10 @@ export namespace Prisma {
   }
 
   export type user_identityOrderByWithRelationInput = {
-    username?: SortOrder
-    external_id?: SortOrder
+    id?: SortOrder
     email?: SortOrder
     provider?: SortOrder
-    hash?: SortOrder
+    hash?: SortOrderInput | SortOrder
     is_verified?: SortOrder
     verification_token?: SortOrderInput | SortOrder
     verification_token_expiration?: SortOrderInput | SortOrder
@@ -3380,14 +3365,13 @@ export namespace Prisma {
   }
 
   export type user_identityWhereUniqueInput = Prisma.AtLeast<{
-    username?: string
-    external_id?: string
+    id?: string
     email?: string
-    hash?: string
     AND?: user_identityWhereInput | user_identityWhereInput[]
     OR?: user_identityWhereInput[]
     NOT?: user_identityWhereInput | user_identityWhereInput[]
     provider?: Enumuser_identity_providerFilter<"user_identity"> | $Enums.user_identity_provider
+    hash?: StringNullableFilter<"user_identity"> | string | null
     is_verified?: BoolFilter<"user_identity"> | boolean
     verification_token?: StringNullableFilter<"user_identity"> | string | null
     verification_token_expiration?: DateTimeNullableFilter<"user_identity"> | Date | string | null
@@ -3398,14 +3382,13 @@ export namespace Prisma {
     created_at?: DateTimeNullableFilter<"user_identity"> | Date | string | null
     updated_at?: DateTimeNullableFilter<"user_identity"> | Date | string | null
     user?: XOR<UserScalarRelationFilter, userWhereInput>
-  }, "username" | "external_id" | "email" | "hash">
+  }, "id" | "email">
 
   export type user_identityOrderByWithAggregationInput = {
-    username?: SortOrder
-    external_id?: SortOrder
+    id?: SortOrder
     email?: SortOrder
     provider?: SortOrder
-    hash?: SortOrder
+    hash?: SortOrderInput | SortOrder
     is_verified?: SortOrder
     verification_token?: SortOrderInput | SortOrder
     verification_token_expiration?: SortOrderInput | SortOrder
@@ -3424,11 +3407,10 @@ export namespace Prisma {
     AND?: user_identityScalarWhereWithAggregatesInput | user_identityScalarWhereWithAggregatesInput[]
     OR?: user_identityScalarWhereWithAggregatesInput[]
     NOT?: user_identityScalarWhereWithAggregatesInput | user_identityScalarWhereWithAggregatesInput[]
-    username?: StringWithAggregatesFilter<"user_identity"> | string
-    external_id?: StringWithAggregatesFilter<"user_identity"> | string
+    id?: StringWithAggregatesFilter<"user_identity"> | string
     email?: StringWithAggregatesFilter<"user_identity"> | string
     provider?: Enumuser_identity_providerWithAggregatesFilter<"user_identity"> | $Enums.user_identity_provider
-    hash?: StringWithAggregatesFilter<"user_identity"> | string
+    hash?: StringNullableWithAggregatesFilter<"user_identity"> | string | null
     is_verified?: BoolWithAggregatesFilter<"user_identity"> | boolean
     verification_token?: StringNullableWithAggregatesFilter<"user_identity"> | string | null
     verification_token_expiration?: DateTimeNullableWithAggregatesFilter<"user_identity"> | Date | string | null
@@ -3441,7 +3423,7 @@ export namespace Prisma {
   }
 
   export type userCreateInput = {
-    username: string
+    id: string
     email: string
     full_name?: string | null
     birth_date?: Date | string | null
@@ -3460,7 +3442,7 @@ export namespace Prisma {
   }
 
   export type userUncheckedCreateInput = {
-    username: string
+    id: string
     email: string
     full_name?: string | null
     birth_date?: Date | string | null
@@ -3479,7 +3461,7 @@ export namespace Prisma {
   }
 
   export type userUpdateInput = {
-    username?: StringFieldUpdateOperationsInput | string
+    id?: StringFieldUpdateOperationsInput | string
     email?: StringFieldUpdateOperationsInput | string
     full_name?: NullableStringFieldUpdateOperationsInput | string | null
     birth_date?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
@@ -3498,7 +3480,7 @@ export namespace Prisma {
   }
 
   export type userUncheckedUpdateInput = {
-    username?: StringFieldUpdateOperationsInput | string
+    id?: StringFieldUpdateOperationsInput | string
     email?: StringFieldUpdateOperationsInput | string
     full_name?: NullableStringFieldUpdateOperationsInput | string | null
     birth_date?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
@@ -3517,7 +3499,7 @@ export namespace Prisma {
   }
 
   export type userCreateManyInput = {
-    username: string
+    id: string
     email: string
     full_name?: string | null
     birth_date?: Date | string | null
@@ -3535,7 +3517,7 @@ export namespace Prisma {
   }
 
   export type userUpdateManyMutationInput = {
-    username?: StringFieldUpdateOperationsInput | string
+    id?: StringFieldUpdateOperationsInput | string
     email?: StringFieldUpdateOperationsInput | string
     full_name?: NullableStringFieldUpdateOperationsInput | string | null
     birth_date?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
@@ -3553,7 +3535,7 @@ export namespace Prisma {
   }
 
   export type userUncheckedUpdateManyInput = {
-    username?: StringFieldUpdateOperationsInput | string
+    id?: StringFieldUpdateOperationsInput | string
     email?: StringFieldUpdateOperationsInput | string
     full_name?: NullableStringFieldUpdateOperationsInput | string | null
     birth_date?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
@@ -3571,10 +3553,9 @@ export namespace Prisma {
   }
 
   export type user_identityCreateInput = {
-    external_id: string
     email: string
     provider: $Enums.user_identity_provider
-    hash: string
+    hash?: string | null
     is_verified?: boolean
     verification_token?: string | null
     verification_token_expiration?: Date | string | null
@@ -3588,11 +3569,10 @@ export namespace Prisma {
   }
 
   export type user_identityUncheckedCreateInput = {
-    username: string
-    external_id: string
+    id: string
     email: string
     provider: $Enums.user_identity_provider
-    hash: string
+    hash?: string | null
     is_verified?: boolean
     verification_token?: string | null
     verification_token_expiration?: Date | string | null
@@ -3605,10 +3585,9 @@ export namespace Prisma {
   }
 
   export type user_identityUpdateInput = {
-    external_id?: StringFieldUpdateOperationsInput | string
     email?: StringFieldUpdateOperationsInput | string
     provider?: Enumuser_identity_providerFieldUpdateOperationsInput | $Enums.user_identity_provider
-    hash?: StringFieldUpdateOperationsInput | string
+    hash?: NullableStringFieldUpdateOperationsInput | string | null
     is_verified?: BoolFieldUpdateOperationsInput | boolean
     verification_token?: NullableStringFieldUpdateOperationsInput | string | null
     verification_token_expiration?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
@@ -3622,11 +3601,10 @@ export namespace Prisma {
   }
 
   export type user_identityUncheckedUpdateInput = {
-    username?: StringFieldUpdateOperationsInput | string
-    external_id?: StringFieldUpdateOperationsInput | string
+    id?: StringFieldUpdateOperationsInput | string
     email?: StringFieldUpdateOperationsInput | string
     provider?: Enumuser_identity_providerFieldUpdateOperationsInput | $Enums.user_identity_provider
-    hash?: StringFieldUpdateOperationsInput | string
+    hash?: NullableStringFieldUpdateOperationsInput | string | null
     is_verified?: BoolFieldUpdateOperationsInput | boolean
     verification_token?: NullableStringFieldUpdateOperationsInput | string | null
     verification_token_expiration?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
@@ -3639,11 +3617,10 @@ export namespace Prisma {
   }
 
   export type user_identityCreateManyInput = {
-    username: string
-    external_id: string
+    id: string
     email: string
     provider: $Enums.user_identity_provider
-    hash: string
+    hash?: string | null
     is_verified?: boolean
     verification_token?: string | null
     verification_token_expiration?: Date | string | null
@@ -3656,10 +3633,9 @@ export namespace Prisma {
   }
 
   export type user_identityUpdateManyMutationInput = {
-    external_id?: StringFieldUpdateOperationsInput | string
     email?: StringFieldUpdateOperationsInput | string
     provider?: Enumuser_identity_providerFieldUpdateOperationsInput | $Enums.user_identity_provider
-    hash?: StringFieldUpdateOperationsInput | string
+    hash?: NullableStringFieldUpdateOperationsInput | string | null
     is_verified?: BoolFieldUpdateOperationsInput | boolean
     verification_token?: NullableStringFieldUpdateOperationsInput | string | null
     verification_token_expiration?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
@@ -3672,11 +3648,10 @@ export namespace Prisma {
   }
 
   export type user_identityUncheckedUpdateManyInput = {
-    username?: StringFieldUpdateOperationsInput | string
-    external_id?: StringFieldUpdateOperationsInput | string
+    id?: StringFieldUpdateOperationsInput | string
     email?: StringFieldUpdateOperationsInput | string
     provider?: Enumuser_identity_providerFieldUpdateOperationsInput | $Enums.user_identity_provider
-    hash?: StringFieldUpdateOperationsInput | string
+    hash?: NullableStringFieldUpdateOperationsInput | string | null
     is_verified?: BoolFieldUpdateOperationsInput | boolean
     verification_token?: NullableStringFieldUpdateOperationsInput | string | null
     verification_token_expiration?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
@@ -3758,7 +3733,7 @@ export namespace Prisma {
   }
 
   export type userCountOrderByAggregateInput = {
-    username?: SortOrder
+    id?: SortOrder
     email?: SortOrder
     full_name?: SortOrder
     birth_date?: SortOrder
@@ -3776,7 +3751,7 @@ export namespace Prisma {
   }
 
   export type userMaxOrderByAggregateInput = {
-    username?: SortOrder
+    id?: SortOrder
     email?: SortOrder
     full_name?: SortOrder
     birth_date?: SortOrder
@@ -3794,7 +3769,7 @@ export namespace Prisma {
   }
 
   export type userMinOrderByAggregateInput = {
-    username?: SortOrder
+    id?: SortOrder
     email?: SortOrder
     full_name?: SortOrder
     birth_date?: SortOrder
@@ -3905,8 +3880,7 @@ export namespace Prisma {
   }
 
   export type user_identityCountOrderByAggregateInput = {
-    username?: SortOrder
-    external_id?: SortOrder
+    id?: SortOrder
     email?: SortOrder
     provider?: SortOrder
     hash?: SortOrder
@@ -3922,8 +3896,7 @@ export namespace Prisma {
   }
 
   export type user_identityMaxOrderByAggregateInput = {
-    username?: SortOrder
-    external_id?: SortOrder
+    id?: SortOrder
     email?: SortOrder
     provider?: SortOrder
     hash?: SortOrder
@@ -3939,8 +3912,7 @@ export namespace Prisma {
   }
 
   export type user_identityMinOrderByAggregateInput = {
-    username?: SortOrder
-    external_id?: SortOrder
+    id?: SortOrder
     email?: SortOrder
     provider?: SortOrder
     hash?: SortOrder
@@ -4227,10 +4199,9 @@ export namespace Prisma {
   }
 
   export type user_identityCreateWithoutUserInput = {
-    external_id: string
     email: string
     provider: $Enums.user_identity_provider
-    hash: string
+    hash?: string | null
     is_verified?: boolean
     verification_token?: string | null
     verification_token_expiration?: Date | string | null
@@ -4243,10 +4214,9 @@ export namespace Prisma {
   }
 
   export type user_identityUncheckedCreateWithoutUserInput = {
-    external_id: string
     email: string
     provider: $Enums.user_identity_provider
-    hash: string
+    hash?: string | null
     is_verified?: boolean
     verification_token?: string | null
     verification_token_expiration?: Date | string | null
@@ -4275,10 +4245,9 @@ export namespace Prisma {
   }
 
   export type user_identityUpdateWithoutUserInput = {
-    external_id?: StringFieldUpdateOperationsInput | string
     email?: StringFieldUpdateOperationsInput | string
     provider?: Enumuser_identity_providerFieldUpdateOperationsInput | $Enums.user_identity_provider
-    hash?: StringFieldUpdateOperationsInput | string
+    hash?: NullableStringFieldUpdateOperationsInput | string | null
     is_verified?: BoolFieldUpdateOperationsInput | boolean
     verification_token?: NullableStringFieldUpdateOperationsInput | string | null
     verification_token_expiration?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
@@ -4291,10 +4260,9 @@ export namespace Prisma {
   }
 
   export type user_identityUncheckedUpdateWithoutUserInput = {
-    external_id?: StringFieldUpdateOperationsInput | string
     email?: StringFieldUpdateOperationsInput | string
     provider?: Enumuser_identity_providerFieldUpdateOperationsInput | $Enums.user_identity_provider
-    hash?: StringFieldUpdateOperationsInput | string
+    hash?: NullableStringFieldUpdateOperationsInput | string | null
     is_verified?: BoolFieldUpdateOperationsInput | boolean
     verification_token?: NullableStringFieldUpdateOperationsInput | string | null
     verification_token_expiration?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
@@ -4307,7 +4275,7 @@ export namespace Prisma {
   }
 
   export type userCreateWithoutUser_identityInput = {
-    username: string
+    id: string
     email: string
     full_name?: string | null
     birth_date?: Date | string | null
@@ -4325,7 +4293,7 @@ export namespace Prisma {
   }
 
   export type userUncheckedCreateWithoutUser_identityInput = {
-    username: string
+    id: string
     email: string
     full_name?: string | null
     birth_date?: Date | string | null
@@ -4359,7 +4327,7 @@ export namespace Prisma {
   }
 
   export type userUpdateWithoutUser_identityInput = {
-    username?: StringFieldUpdateOperationsInput | string
+    id?: StringFieldUpdateOperationsInput | string
     email?: StringFieldUpdateOperationsInput | string
     full_name?: NullableStringFieldUpdateOperationsInput | string | null
     birth_date?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
@@ -4377,7 +4345,7 @@ export namespace Prisma {
   }
 
   export type userUncheckedUpdateWithoutUser_identityInput = {
-    username?: StringFieldUpdateOperationsInput | string
+    id?: StringFieldUpdateOperationsInput | string
     email?: StringFieldUpdateOperationsInput | string
     full_name?: NullableStringFieldUpdateOperationsInput | string | null
     birth_date?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null

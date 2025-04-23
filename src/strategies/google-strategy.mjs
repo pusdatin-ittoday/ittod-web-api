@@ -3,65 +3,66 @@ import { Strategy } from "passport-google-oauth20";
 import "@dotenvx/dotenvx/config";
 import prisma from "../prisma.mjs";
 
+passport.serializeUser((user, done) => done(null, user.id));
+
+passport.deserializeUser(async (id, done) => {
+    try {
+        const [user] = await prisma.$queryRaw`
+            SELECT * FROM user WHERE id = ${id} LIMIT 1
+        `;
+        if (!user) throw new Error("User not found");
+        done(null, user);
+    } catch (err) {
+        done(err, null);
+    }
+});
+
 export default passport.use(
     new Strategy(
         {
             clientID: process.env.GOOGLE_CLIENT_ID,
             clientSecret: process.env.GOOGLE_CLIENT_SECRET,
             callbackURL: "http://localhost:3000/api/auth/google/redirect",
-            passReqToCallback: true,
         },
         async (accessToken, refreshToken, profile, done) => {
-            let findUser;
-            try {
-                findUser = await prisma.user_identity.findUnique({
-                    where: { external_id: profile.id },
-                });
-            } catch (e) {
-                return done(e, null);
-            }
+            const externalId = profile.id;
+            const email = profile.emails?.[0]?.value;
+            const fullName = profile.displayName ?? null;
+            const provider = "google";
+
+            if (!email) return done(new Error("Email is required."), null);
 
             try {
-                if (!findUser) {
-                    const email =
-                        profile.emails && profile.emails[0]
-                            ? profile.emails[0].value
-                            : null;
-                    if (!email) {
-                        return done(
-                            new Error(
-                                "Email is required but not provided by Google."
-                            ),
-                            null
-                        );
-                    }
+                const [identity] = await prisma.$queryRaw`
+                    SELECT * FROM user_identity WHERE id = ${externalId} LIMIT 1
+                `;
 
-                    const username = profile.id;
-                    const provider = "google";
-
-                    await prisma.user.upsert({
-                        where: { username },
-                        update: {},
-                        create: {
-                            username,
-                            email,
-                        },
-                    });
-
-                    const newUser = await prisma.user_identity.create({
-                        data: {
-                            username,
-                            external_id: profile.id,
-                            email,
-                            provider,
-                        },
-                    });
-                    return done(null, newUser);
+                if (identity) {
+                    const [user] = await prisma.$queryRaw`
+                        SELECT * FROM user WHERE id = ${identity.id} LIMIT 1
+                    `;
+                    return done(null, user);
                 }
-                return done(null, findUser);
-            } catch (e) {
-                console.log(e);
-                return done(e, null);
+
+                // Create user
+                await prisma.$executeRaw`
+                    INSERT INTO user (id, email, full_name)
+                    VALUES (${externalId}, ${email}, ${fullName})
+                `;
+
+                // Create identity
+                await prisma.$executeRaw`
+                    INSERT INTO user_identity (id, email, provider, hash)
+                    VALUES (${externalId}, ${email}, ${provider}, NULL)
+                `;
+
+                const [newUser] = await prisma.$queryRaw`
+                    SELECT * FROM user WHERE id = ${externalId} LIMIT 1
+                `;
+                return done(null, newUser);
+            } catch (err) {
+                console.error("OAuth error:", err);
+                return done(err, null);
             }
         }
     )

@@ -1,20 +1,22 @@
-// noinspection JSCheckFunctionSignatures
-
 import { Router } from "express";
 import passport from "passport";
-
+import { validateLogin } from "../middleware/authMiddleware.mjs";
+import googleStrategy from "../strategies/google-strategy.mjs";
 const authRouter = Router();
 
+authRouter.post("api/auth/login", validateLogin, (req, res) => {
+    res.status(200).send("Login successful");
+});
+
 authRouter.get(
-    "/auth/google",
+    "/api/auth/google",
     passport.authenticate("google", { scope: ["profile", "email"] })
 );
 
 authRouter.get(
-    "/auth/google/redirect",
+    "/api/auth/google/redirect",
     passport.authenticate("google", { failureRedirect: "/login" }),
     (req, res) => {
-        // Successful authentication
         res.redirect("/");
     }
 );
@@ -28,4 +30,11 @@ authRouter.get("/logout", (req, res) => {
     });
 });
 
+authRouter.get(
+    "/api/auth/google/redirect",
+    passport.authenticate("google", { failureRedirect: "/login" }),
+    (req, res) => {
+        res.sendStatus(200);
+    }
+);
 export default authRouter;

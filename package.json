@@ -4,7 +4,7 @@
     "main": "index.js",
     "scripts": {
         "test": "echo \"Error: no test specified\" && exit 1",
-        "serve:dev": "nodemon src/server.mjs",
+        "dev": "nodemon src/server.mjs",
         "serve": "node src/server.mjs",
         "format": "prettier --write ."
     },

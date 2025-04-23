@@ -6,4 +6,8 @@ const router = Router();
 router.use(authRouter);
 router.use(usersRouter);
 
+router.get("/", (req, res) => {
+    res.status(200).send("OK");
+});
+
 export default router;
