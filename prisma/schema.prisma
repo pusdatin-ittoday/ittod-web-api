@@ -13,7 +13,7 @@ model user {
   email                    String          @unique(map: "unique_email", length: 255) @db.Text
   full_name                String?         @db.Text
   birth_date               DateTime?       @db.Date
-  education                user_education?
+  education                String?         @db.Text
   entry_source             String?         @db.Text
   instance                 String?         @db.Text
   phone_number             String?         @db.Text
@@ -50,17 +50,8 @@ enum user_identity_provider {
   github
 }
 
-enum user_education {
-  SMA
-  D3
-  S1
-  S2
-  S3
-  Lainnya
-}
-
 enum user_identity_role {
   user
   admin
-  superadmin
 }
+
