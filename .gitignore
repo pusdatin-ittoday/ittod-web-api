@@ -153,3 +153,5 @@ build/
 .vscode/
 .idea/
 *.iml
+
+public/uploads
