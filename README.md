@@ -31,6 +31,7 @@ DATABASE_URL=mysql:xxxx
 SECRET_KEY_SESSION=xxxx 
 GOOGLE_CLIENT_SECRET=xxxx
 GOOGLE_CLIENT_ID=xxxx
+GOOGLE_REDIRECT=https://xxxx
 ```
 Save .env to project root folder
 #### 5. Configure Prisma
