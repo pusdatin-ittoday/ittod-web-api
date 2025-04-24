@@ -44,7 +44,7 @@ enum media_type_enum {
 }
 
 model competition {
-  id               String   @id 
+  id               String   @id
   title            String   @db.Text
   description      String   @db.Text
   max_team_member  Int      @default(3)
@@ -57,9 +57,9 @@ model competition {
 }
 
 model competition_announcement {
-  id             String     @id 
-  competition_id String     
-  author_id      String     
+  id             String     @id
+  competition_id String
+  author_id      String
   title          String     @db.Text
   description    String     @db.Text
   created_at     DateTime   @default(now())
@@ -70,22 +70,22 @@ model competition_announcement {
 }
 
 model competition_submission {
-  team_id        String     
-  competition_id String     
+  team_id        String
+  competition_id String
   media_id       String     @unique
   created_at     DateTime   @default(now())
   updated_at     DateTime?  @updatedAt
 
   team        team        @relation(fields: [team_id], references: [id])
   competition competition @relation(fields: [competition_id], references: [id])
-  media       media       @relation(fields: [media_id], references: [id]) 
+  media       media       @relation(fields: [media_id], references: [id])
 
   @@id ([team_id, competition_id])
 }
 
 model competition_timeline {
-  id                 String     @id 
-  competition_id     String     
+  id                 String     @id
+  competition_id     String
   title              String     @db.Text
   date               DateTime
 
@@ -93,8 +93,8 @@ model competition_timeline {
 }
 
 model media {
-  id          String   @id 
-  uploader_id String   
+  id          String   @id
+  uploader_id String
   name        String   @unique
   grouping    media_grouping_enum?
   type        media_type_enum
@@ -102,16 +102,16 @@ model media {
   created_at  DateTime @default(now())
 
   uploader    user     @relation(fields: [uploader_id], references: [id])
-  
-  paymentproof team_member?
+
+  paymentproof team_member? @relation("paymentProof")
   twibbon      team_member? @relation("twibbon")
   kartu        team_member? @relation("kartu-mahasiswa")
   submission   competition_submission?
 }
 
 model team {
-  id                     String   @id 
-  competition_id         String   
+  id                     String   @id
+  competition_id         String
   team_name              String   @db.Text
   team_code              String   @unique
   is_verified            Boolean  @default(false)
@@ -126,8 +126,8 @@ model team {
 }
 
 model team_member {
-  user_id                 String                  
-  team_id                 String                  
+  user_id                 String
+  team_id                 String
   role                    team_member_role_enum
   kartu_media_id          String?                 @unique
   twibbon_media_id        String?                 @unique
@@ -135,7 +135,7 @@ model team_member {
   is_verified             Boolean                 @default(false)
   verification_error      String?                 @db.Text
 
-  paymentProof  media?  @relation(fields: [payment_proof_media_id], references: [id])
+  paymentProof  media?  @relation("paymentProof", fields: [payment_proof_media_id], references: [id])
   user          user  @relation(fields: [user_id], references: [id])
   team          team  @relation(fields: [team_id], references: [id])
   twibbon       media? @relation("twibbon", fields: [twibbon_media_id], references: [id])
@@ -145,7 +145,7 @@ model team_member {
 }
 
 model user {
-  id                        String   @id 
+  id                        String   @id
   email                     String   @unique
   full_name                 String?
   birth_date                DateTime?
@@ -164,11 +164,11 @@ model user {
   uploaded                  media[]
   identity                  user_identity?
   announcements             competition_announcement[]
-  member                    team_member[] 
+  member                    team_member[]
 }
 
 model user_identity {
-  id                                  String   @id 
+  id                                  String   @id
   email                               String   @unique
   provider                            user_identity_provider_enum
   hash                                String
@@ -178,7 +178,7 @@ model user_identity {
   password_recovery_token             String?
   password_recovery_token_expiration  DateTime?
   refresh_token                       String?
-  role                                user_identity_role_enum? 
+  role                                user_identity_role_enum?
   created_at                          DateTime @default(now())
   updated_at                          DateTime? @updatedAt
 
