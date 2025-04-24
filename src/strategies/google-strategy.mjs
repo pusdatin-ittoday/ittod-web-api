@@ -22,7 +22,7 @@ export default passport.use(
         {
             clientID: process.env.GOOGLE_CLIENT_ID,
             clientSecret: process.env.GOOGLE_CLIENT_SECRET,
-            callbackURL: "http://localhost:3000/api/auth/google/redirect",
+            callbackURL: process.env.GOOGLE_REDIRECT,
         },
         async (accessToken, refreshToken, profile, done) => {
             const externalId = profile.id;
