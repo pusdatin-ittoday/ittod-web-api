@@ -64,6 +64,7 @@ _More endpoints will be added soon._
 ---
 
 ## 🗺️ Entity Relationship Diagram
+
 ![ERD ITTODAY 2025](https://github.com/user-attachments/assets/fe28b0cc-7612-4428-9c02-779fb133d91f)
 
 ---
@@ -76,6 +77,7 @@ _More endpoints will be added soon._
 - **Prisma ORM**
 - **Supabase** (for object storage)
 - **Prettier** (as linter)
+
 ---
 
 ## 📄 License
@@ -91,11 +93,7 @@ This project is licensed under the [MIT License](LICENSE).
 ```
 - Walid Nadirul ahnaf
 - Aldi Pramudya
-- Ilham Edgar Maulana Goesasi 
+- Ilham Edgar Maulana Goesasi
 - Qois Firosi
 - Jeremy Tjahjana
 ```
-
-
-
-

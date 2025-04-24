@@ -23,7 +23,13 @@ lib-cov
 # Coverage directory used by tools like istanbul
 coverage
 *.lcov
+# Ignore Prisma environment files and app
+prisma/.env
+prisma/app
 
+# Do not ignore schema and migrations
+!prisma/schema.prisma
+!prisma/migrations/
 # nyc test coverage
 .nyc_output
 

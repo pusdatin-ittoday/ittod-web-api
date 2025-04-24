@@ -1,5 +1,6 @@
 generator client {
   provider = "prisma-client-js"
+  output   = "app/generated/prisma/client"
 }
 
 datasource db {
@@ -7,161 +8,50 @@ datasource db {
   url      = env("DATABASE_URL")
 }
 
-
-enum team_member_role_renum {
-  leader
-  member
-}
-
-enum user_identity_provider_enum {
-  google
-  basic
-}
-
-enum user_identity_role_enum {
-  admin
-  user
-}
-
-enum media_grouping_enum {
-  payments
-  competition_submission
-  twibbon
-}
-
-enum media_type_enum {
-  image
-  pdf
-}
-
-model competition {
-  id               String                @id @db.Text
-  title            String                @db.Text
-  description      String                @db.Text
-  max_participants Int
-  max_team_member  Int
-  guide_book_url   String?              @db.Text
-  announcements    competition_announcement[]
-  submissions      competition_submission[]
-  timelines        competition_timeline[]
-  teams            team[]
-}
-
-model competition_announcement {
-  id             String     @id @db.Text
-  competition_id String     @db.Text
-  author_id      String     @db.Text
-  title          String     @db.Text
-  description    String     @db.Text
-  created_at     DateTime   @default(now())
-  updated_at     DateTime?
-
-  competition competition @relation(fields: [competition_id], references: [id])
-  author      user        @relation(fields: [author_id], references: [id])
-}
-
-model competition_submission {
-  team_id        String
-  competition_id String
-  media_id       String
-  created_at     DateTime   @default(now())
-  updated_at     DateTime?
-
-  team        user        @relation(fields: [team_id], references: [id])
-  competition competition @relation(fields: [competition_id], references: [id])
-  media       media       @relation(fields: [media_id], references: [id])
-
-  @@id([team_id, type])
-}
-
-model competition_timeline {
-  id                 String     @id @db.Text
-  competition_id     String     @db.Text
-  title              String     @db.Text
-  date               DateTime
-
-  competition competition @relation(fields: [competition_id], references: [id])
-}
-
-model media {
-  id         String   @id @db.Text
-  creator_id String   @db.Text
-  name       String   @unique
-  grouping   media_grouping_enum
-  type       media_type_enum
-  url        String
-  created_at DateTime @default(now())
-
-  // Relations will be defined by referencing models
-}
-
-model team {
-  id                     String   @id @db.Text
-  competition_id         String   @db.Text
-  team_name              String   @db.Text
-  team_code              String   @unique
-  payment_proof_media_id String?  @db.Text
-  is_verified            Boolean  @default(false)
-  verification_error     String?  @db.Text
-  created_at             DateTime @default(now())
-  updated_at             DateTime?
-
-  competition competition @relation(fields: [competition_id], references: [id])
-  paymentProof media?     @relation("TeamPaymentProof", fields: [payment_proof_media_id], references: [id])
-  members      team_member[]
-}
-
-model team_member {
-  user_id             String
-  team_id             String
-  role                team_member_role_renum
-  kartu_media_id      String? @db.Text
-  twibbon_media_id    String? @db.Text
-  is_verified         Boolean @default(false)
-  verification_error  String? @db.Text
-
-  user     user  @relation(fields: [user_id], references: [id])
-  team     team  @relation(fields: [team_id], references: [id])
-  twibbon  media? @relation("TwibbonMedia", fields: [twibbon_media_id], references: [id])
-
-  @@id([user_id, team_id])
-}
-
 model user {
-  id                        String   @id @db.Text
-  email                     String   @unique
-  full_name                 String?
-  birth_date                DateTime?
-  entry_source              String?
-  instance                  String?
-  phone_number              String?
-  id_line                   String?
-  id_discord                String?
-  id_instagram              String?
-  consent                   Boolean  @default(false)
-  is_registration_complete  Boolean  @default(false)
-  created_at                DateTime @default(now())
-  updated_at                DateTime?
-
-  identity                  user_identity?
-  announcements             competition_announcement[] user_identity_provider_enum@relation("UserAnnouncements")
-  submissions               competition_submission[] @relation("UserSubmissions")
+  id                       String          @id @db.VarChar(36)
+  email                    String          @unique(map: "unique_email", length: 255) @db.Text
+  full_name                String?         @db.Text
+  birth_date               DateTime?       @db.Date
+  education                String?         @db.Text
+  entry_source             String?         @db.Text
+  instance                 String?         @db.Text
+  phone_number             String?         @db.Text
+  id_line                  String?         @db.Text
+  id_discord               String?         @db.Text
+  id_instagram             String?         @db.Text
+  consent                  Boolean         @default(false)
+  is_registration_complete Boolean         @default(false)
+  created_at               DateTime?       @default(dbgenerated("(now())")) @db.Timestamp(0)
+  updated_at               DateTime?       @default(dbgenerated("(now())")) @db.Timestamp(0)
+  user_identity            user_identity?
 }
 
 model user_identity {
-  id                                  String   @id @db.Text
-  email                               String   @unique
-  provider                            
-  hash                                String
-  is_verified                         Boolean  @default(false)
-  verification_token                  String
-  verification_token_expiration       DateTime
-  password_recovery_token             String?
-  password_recovery_token_expiration  DateTime?
-  refresh_token                       String?
-  role                                user_identity_role_enum @default(user)
-  created_at                          DateTime @default(now())
-  updated_at                          DateTime?
+  id                                 String                 @id @db.VarChar(36)
+  email                              String                 @unique(map: "unique_email", length: 255) @db.Text
+  provider                           user_identity_provider
+  hash                               String?                @db.Text
+  is_verified                        Boolean                @default(false)
+  verification_token                 String?                @db.Text
+  verification_token_expiration      DateTime?              @db.Timestamp(0)
+  password_recovery_token            String?                @db.Text
+  password_recovery_token_expiration DateTime?              @db.Timestamp(0)
+  refresh_token                      String?                @db.Text
+  role                               user_identity_role     @default(user)
+  created_at                         DateTime?              @default(dbgenerated("(now())")) @db.Timestamp(0)
+  updated_at                         DateTime?              @default(dbgenerated("(now())")) @db.Timestamp(0)
+  user                               user                   @relation(fields: [id], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "user_identity_ibfk_1")
+}
 
-  user user @relation(fields: [id], references: [id])
-} 
+enum user_identity_provider {
+  email
+  google
+  github
+}
+
+enum user_identity_role {
+  user
+  admin
+}
+
