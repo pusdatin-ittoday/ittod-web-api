@@ -117,14 +117,79 @@ exports.Prisma.TransactionIsolationLevel = makeStrictEnum({
   Serializable: 'Serializable'
 });
 
+exports.Prisma.CompetitionScalarFieldEnum = {
+  id: 'id',
+  title: 'title',
+  description: 'description',
+  max_team_member: 'max_team_member',
+  guide_book_url: 'guide_book_url'
+};
+
+exports.Prisma.Competition_announcementScalarFieldEnum = {
+  id: 'id',
+  competition_id: 'competition_id',
+  author_id: 'author_id',
+  title: 'title',
+  description: 'description',
+  created_at: 'created_at',
+  updated_at: 'updated_at'
+};
+
+exports.Prisma.Competition_submissionScalarFieldEnum = {
+  team_id: 'team_id',
+  competition_id: 'competition_id',
+  media_id: 'media_id',
+  created_at: 'created_at',
+  updated_at: 'updated_at'
+};
+
+exports.Prisma.Competition_timelineScalarFieldEnum = {
+  id: 'id',
+  competition_id: 'competition_id',
+  title: 'title',
+  date: 'date'
+};
+
+exports.Prisma.MediaScalarFieldEnum = {
+  id: 'id',
+  uploader_id: 'uploader_id',
+  name: 'name',
+  grouping: 'grouping',
+  type: 'type',
+  url: 'url',
+  created_at: 'created_at'
+};
+
+exports.Prisma.TeamScalarFieldEnum = {
+  id: 'id',
+  competition_id: 'competition_id',
+  team_name: 'team_name',
+  team_code: 'team_code',
+  is_verified: 'is_verified',
+  verification_error: 'verification_error',
+  created_at: 'created_at',
+  updated_at: 'updated_at'
+};
+
+exports.Prisma.Team_memberScalarFieldEnum = {
+  user_id: 'user_id',
+  team_id: 'team_id',
+  role: 'role',
+  kartu_media_id: 'kartu_media_id',
+  twibbon_media_id: 'twibbon_media_id',
+  payment_proof_media_id: 'payment_proof_media_id',
+  is_verified: 'is_verified',
+  verification_error: 'verification_error'
+};
+
 exports.Prisma.UserScalarFieldEnum = {
   id: 'id',
   email: 'email',
   full_name: 'full_name',
   birth_date: 'birth_date',
-  education: 'education',
+  pendidikan: 'pendidikan',
+  nama_sekolah: 'nama_sekolah',
   entry_source: 'entry_source',
-  instance: 'instance',
   phone_number: 'phone_number',
   id_line: 'id_line',
   id_discord: 'id_discord',
@@ -156,17 +221,68 @@ exports.Prisma.SortOrder = {
   desc: 'desc'
 };
 
+exports.Prisma.competitionOrderByRelevanceFieldEnum = {
+  id: 'id',
+  title: 'title',
+  description: 'description',
+  guide_book_url: 'guide_book_url'
+};
+
+exports.Prisma.competition_announcementOrderByRelevanceFieldEnum = {
+  id: 'id',
+  competition_id: 'competition_id',
+  author_id: 'author_id',
+  title: 'title',
+  description: 'description'
+};
+
 exports.Prisma.NullsOrder = {
   first: 'first',
   last: 'last'
+};
+
+exports.Prisma.competition_submissionOrderByRelevanceFieldEnum = {
+  team_id: 'team_id',
+  competition_id: 'competition_id',
+  media_id: 'media_id'
+};
+
+exports.Prisma.competition_timelineOrderByRelevanceFieldEnum = {
+  id: 'id',
+  competition_id: 'competition_id',
+  title: 'title'
+};
+
+exports.Prisma.mediaOrderByRelevanceFieldEnum = {
+  id: 'id',
+  uploader_id: 'uploader_id',
+  name: 'name',
+  url: 'url'
+};
+
+exports.Prisma.teamOrderByRelevanceFieldEnum = {
+  id: 'id',
+  competition_id: 'competition_id',
+  team_name: 'team_name',
+  team_code: 'team_code',
+  verification_error: 'verification_error'
+};
+
+exports.Prisma.team_memberOrderByRelevanceFieldEnum = {
+  user_id: 'user_id',
+  team_id: 'team_id',
+  kartu_media_id: 'kartu_media_id',
+  twibbon_media_id: 'twibbon_media_id',
+  payment_proof_media_id: 'payment_proof_media_id',
+  verification_error: 'verification_error'
 };
 
 exports.Prisma.userOrderByRelevanceFieldEnum = {
   id: 'id',
   email: 'email',
   full_name: 'full_name',
+  nama_sekolah: 'nama_sekolah',
   entry_source: 'entry_source',
-  instance: 'instance',
   phone_number: 'phone_number',
   id_line: 'id_line',
   id_discord: 'id_discord',
@@ -181,28 +297,49 @@ exports.Prisma.user_identityOrderByRelevanceFieldEnum = {
   password_recovery_token: 'password_recovery_token',
   refresh_token: 'refresh_token'
 };
-exports.user_education = exports.$Enums.user_education = {
-  SMA: 'SMA',
-  D3: 'D3',
-  S1: 'S1',
-  S2: 'S2',
-  S3: 'S3',
-  Lainnya: 'Lainnya'
+exports.media_grouping_enum = exports.$Enums.media_grouping_enum = {
+  payments: 'payments',
+  dokum_tahun_lalu: 'dokum_tahun_lalu',
+  competition_submission: 'competition_submission',
+  twibbon: 'twibbon'
 };
 
-exports.user_identity_provider = exports.$Enums.user_identity_provider = {
-  email: 'email',
+exports.media_type_enum = exports.$Enums.media_type_enum = {
+  image: 'image',
+  pdf: 'pdf'
+};
+
+exports.team_member_role_enum = exports.$Enums.team_member_role_enum = {
+  leader: 'leader',
+  member: 'member'
+};
+
+exports.education_enum = exports.$Enums.education_enum = {
+  sma: 'sma',
+  s1: 's1',
+  d3: 'd3',
+  d4: 'd4'
+};
+
+exports.user_identity_provider_enum = exports.$Enums.user_identity_provider_enum = {
   google: 'google',
+  basic: 'basic',
   github: 'github'
 };
 
-exports.user_identity_role = exports.$Enums.user_identity_role = {
-  user: 'user',
+exports.user_identity_role_enum = exports.$Enums.user_identity_role_enum = {
   admin: 'admin',
-  superadmin: 'superadmin'
+  user: 'user'
 };
 
 exports.Prisma.ModelName = {
+  competition: 'competition',
+  competition_announcement: 'competition_announcement',
+  competition_submission: 'competition_submission',
+  competition_timeline: 'competition_timeline',
+  media: 'media',
+  team: 'team',
+  team_member: 'team_member',
   user: 'user',
   user_identity: 'user_identity'
 };
