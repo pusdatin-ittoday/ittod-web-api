@@ -2,6 +2,7 @@ import passport from "passport";
 import { Strategy } from "passport-google-oauth20";
 import "@dotenvx/dotenvx/config";
 import prisma from "../prisma.mjs";
+import { v4 as uuidv4 } from "uuid";
 
 passport.serializeUser((user, done) => done(null, user.id));
 
@@ -33,33 +34,45 @@ export default passport.use(
             if (!email) return done(new Error("Email is required."), null);
 
             try {
-                const [identity] = await prisma.$queryRaw`
-                    SELECT * FROM user_identity WHERE id = ${externalId} LIMIT 1
-                `;
+                // Use Prisma's upsert to handle both create and update cases
+                const user = await prisma.user.upsert({
+                    where: { id: externalId },
+                    update: {
+                        email,
+                        full_name: fullName,
+                    },
+                    create: {
+                        id: externalId,
+                        email,
+                        full_name: fullName,
+                    },
+                });
 
-                if (identity) {
-                    const [user] = await prisma.$queryRaw`
-                        SELECT * FROM user WHERE id = ${identity.id} LIMIT 1
-                    `;
-                    return done(null, user);
-                }
+                // Create or update identity with verification token
+                const userIdentity = await prisma.user_identity.upsert({
+                    where: {
+                        id: externalId,
+                    },
+                    update: {
+                        email,
+                        provider: "google",
+                    },
+                    create: {
+                        id: externalId,
+                        email,
+                        provider: "google",
+                        hash: null,
+                        verification_token: uuidv4(),
+                        verification_token_expiration: new Date(Date.now() + 24 * 60 * 60 * 1000), // 24 hours from now
+                        user: {
+                            connect: {
+                                id: externalId
+                            }
+                        }
+                    },
+                });
 
-                // Create user
-                await prisma.$executeRaw`
-                    INSERT INTO user (id, email, full_name)
-                    VALUES (${externalId}, ${email}, ${fullName})
-                `;
-
-                // Create identity
-                await prisma.$executeRaw`
-                    INSERT INTO user_identity (id, email, provider, hash)
-                    VALUES (${externalId}, ${email}, ${provider}, NULL)
-                `;
-
-                const [newUser] = await prisma.$queryRaw`
-                    SELECT * FROM user WHERE id = ${externalId} LIMIT 1
-                `;
-                return done(null, newUser);
+                return done(null, user);
             } catch (err) {
                 console.error("OAuth error:", err);
                 return done(err, null);
