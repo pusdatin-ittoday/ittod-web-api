@@ -1,24 +1,46 @@
 # IT-TODAY Backend API
 
-A RESTful backend service for the IT-TODAY 2025 platform, built with **Node.js**, **Express.js**, **PostgreSQL**, and **Prisma ORM**. This API handles user data, products, and other endpoints related to the IT-TODAY event.
+A RESTful backend service for the IT-TODAY 2025 platform, built with **Node.js**, **Express.js**, **MySQL**, and **Prisma ORM**. This API handles user data, products, and other endpoints related to the IT-TODAY event.
 
 ---
 
 ## 🚀 Installation
 
-Follow these steps to set up the project locally:
+Follow these steps to set up the project locally: 
 
+
+#### 1. Clone the repository
 ```bash
-# 1. Clone the repository
 git clone <repository-url>
+```
 
-# 2. Navigate to the project directory
+#### 2. Navigate to the project directory
+```bash
 cd <project-directory>
+```
 
-# 3. Install dependencies
+#### 3. Install dependencies
+```bash
 npm install
 ```
 
+#### 4. Configure .env
+Google client id is necessary for this step. For more details visit: https://developers.google.com/identity/protocols/oauth2
+```bash
+DATABASE_URL=mysql:xxxx  
+SECRET_KEY_SESSION=xxxx 
+GOOGLE_CLIENT_SECRET=xxxx
+GOOGLE_CLIENT_ID=xxxx
+```
+Save .env to project root folder
+#### 5. Configure Prisma
+Asumption: Empty database
+```bash
+npx prisma generate       # generates the Prisma client
+npx prisma migrate dev    # runs migrations and creates the database
+# or if you're not using migrations:
+npx prisma db push        # pushes the schema to the database without migrations
+```
 ---
 
 ## 🧪 Usage
@@ -32,7 +54,7 @@ npm run dev
 Or start the production build:
 
 ```bash
-npm start
+npm run serve
 ```
 
 Access the API at:  
@@ -73,7 +95,7 @@ _More endpoints will be added soon._
 
 - **Node.js**
 - **Express.js**
-- **PostgreSQL**
+- **MySQL**
 - **Prisma ORM**
 - **Supabase** (for object storage)
 - **Prettier** (as linter)
