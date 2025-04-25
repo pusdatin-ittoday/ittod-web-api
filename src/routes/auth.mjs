@@ -3,11 +3,15 @@
 import { Router } from "express";
 import passport from "passport";
 import { validateLogin } from "../middleware/authMiddleware.mjs";
+import { validateRegister } from "../middleware/registerValidationMiddleware.mjs";
 import preventLoginIfAuthenticated from "../middleware/preventLoginIfAuthenticated.mjs";
 import googleStrategy from "../strategies/google-strategy.mjs";
-import LocalStrategy from "../strategies/local-strategy.mjs"
+import LocalStrategy from "../strategies/local-strategy.mjs";
+import { register, verifyEmail } from "../controllers/auth.controller.mjs";
+
 const authRouter = Router();
 
+authRouter.post("/api/auth/register", validateRegister, register);
 authRouter.post(
     "/api/auth/login",
     preventLoginIfAuthenticated,
@@ -17,6 +21,8 @@ authRouter.post(
         res.status(200).send("Login successful");
     }
 );
+
+authRouter.get("/api/auth/verify", verifyEmail);
 
 authRouter.get(
     "/api/auth/google",
