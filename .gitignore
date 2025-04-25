@@ -9,13 +9,11 @@ node_modules/
 .env.local
 
 # Prisma-related files
-prisma/.env
-prisma/app/*
-prisma/app/generated/
+prisma/app
 
 # Build output
 dist/
 build/
 
 # Public uploads
-public/uploads
+public/uploads!/prisma/app/
