@@ -147,7 +147,7 @@ model team_member {
 model user {
   id                       String          @id
   email                    String          @unique
-  full_name                String?
+  full_name                String
   birth_date               DateTime?
   pendidikan               education_enum?
   nama_sekolah             String?
