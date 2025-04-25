@@ -10,7 +10,7 @@ node_modules/
 
 # Prisma-related files
 prisma/.env
-prisma/app
+prisma/app/*
 prisma/app/generated/
 
 # Build output
