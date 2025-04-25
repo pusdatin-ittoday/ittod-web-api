@@ -15,10 +15,9 @@ class PrismaSessionStore extends session.Store {
 
     async touch(sid, session, callback) {
         try {
-            const expires =
-                session.cookie && session.cookie.expires
-                    ? new Date(session.cookie.expires)
-                    : new Date(Date.now() + 24 * 60 * 60 * 1000); // Default to 1 day if expires is invalid
+            const expires = session.cookie?.expires
+                ? new Date(session.cookie.expires)
+                : new Date(Date.now() + 24 * 60 * 60 * 1000); // Default to 1 day if expires is invalid
             await prisma.session.update({
                 where: { id: sid },
                 data: { expires },
