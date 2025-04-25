@@ -199,7 +199,7 @@ model user_identity {
 model Session {
   id      String   @id @default(cuid())
   expires DateTime
-  data    String
+  data    Json
 
   @@map("sessions") // Match the table name created by express-mysql-session
 }
