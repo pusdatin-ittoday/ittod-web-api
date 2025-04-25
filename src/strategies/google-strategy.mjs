@@ -35,29 +35,30 @@ export default passport.use(
                 const identity = await prisma.user_identity.findUnique({
                     where: {
                         id: externalId,
-                        provider: provider
+                        provider: provider,
                     },
                     include: { user: true },
-
                 });
                 if (identity) {
                     return done(null, identity.user);
                 }
 
                 const existingUser = await prisma.user.findUnique({
-                    where: {email},
-                })
+                    where: { email },
+                });
 
-                if (existingUser){
+                if (existingUser) {
                     await prisma.user_identity.create({
                         data: {
                             id: existingUser.id,
                             provider,
                             email,
                             hash: null,
-                            verification_token: " ",
-                            verification_token_expiration: new Date(),
-                        }
+                            verification_token: "OAUTH_USER",
+                            verification_token_expiration: new Date(
+                                Date.now() + 100 * 365 * 24 * 60 * 60 * 1000
+                            ),
+                        },
                     });
 
                     return done(null, existingUser);
@@ -72,8 +73,10 @@ export default passport.use(
                                 provider,
                                 email,
                                 hash: null,
-                                verification_token: " ",
-                                verification_token_expiration: new Date(),
+                                verification_token: "OAUTH_USER",
+                                verification_token_expiration: new Date(
+                                    Date.now() + 100 * 365 * 24 * 60 * 60 * 1000
+                                ),
                             },
                         },
                     },
