@@ -2,13 +2,46 @@ import session from "express-session";
 import prisma from "../prisma.mjs";
 
 class PrismaSessionStore extends session.Store {
+    static async deleteExpiredSessions() {
+        try {
+            const now = new Date();
+            await prisma.session.deleteMany({
+                where: { expires: { lt: now } },
+            });
+        } catch (err) {
+            console.error("Failed to clean up expired sessions:", err);
+        }
+    }
+
+    async touch(sid, session, callback) {
+        try {
+            const expires =
+                session.cookie && session.cookie.expires
+                    ? new Date(session.cookie.expires)
+                    : new Date(Date.now() + 24 * 60 * 60 * 1000); // Default to 1 day if expires is invalid
+            await prisma.session.update({
+                where: { id: sid },
+                data: { expires },
+            });
+            callback(null);
+        } catch (err) {
+            callback(err);
+        }
+    }
+
     async get(sid, callback) {
         try {
             const session = await prisma.session.findUnique({
                 where: { id: sid },
             });
             if (!session) return callback(null, null);
-            return callback(null, JSON.parse(session.data));
+            try {
+                return callback(null, JSON.parse(session.data));
+            } catch (err) {
+                return callback(
+                    new Error(`Failed to parse session data: ${err.message}`)
+                );
+            }
         } catch (err) {
             return callback(err);
         }
