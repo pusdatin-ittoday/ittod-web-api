@@ -184,3 +184,10 @@ model user_identity {
 
   user user @relation(fields: [id], references: [id])
 }
+
+model Session {
+  id           String   @id @default(cuid())
+  expires      DateTime
+  data         String
+  @@map("sessions") // Match the table name created by express-mysql-session
+}

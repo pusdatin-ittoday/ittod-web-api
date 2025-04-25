@@ -155,3 +155,4 @@ build/
 *.iml
 
 public/uploads
+prisma/app/generated/
