@@ -28,7 +28,7 @@ passport.use(
                     where: { email },
                 });
                 if (!user || !user.is_verified) return done(null, false);
-                const valid = await argon2.verify(user.password, password);
+                const valid = await argon2.verify(user.hash, password);
                 if (!valid) return done(null, false);
                 return done(null, user);
             } catch (err) {
