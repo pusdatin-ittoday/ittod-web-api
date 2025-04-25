@@ -5,13 +5,14 @@ import passport from "passport";
 import { validateLogin } from "../middleware/authMiddleware.mjs";
 import preventLoginIfAuthenticated from "../middleware/preventLoginIfAuthenticated.mjs";
 import googleStrategy from "../strategies/google-strategy.mjs";
-
+import LocalStrategy from "../strategies/local-strategy.mjs"
 const authRouter = Router();
 
 authRouter.post(
     "/api/auth/login",
     preventLoginIfAuthenticated,
     validateLogin,
+    passport.authenticate("local"),
     (req, res) => {
         res.status(200).send("Login successful");
     }
