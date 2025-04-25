@@ -1,15 +1,5 @@
 import Joi from "joi";
-
-const loginSchema = Joi.object({
-    email: Joi.string().email().required().messages({
-        "string.email": "A valid email is required.",
-        "any.required": "Email is required.",
-    }),
-    password: Joi.string().min(6).required().messages({
-        "string.min": "Password must be at least 6 characters long.",
-        "any.required": "Password is required.",
-    }),
-});
+import loginSchema from "../validators/loginValidationSchema.mjs";
 
 const validateLogin = (req, res, next) => {
     const { error } = loginSchema.validate(req.body, { abortEarly: false });

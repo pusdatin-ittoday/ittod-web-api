@@ -1,6 +1,6 @@
 generator client {
   provider = "prisma-client-js"
- output   = "app/generated/prisma/client"
+  output   = "app/generated/prisma/client"
 }
 
 datasource db {
@@ -171,7 +171,7 @@ model user_identity {
   id                                 String                      @id
   email                              String                      @unique
   provider                           user_identity_provider_enum
-  hash                               String
+  hash                               String?
   is_verified                        Boolean                     @default(false)
   verification_token                 String
   verification_token_expiration      DateTime
@@ -183,4 +183,11 @@ model user_identity {
   updated_at                         DateTime?                   @updatedAt
 
   user user @relation(fields: [id], references: [id])
+}
+
+model Session {
+  id           String   @id @default(cuid())
+  expires      DateTime
+  data         String
+  @@map("sessions") // Match the table name created by express-mysql-session
 }
