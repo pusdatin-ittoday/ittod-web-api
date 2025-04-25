@@ -11,7 +11,7 @@ Follow these steps to set up the project locally:
 
 #### 1. Clone the repository
 ```bash
-git clone [<repository-url>](https://github.com/pusdatin-ittoday/ittod-web-api.git)
+git clone https://github.com/pusdatin-ittoday/ittod-web-api.git
 ```
 
 #### 2. Navigate to the project directory
