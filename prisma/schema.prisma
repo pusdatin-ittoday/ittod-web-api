@@ -1,6 +1,6 @@
 generator client {
   provider = "prisma-client-js"
- output   = "app/generated/prisma/client"
+  output   = "app/generated/prisma/client"
 }
 
 datasource db {
@@ -171,7 +171,7 @@ model user_identity {
   id                                 String                      @id
   email                              String                      @unique
   provider                           user_identity_provider_enum
-  hash                               String
+  hash                               String?
   is_verified                        Boolean                     @default(false)
   verification_token                 String
   verification_token_expiration      DateTime
