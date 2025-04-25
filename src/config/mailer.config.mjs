@@ -5,4 +5,4 @@ export const mailerConfig = [{
         user: process.env.EMAIL_USER,
         pass: process.env.EMAIL_PASS,
     },
-}];
+}]; //will be used later
