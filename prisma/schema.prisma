@@ -3,6 +3,11 @@ generator client {
   output   = "app/generated/prisma/client"
 }
 
+generator dbml {
+  provider = "prisma-dbml-generator"
+  output   = "../docs"
+}
+
 datasource db {
   provider = "mysql"
   url      = env("DATABASE_URL")
