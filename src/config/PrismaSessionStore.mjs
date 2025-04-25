@@ -17,7 +17,7 @@ class PrismaSessionStore extends session.Store {
         try {
             const expires = session.cookie?.expires
                 ? new Date(session.cookie.expires)
-                : new Date(Date.now() + 24 * 60 * 60 * 1000); // Default to 1 day if expires is invalid
+                : new Date(Date.now() + 24 * 60 * 60 * 1000);
             await prisma.session.update({
                 where: { id: sid },
                 data: { expires },
@@ -30,17 +30,11 @@ class PrismaSessionStore extends session.Store {
 
     async get(sid, callback) {
         try {
-            const session = await prisma.session.findUnique({
+            const sessionRecord = await prisma.session.findUnique({
                 where: { id: sid },
             });
-            if (!session) return callback(null, null);
-            try {
-                return callback(null, JSON.parse(session.data));
-            } catch (err) {
-                return callback(
-                    new Error(`Failed to parse session data: ${err.message}`)
-                );
-            }
+            if (!sessionRecord) return callback(null, null);
+            return callback(null, sessionRecord.data);
         } catch (err) {
             return callback(err);
         }
@@ -51,11 +45,10 @@ class PrismaSessionStore extends session.Store {
             const expires = sessionData.cookie?.expires
                 ? new Date(sessionData.cookie.expires)
                 : new Date(Date.now() + 24 * 60 * 60 * 1000);
-            const data = JSON.stringify(sessionData);
             await prisma.session.upsert({
                 where: { id: sid },
-                update: { data, expires },
-                create: { id: sid, data, expires },
+                update: { data: sessionData, expires },
+                create: { id: sid, data: sessionData, expires },
             });
             callback(null);
         } catch (err) {
@@ -70,6 +63,9 @@ class PrismaSessionStore extends session.Store {
             });
             callback(null);
         } catch (err) {
+            if (err.code === "P2025") {
+                return callback(null); // safe to ignore
+            }
             callback(err);
         }
     }
