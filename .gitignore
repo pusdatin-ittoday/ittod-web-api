@@ -16,4 +16,4 @@ dist/
 build/
 
 # Public uploads
-public/uploads!/prisma/app/
+public/uploads
