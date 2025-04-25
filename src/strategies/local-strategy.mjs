@@ -24,7 +24,7 @@ passport.use(
         { usernameField: "email" },
         async (email, password, done) => {
             try {
-                const user = await prisma.user.findUnique({
+                const user = await prisma.user_identity.findUnique({
                     where: { email },
                 });
                 if (!user || !user.is_verified) return done(null, false);
