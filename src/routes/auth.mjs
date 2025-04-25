@@ -30,7 +30,7 @@ authRouter.get(
     }
 );
 
-authRouter.get("/logout", (req, res) => {
+authRouter.get("/api/auth/logout", (req, res) => {
     req.logout(err => {
         if (err) {
             return res.status(500).send("Error logging out.");
@@ -41,7 +41,13 @@ authRouter.get("/logout", (req, res) => {
 
 authRouter.get("/api/auth/status", (req, res) => {
     if (req.isAuthenticated()) {
-        res.status(200).json({ authenticated: true, user: req.user });
+        // res.status(200).json({ authenticated: true, user: req.user });
+        // sanitize first
+        const { id, email, full_name } = req.user;
+        res.status(200).json({
+            authenticated: true,
+            user: { id, email, full_name },
+        });
     } else {
         res.status(200).json({ authenticated: false });
     }
