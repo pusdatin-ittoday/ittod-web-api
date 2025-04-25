@@ -1,3 +1,5 @@
+// not useful anymore
+
 import prisma from "../prisma.mjs";
 
 export async function changeUsername(oldUsername, newUsername) {
