@@ -34,12 +34,4 @@ authRouter.get("/logout", (req, res) => {
   });
 });
 
-authRouter.get(
-  "/api/auth/google/redirect",
-  passport.authenticate("google", { failureRedirect: "/login" }),
-  (req, res) => {
-    res.sendStatus(200);
-  }
-);
-
 export default authRouter;
