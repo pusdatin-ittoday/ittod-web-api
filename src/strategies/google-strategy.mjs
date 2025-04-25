@@ -50,7 +50,7 @@ export default passport.use(
                 if (existingUser) {
                     await prisma.user_identity.create({
                         data: {
-                            id: existingUser.id,
+                            id: externalId,
                             provider,
                             email,
                             hash: null,
