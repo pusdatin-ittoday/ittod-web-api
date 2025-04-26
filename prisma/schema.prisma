@@ -54,9 +54,9 @@ model event {
   description     String @db.Text
   guide_book_url  String @db.Text
   type            event_type_enum
-  contact_person1 String?
+  contact_person1 String
   contact_person2 String?
-  max_participant Int?
+  max_noncompetition_participant Int?
 
   announcements event_announcement[]
   submissions   competition_submission[]
@@ -175,7 +175,7 @@ model user {
   identity                 user_identity?
   announcements            event_announcement[]
   member                   team_member[]
-  non_competition_events   event[]
+  noncompetition_events   event[]
 }
 
 model user_identity {
