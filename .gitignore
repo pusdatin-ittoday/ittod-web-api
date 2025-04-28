@@ -17,3 +17,6 @@ build/
 
 # Public uploads
 public/uploads
+
+#vscode
+.vscode
