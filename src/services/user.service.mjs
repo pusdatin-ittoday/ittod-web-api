@@ -1,4 +1,7 @@
-// not useful anymore
+/**
+ * @deprecated This service is deprecated. Please use the auth service instead
+ * for user management functionality.
+ */
 
 import prisma from "../prisma.mjs";
 
