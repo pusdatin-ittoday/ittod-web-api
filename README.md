@@ -27,11 +27,23 @@ npm install
 #### 4. Configure .env
 Google client id is necessary for this step. For more details visit: https://developers.google.com/identity/protocols/oauth2
 ```bash
-DATABASE_URL=mysql:xxxx  
-SECRET_KEY_SESSION=xxxx 
+# Used for Prisma Migrations and within your application
+DATABASE_URL=mysqlxxxx
+SECRET_KEY_SESSION=xxx
 GOOGLE_CLIENT_SECRET=xxxx
-GOOGLE_CLIENT_ID=xxxx
-GOOGLE_REDIRECT=https://xxxx
+GOOGLE_CLIENT_ID=xxx
+# for local
+GOOGLE_REDIRECT=http://localhost:3000/api/auth/google/redirect 
+DB_HOST=localhost
+DB_PORT=32768
+DB_USER=xxx
+DB_PASSWORD=xxx
+DB_NAME=xxx
+EMAIL_USER=xxxx
+EMAIL_PASS=zxxxx
+EMAIL_HOST=smxxxx
+EMAIL_PORT=xxxx
+
 ```
 Save .env to project root folder
 #### 5. Configure Prisma
