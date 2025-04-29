@@ -2,7 +2,7 @@
 
 import { Router } from "express";
 import passport from "passport";
-import { validateLogin } from "../middleware/authMiddleware.mjs";
+import { validateLogin, loginLimiter } from "../middleware/authMiddleware.mjs";
 import { validateRegister } from "../middleware/registerValidationMiddleware.mjs";
 import preventLoginIfAuthenticated from "../middleware/preventLoginIfAuthenticated.mjs";
 import googleStrategy from "../strategies/google-strategy.mjs";
@@ -14,6 +14,7 @@ const authRouter = Router();
 authRouter.post("/api/auth/register", validateRegister, register);
 authRouter.post(
     "/api/auth/login",
+    loginLimiter,
     preventLoginIfAuthenticated,
     validateLogin,
     passport.authenticate("local"),
