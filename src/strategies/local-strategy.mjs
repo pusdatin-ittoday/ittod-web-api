@@ -27,11 +27,25 @@ passport.use(
                 const user = await prisma.user_identity.findUnique({
                     where: { email },
                 });
-                if (!user || !user.is_verified) return done(null, false);
+
+                // Check user existence and hash existence
+                if (!user || !user.hash) {
+                    return done(null, false, { message: 'Invalid email or password' });
+                }
+
+                // Check verification status
+                if (!user.is_verified) {
+                    return done(null, false, { message: 'Please verify your email before logging in' });
+                }
+
+                // Verify password
                 const valid = await argon2.verify(user.hash, password);
-                if (!valid) return done(null, false);
+                if (!valid) {
+                    return done(null, false, { message: 'Invalid email or password' });
+                }
                 return done(null, user);
             } catch (err) {
+                console.error('Authentication error:', err);
                 return done(err);
             }
         }
