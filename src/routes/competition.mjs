@@ -9,3 +9,5 @@ const compeRouter = Router();
 compeRouter.post("/api/competition/register", registerCompetition);
 
 compeRouter.post("/api/competition/join", joinCompetitionWithTeamCode);
+
+export default compeRouter;
