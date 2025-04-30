@@ -1,8 +1,8 @@
-import PrismaSessionStore from './PrismaSessionStore.mjs';
+import PrismaSessionStore from "./PrismaSessionStore.mjs";
 
 const sessionSecret = process.env.SECRET_KEY_SESSION;
 if (!sessionSecret) {
-    throw new Error('Missing SECRET_KEY_SESSION environment variable');
+    throw new Error("Missing SECRET_KEY_SESSION environment variable");
 }
 
 export default {
@@ -11,9 +11,9 @@ export default {
     saveUninitialized: false,
     store: new PrismaSessionStore(),
     cookie: {
-        secure: process.env.NODE_ENV === 'production',
+        secure: process.env.NODE_ENV === "production",
         httpOnly: true,
         maxAge: 1000 * 60 * 60 * 24,
-        sameSite: 'lax',
+        sameSite: "lax",
     },
 };

@@ -18,6 +18,6 @@ export const verifyEmail = async (req, res) => {
     }
 };
 
-export const login = (req,res) => {
-    res.json({message: "Login successful", user:req.user})
-}
+export const login = (req, res) => {
+    res.json({ message: "Login successful", user: req.user });
+};

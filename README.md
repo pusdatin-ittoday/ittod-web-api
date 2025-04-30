@@ -6,42 +6,51 @@ A RESTful backend service for the IT-TODAY 2025 platform, built with **Node.js**
 
 ## 🚀 Installation
 
-Follow these steps to set up the project locally: 
-
+Follow these steps to set up the project locally:
 
 #### 1. Clone the repository
+
 ```bash
 git clone https://github.com/pusdatin-ittoday/ittod-web-api.git
 ```
 
 #### 2. Navigate to the project directory
+
 ```bash
 cd ittod-web-api
 ```
 
 #### 3. Install dependencies
+
 ```bash
 npm install
 ```
 
 #### 4. Configure .env
+
 Google client id is necessary for this step. For more details visit: https://developers.google.com/identity/protocols/oauth2
+
 ```bash
-DATABASE_URL=mysql:xxxx  
-SECRET_KEY_SESSION=xxxx 
+DATABASE_URL=mysql:xxxx
+SECRET_KEY_SESSION=xxxx
 GOOGLE_CLIENT_SECRET=xxxx
 GOOGLE_CLIENT_ID=xxxx
 GOOGLE_REDIRECT=https://xxxx
 ```
+
 Save .env to project root folder
+
 #### 5. Configure Prisma
+
 Asumption: Empty database
+
 ```bash
 npx prisma generate       # generates the Prisma client
 npx prisma migrate dev    # runs migrations and creates the database
 # or if you're not using migrations:
 npx prisma db push        # pushes the schema to the database without migrations
 ```
+
 ---
 
 ## 🧪 Usage

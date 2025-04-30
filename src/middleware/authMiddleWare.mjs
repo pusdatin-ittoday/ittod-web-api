@@ -5,9 +5,11 @@ import rateLimit from "express-rate-limit";
 const loginLimiter = rateLimit({
     windowMs: 15 * 60 * 1000,
     max: 5,
-    keyGenerator: (req) => req.body.email || req.ip,
+    keyGenerator: req => req.body.email || req.ip,
     handler: (req, res) =>
-        res.status(429).json({ message: 'Too many login attempts. Try again later.' }),
+        res
+            .status(429)
+            .json({ message: "Too many login attempts. Try again later." }),
     standardHeaders: true,
     legacyHeaders: false,
 });
