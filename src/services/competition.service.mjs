@@ -1,7 +1,7 @@
 import prisma from "../prisma.mjs";
 import crypto from "crypto";
 
-export const registerTeam = async ({ competition_id, team_name }) => {
+export const registerTeamThenInsertLeader = async ({ competition_id, team_name, leader_id }) => {
     const random_id = crypto.randomUUID();
     const team_code = crypto.randomBytes(6).toString("base64url");
 
@@ -14,7 +14,13 @@ export const registerTeam = async ({ competition_id, team_name }) => {
     const teamExists = await prisma.team.findFirst({ where: { team_name } });
     if (teamExists) throw { status: 406, message: "Team name already exists" };
 
+    const leaderExists = await prisma.user.findUnique({
+        where: { id: leader_id },
+    });
+    if (!leaderExists) throw { status: 404, message: "Leader ID not found" };
+
     try {
+        // Create the team
         await prisma.team.create({
             data: {
                 id: random_id,
@@ -23,39 +29,20 @@ export const registerTeam = async ({ competition_id, team_name }) => {
                 team_code,
             },
         });
-        return { message: "Team successfully registered" };
-    } catch (error) {
-        console.error("Registration error:", error);
-        throw { status: 500, message: "Failed to register team" };
-    }
-};
 
-export const leaderJoin = async ({ leader_id, team_id }) => {
-    const leaderExists = await prisma.user.findUnique({
-        where: { id: leader_id },
-    });
-    if (!leaderExists) throw { status: 404, message: "Leader ID not found" };
-
-    const teamExists = await prisma.team.findUnique({ where: { id: team_id } });
-    if (!teamExists) throw { status: 404, message: "Team ID not found" };
-
-    try {
-        await prisma.team_member.upsert({
-            where: { user_id_team_id: { user_id: leader_id, team_id } },
-            update: { role: "leader" },
-            create: {
-                team_id,
+        // Add the leader to the team
+        await prisma.team_member.create({
+            data: {
                 user_id: leader_id,
+                team_id: random_id,
                 role: "leader",
             },
         });
-        return { message: "Leader successfully joined the team" };
-    } catch (err) {
-        console.error("Leader Join error:", err);
-        throw {
-            status: 500,
-            message: "Failed to join leader, please contact admin",
-        };
+
+        return { message: "Team successfully registered and leader assigned" };
+    } catch (error) {
+        console.error("Registration error:", error);
+        throw { status: 500, message: "Failed to register team" };
     }
 };
 
