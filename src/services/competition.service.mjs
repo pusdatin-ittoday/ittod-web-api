@@ -62,6 +62,19 @@ export const memberJoinWithTeamCode = async ({ user_id, team_code }) => {
     if (existingMember)
         throw { status: 409, message: "User is already a member of this team" };
 
+    // Check if the team has reached the max_team_member limit
+    const teamMemberCount = await prisma.team_member.count({
+        where: { team_id: team.id },
+    });
+    const competition = await prisma.competition.findUnique({
+        where: { id: team.competition_id },
+    });
+    if (teamMemberCount >= competition.max_team_member)
+        throw {
+            status: 403,
+            message: "Team has reached the maximum member limit",
+        };
+
     try {
         // Add the user as a member of the team
         await prisma.team_member.create({
