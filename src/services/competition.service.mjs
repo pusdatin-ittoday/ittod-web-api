@@ -26,3 +26,29 @@ export const registerTeam = async ({ competition_id, team_name }) => {
         throw { status: 500, message: "Failed to register team" };
     }
 };
+
+export const leaderJoin = async ({ leader_id, team_id }) => {
+    if (!prisma.user.findUnique({ where: { id: leader_id } }))
+        throw { status: 404, message: "id of leader is not found" };
+
+    if (!prisma.team.findUnique({ where: { id: team_id } }))
+        throw { status: 404, message: "id of team is not found" };
+
+    try {
+        const leader = await prisma.team_member.upsert({
+            where: {team_id},
+            data: {
+                team_id,
+                user_id: leader_id,
+                role: "leader",
+            }
+        })
+    } catch (err) {
+        console.error("Leader Join error:", err);
+        throw {
+            status: 500,
+            message:
+                "Failed to insert leader into the db, please contact admin",
+        };
+    }
+};
