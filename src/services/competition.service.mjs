@@ -5,8 +5,11 @@ export const registerTeam = async ({ competition_id, team_name }) => {
     const random_id = crypto.randomUUID();
     const team_code = crypto.randomBytes(6).toString("base64url");
 
-    const competitionExists = await prisma.competition.findUnique({ where: { id: competition_id } });
-    if (!competitionExists) throw { status: 404, message: "competition_id not found" };
+    const competitionExists = await prisma.competition.findUnique({
+        where: { id: competition_id },
+    });
+    if (!competitionExists)
+        throw { status: 404, message: "competition_id not found" };
 
     const teamExists = await prisma.team.findFirst({ where: { team_name } });
     if (teamExists) throw { status: 406, message: "Team name already exists" };
@@ -28,7 +31,9 @@ export const registerTeam = async ({ competition_id, team_name }) => {
 };
 
 export const leaderJoin = async ({ leader_id, team_id }) => {
-    const leaderExists = await prisma.user.findUnique({ where: { id: leader_id } });
+    const leaderExists = await prisma.user.findUnique({
+        where: { id: leader_id },
+    });
     if (!leaderExists) throw { status: 404, message: "Leader ID not found" };
 
     const teamExists = await prisma.team.findUnique({ where: { id: team_id } });
@@ -47,7 +52,10 @@ export const leaderJoin = async ({ leader_id, team_id }) => {
         return { message: "Leader successfully joined the team" };
     } catch (err) {
         console.error("Leader Join error:", err);
-        throw { status: 500, message: "Failed to join leader, please contact admin" };
+        throw {
+            status: 500,
+            message: "Failed to join leader, please contact admin",
+        };
     }
 };
 
