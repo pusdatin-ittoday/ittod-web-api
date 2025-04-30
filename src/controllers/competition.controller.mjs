@@ -13,7 +13,7 @@ export const registerCompetition = async (req, res) => {
     }
 };
 
-export const joinCompetitionWithTeamCode = async (req,res) => {
+export const joinCompetitionWithTeamCode = async (req, res) => {
     try {
         const user_id = req.user.id;
         const result = await compService.memberJoinWithTeamCode({
@@ -24,4 +24,4 @@ export const joinCompetitionWithTeamCode = async (req,res) => {
     } catch (err) {
         res.status(err.status || 500).json({ error: err.message });
     }
-}
+};

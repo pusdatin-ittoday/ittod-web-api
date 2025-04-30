@@ -1,7 +1,11 @@
 import prisma from "../prisma.mjs";
 import crypto from "crypto";
 
-export const registerTeamThenInsertLeader = async ({ competition_id, team_name, leader_id }) => {
+export const registerTeamThenInsertLeader = async ({
+    competition_id,
+    team_name,
+    leader_id,
+}) => {
     const random_id = crypto.randomUUID();
     const team_code = crypto.randomBytes(6).toString("base64url");
 

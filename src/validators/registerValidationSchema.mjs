@@ -12,7 +12,7 @@ const registerSchema = Joi.object({
     full_name: Joi.string().min(2).required().messages({
         "string.min": "Full name must be at least 2 characters long.",
         "any.required": "Full name is required.",
-    })
+    }),
 });
 
 export default registerSchema;
