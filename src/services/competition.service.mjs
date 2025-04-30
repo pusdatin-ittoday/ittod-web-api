@@ -28,28 +28,26 @@ export const registerTeam = async ({ competition_id, team_name }) => {
 };
 
 export const leaderJoin = async ({ leader_id, team_id }) => {
-    if (!prisma.user.findUnique({ where: { id: leader_id } }))
-        throw { status: 404, message: "id of leader is not found" };
+    const leaderExists = await prisma.user.findUnique({ where: { id: leader_id } });
+    if (!leaderExists) throw { status: 404, message: "Leader ID not found" };
 
-    if (!prisma.team.findUnique({ where: { id: team_id } }))
-        throw { status: 404, message: "id of team is not found" };
+    const teamExists = await prisma.team.findUnique({ where: { id: team_id } });
+    if (!teamExists) throw { status: 404, message: "Team ID not found" };
 
     try {
-        const leader = await prisma.team_member.upsert({
-            where: { team_id },
-            data: {
+        await prisma.team_member.upsert({
+            where: { user_id_team_id: { user_id: leader_id, team_id } },
+            update: { role: "leader" },
+            create: {
                 team_id,
                 user_id: leader_id,
                 role: "leader",
             },
         });
+        return { message: "Leader successfully joined the team" };
     } catch (err) {
         console.error("Leader Join error:", err);
-        throw {
-            status: 500,
-            message:
-                "Failed to join leader into the team, please contact admin",
-        };
+        throw { status: 500, message: "Failed to join leader, please contact admin" };
     }
 };
 
