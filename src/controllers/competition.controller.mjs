@@ -15,7 +15,8 @@ export const registerCompetition = async (req, res) => {
         }
         const leader_id = req.user.id;
         const result = await compService.registerTeamThenInsertLeader({
-            ...req.body,
+            competition_id,
+            team_name,
             leader_id,
         });
         res.status(201).json(result);
