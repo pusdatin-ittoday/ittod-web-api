@@ -77,6 +77,21 @@ export const registerTeamThenInsertLeader = async ({
 export const memberJoinWithTeamCode = async ({ user_id, team_code }) => {
     return prisma.$transaction(
         async tx => {
+            // Check if the user is already registered in more than 2 competitions
+            const userCompetitionsCount = await tx.team_member.count({
+                where: {
+                    user_id,
+                },
+                distinct: ["team.competition_id"],
+            });
+
+            if (userCompetitionsCount >= 2) {
+                throw {
+                    status: 403,
+                    message: "You can only participate in at most 2 competitions",
+                };
+            }
+
             const team = await tx.team.findUnique({ where: { team_code } });
             if (!team) throw { status: 404, message: "Invalid team code" };
 
