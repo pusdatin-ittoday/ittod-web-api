@@ -24,23 +24,24 @@ export const registerTeamThenInsertLeader = async ({
     if (!leaderExists) throw { status: 404, message: "Leader ID not found" };
 
     try {
-        // Create the team
-        await prisma.team.create({
-            data: {
-                id: random_id,
-                competition_id,
-                team_name,
-                team_code,
-            },
-        });
-
-        // Add the leader to the team
-        await prisma.team_member.create({
-            data: {
-                user_id: leader_id,
-                team_id: random_id,
-                role: "leader",
-            },
+        await prisma.$transaction(async tx => {
+            // Create the team
+            await tx.team.create({
+                data: {
+                    id: random_id,
+                    competition_id,
+                    team_name,
+                    team_code,
+                },
+            });
+            // Add the leader to the team
+            await tx.team_member.create({
+                data: {
+                    user_id: leader_id,
+                    team_id: random_id,
+                    role: "leader",
+                },
+            });
         });
 
         return { message: "Team successfully registered and leader assigned" };
