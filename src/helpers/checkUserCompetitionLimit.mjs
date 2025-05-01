@@ -1,11 +1,13 @@
 export async function checkUserCompetitionLimit(prismaClient, userId) {
-    const userCompetitionsCount = await prismaClient.team_member.groupBy({
-        by: ["team_id"],
-        where: { user_id: userId },
-        _count: {
-            team_id: true,
-        },
-    }).then(groups => new Set(groups.map(group => group.team_id)).size);
+    const userCompetitionsCount = await prismaClient.team_member
+        .groupBy({
+            by: ["team_id"],
+            where: { user_id: userId },
+            _count: {
+                team_id: true,
+            },
+        })
+        .then(groups => new Set(groups.map(group => group.team_id)).size);
 
     if (userCompetitionsCount >= 2) {
         throw {

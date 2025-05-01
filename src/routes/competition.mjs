@@ -7,8 +7,16 @@ import { isAuthenticated } from "../middleware/authMiddleware.mjs";
 
 const compeRouter = Router();
 
-compeRouter.post("/api/competition/register",isAuthenticated, registerCompetition);
+compeRouter.post(
+    "/api/competition/register",
+    isAuthenticated,
+    registerCompetition
+);
 
-compeRouter.post("/api/competition/join",isAuthenticated, joinCompetitionWithTeamCode);
+compeRouter.post(
+    "/api/competition/join",
+    isAuthenticated,
+    joinCompetitionWithTeamCode
+);
 
 export default compeRouter;

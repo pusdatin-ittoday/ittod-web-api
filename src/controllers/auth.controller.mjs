@@ -22,6 +22,6 @@ export const login = (req, res) => {
     const { id, email, name } = req.user;
     res.json({
         message: "Login successful",
-        user: { id, email, name }
+        user: { id, email, name },
     });
 };
