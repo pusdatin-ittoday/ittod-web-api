@@ -4,48 +4,39 @@ import crypto from "crypto";
 import { sendVerificationEmail } from "../utils/mailer.mjs";
 
 export const register = async ({ email, password, full_name }) => {
-    // Validate password strength
-    if (password.length < 8) {
-        throw {
-            status: 400,
-            message: "Password must be at least 8 characters",
-        };
-    }
+    if (password.length < 8) throw { status: 400, message: "Password must be at least 8 characters" };
+
     const existing = await prisma.user.findUnique({ where: { email } });
     if (existing) throw { status: 409, message: "Email already used" };
+
     const provider = "basic";
     const hashed = await argon2.hash(password);
     const token = crypto.randomBytes(32).toString("hex");
     const generatedId = crypto.randomUUID();
 
-    // Use transaction to ensure data consistency
-    try {
-        const user = await prisma.$transaction(async prismaClient => {
-            return prismaClient.user.create({
-                data: {
-                    id: generatedId,
+    await prisma.user.create({
+        data: {
+            id: generatedId,
+            email,
+            full_name,
+            identity: {
+                create: {
+                    provider,
                     email,
-                    full_name,
-                    identity: {
-                        create: {
-                            provider,
-                            email,
-                            hash: hashed,
-                            verification_token: token,
-                            verification_token_expiration: new Date(
-                                Date.now() + 60 * 5 * 1000
-                            ),
-                        },
-                    },
+                    hash: hashed,
+                    verification_token: token,
+                    verification_token_expiration: new Date(Date.now() + 60 * 5 * 1000),
                 },
-            });
-        });
-        await sendVerificationEmail(email, token);
-        return { message: "Registered. Please verify your email." };
-    } catch (error) {
-        console.error("Registration error:", error);
-        throw { status: 500, message: "Failed to register user" };
-    }
+            },
+        },
+    });
+
+    // Fire and forget (or send to a queue)
+    sendVerificationEmail(email, token, full_name).catch(err =>
+        console.error("Failed to send verification email (not critical):", err)
+    );
+
+    return { message: "Registered. Please verify your email." };
 };
 
 export const verifyEmail = async token => {
