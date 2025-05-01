@@ -2,10 +2,10 @@ import prisma from "../prisma.mjs";
 import crypto from "crypto";
 
 export const registerTeamThenInsertLeader = async ({
-                                                       competition_id,
-                                                       team_name,
-                                                       leader_id,
-                                                   }) => {
+    competition_id,
+    team_name,
+    leader_id,
+}) => {
     // Check if the user is already registered in more than 2 competitions
     const userCompetitionsCount = await prisma.team_member.count({
         where: {
@@ -22,6 +22,8 @@ export const registerTeamThenInsertLeader = async ({
     }
 
     const random_id = crypto.randomUUID();
+    const MAX_RETRIES = 10;
+    let retryCount = 0;
     let team_code;
     let existingTeamWithCode;
     // Ensure team code is unique
@@ -30,6 +32,13 @@ export const registerTeamThenInsertLeader = async ({
         existingTeamWithCode = await prisma.team.findUnique({
             where: { team_code },
         });
+        retryCount++;
+        if (retryCount >= MAX_RETRIES && existingTeamWithCode) {
+            throw {
+                status: 500,
+                message: "Failed to generate unique team code",
+            };
+        }
     } while (existingTeamWithCode);
 
     const competitionExists = await prisma.competition.findUnique({
@@ -88,7 +97,8 @@ export const memberJoinWithTeamCode = async ({ user_id, team_code }) => {
             if (userCompetitionsCount >= 2) {
                 throw {
                     status: 403,
-                    message: "You can only participate in at most 2 competitions",
+                    message:
+                        "You can only participate in at most 2 competitions",
                 };
             }
 
