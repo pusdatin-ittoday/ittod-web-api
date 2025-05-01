@@ -19,5 +19,9 @@ export const verifyEmail = async (req, res) => {
 };
 
 export const login = (req, res) => {
-    res.json({ message: "Login successful", user: req.user });
+    const { id, email, name } = req.user;
+    res.json({
+        message: "Login successful",
+        user: { id, email, name }
+    });
 };
