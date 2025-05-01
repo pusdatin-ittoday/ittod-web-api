@@ -4,10 +4,11 @@ import { mailerConfig } from "../config/mailer.config.mjs";
 const transporter = nodemailer.createTransport(mailerConfig);
 
 export const sendVerificationEmail = async (email, token, name) => {
-    const baseUrl = process.env.APP_BASE_URL || 'http://localhost:3000';
-    const supportEmail = process.env.SUPPORT_EMAIL || 'support@ittoday.com';
+    const baseUrl = process.env.APP_BASE_URL || "http://localhost:3000";
+    const supportEmail = process.env.SUPPORT_EMAIL || "support@ittoday.com";
     const url = `${baseUrl}/api/auth/verify?token=${token}`;
-    const sender = process.env.EMAIL_SENDER || '"IT Today" <no-reply@ittoday.com>';
+    const sender =
+        process.env.EMAIL_SENDER || '"IT Today" <no-reply@ittoday.com>';
 
     try {
         const result = await transporter.sendMail({
@@ -18,7 +19,7 @@ export const sendVerificationEmail = async (email, token, name) => {
             html: `
                 <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto; line-height:1.5;">
                     <h2>Email Verification</h2>
-                    <p>Hi ${name || ''},</p>
+                    <p>Hi ${name || ""},</p>
                     <p>Thank you for joining IT Today! To secure your account, please verify your email by clicking the button below:</p>
                     <div style="text-align:center; margin:20px 0;">
                         <a href="${url}"

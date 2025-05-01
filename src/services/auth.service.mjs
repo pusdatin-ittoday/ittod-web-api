@@ -4,7 +4,11 @@ import crypto from "crypto";
 import { sendVerificationEmail } from "../utils/mailer.mjs";
 
 export const register = async ({ email, password, full_name }) => {
-    if (password.length < 8) throw { status: 400, message: "Password must be at least 8 characters" };
+    if (password.length < 8)
+        throw {
+            status: 400,
+            message: "Password must be at least 8 characters",
+        };
 
     const existing = await prisma.user.findUnique({ where: { email } });
     if (existing) throw { status: 409, message: "Email already used" };
@@ -26,7 +30,9 @@ export const register = async ({ email, password, full_name }) => {
                     email,
                     hash: hashed,
                     verification_token: token,
-                    verification_token_expiration: new Date(Date.now() + 60 * 5 * 1000),
+                    verification_token_expiration: new Date(
+                        Date.now() + 60 * 5 * 1000
+                    ),
                 },
             },
         },
