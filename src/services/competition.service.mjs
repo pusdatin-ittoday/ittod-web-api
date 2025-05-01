@@ -1,11 +1,25 @@
 import prisma from "../prisma.mjs";
 import crypto from "crypto";
 import { checkUserCompetitionLimit } from "../helpers/checkUserCompetitionLimit.mjs";
+
 export const registerTeamThenInsertLeader = async ({
     competition_id,
     team_name,
     leader_id,
 }) => {
+    const existingLeader = await prisma.team_member.findFirst({
+        where: {
+            user_id: leader_id,
+            role: "leader",
+        },
+    });
+
+    if (existingLeader) {
+        throw {
+            status: 403,
+            message: "You can only register one team as a leader",
+        };
+    }
     await checkUserCompetitionLimit(prisma, leader_id);
     const random_id = crypto.randomUUID();
     const MAX_RETRIES = 10;
