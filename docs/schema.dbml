@@ -1,60 +1,207 @@
-// Enums
-Enum user_education_enum {
-  SMA
-  D3
-  S1
-  S2
-  S3
-  Lainnya
+//// ------------------------------------------------------
+//// THIS FILE WAS AUTOMATICALLY GENERATED (DO NOT MODIFY)
+//// ------------------------------------------------------
+
+Table competition {
+  id String [pk]
+  title String [not null]
+  description String [not null]
+  max_team_member Int [not null, default: 3]
+  guide_book_url String [not null]
+  announcements competition_announcement [not null]
+  submissions competition_submission [not null]
+  timelines competition_timeline [not null]
+  teams team [not null]
+}
+
+Table competition_announcement {
+  id String [pk]
+  competition_id String [not null]
+  author_id String [not null]
+  title String [not null]
+  description String [not null]
+  created_at DateTime [default: `now()`, not null]
+  updated_at DateTime [not null]
+  competition competition [not null]
+  author user [not null]
+}
+
+Table competition_submission {
+  team_id String [not null]
+  competition_id String [not null]
+  media_id String [unique, not null]
+  created_at DateTime [default: `now()`, not null]
+  updated_at DateTime
+  team team [not null]
+  competition competition [not null]
+  media media [not null]
+
+  indexes {
+    (team_id, competition_id) [pk]
+  }
+}
+
+Table competition_timeline {
+  id String [pk]
+  competition_id String [not null]
+  title String [not null]
+  date DateTime [not null]
+  competition competition [not null]
+}
+
+Table media {
+  id String [pk]
+  uploader_id String [not null]
+  name String [unique, not null]
+  grouping media_grouping_enum
+  type media_type_enum [not null]
+  url String [not null]
+  created_at DateTime [default: `now()`, not null]
+  uploader user [not null]
+  paymentproof team_member
+  twibbon team_member
+  kartu team_member
+  submission competition_submission
+}
+
+Table team {
+  id String [pk]
+  competition_id String [not null]
+  team_name String [not null]
+  team_code String [unique, not null]
+  is_verified Boolean [not null, default: false]
+  verification_error String
+  created_at DateTime [default: `now()`, not null]
+  updated_at DateTime
+  competition competition [not null]
+  members team_member [not null]
+  submission competition_submission [not null]
+}
+
+Table team_member {
+  user_id String [not null]
+  team_id String [not null]
+  role team_member_role_enum [not null]
+  kartu_media_id String [unique]
+  twibbon_media_id String [unique]
+  payment_proof_media_id String [unique]
+  is_verified Boolean [not null, default: false]
+  verification_error String
+  paymentProof media
+  user user [not null]
+  team team [not null]
+  twibbon media
+  kartu media
+
+  indexes {
+    (user_id, team_id) [pk]
+  }
+}
+
+Table user {
+  id String [pk]
+  email String [unique, not null]
+  full_name String [not null]
+  birth_date DateTime
+  pendidikan education_enum
+  nama_sekolah String
+  entry_source String
+  phone_number String
+  id_line String
+  id_discord String
+  id_instagram String
+  consent Boolean [not null, default: false]
+  is_registration_complete Boolean [not null, default: false]
+  created_at DateTime [default: `now()`, not null]
+  updated_at DateTime
+  uploaded media [not null]
+  identity user_identity
+  announcements competition_announcement [not null]
+  member team_member [not null]
+}
+
+Table user_identity {
+  id String [pk]
+  email String [unique, not null]
+  provider user_identity_provider_enum [not null]
+  hash String
+  is_verified Boolean [not null, default: false]
+  verification_token String [not null]
+  verification_token_expiration DateTime [not null]
+  password_recovery_token String
+  password_recovery_token_expiration DateTime
+  refresh_token String
+  role user_identity_role_enum
+  created_at DateTime [default: `now()`, not null]
+  updated_at DateTime
+  user user [not null]
+}
+
+Table sessions {
+  id String [pk]
+  expires DateTime [not null]
+  data Json [not null]
+}
+
+Enum education_enum {
+  sma
+  s1
+  d3
+  d4
+}
+
+Enum team_member_role_enum {
+  leader
+  member
 }
 
 Enum user_identity_provider_enum {
-  email
   google
+  basic
   github
 }
 
 Enum user_identity_role_enum {
-  user
   admin
-  superadmin
+  user
 }
 
-// Tables
-Table user {
-  id text [pk, not null]
-  email text [not null, unique]
-  full_name text
-  birth_date date
-  education user_education_enum
-  entry_source text
-  instance text
-  phone_number text
-  id_line text
-  id_discord text
-  id_instagram text
-  consent boolean [not null, default: false]
-  is_registration_complete boolean [not null, default: false]
-  created_at timestamp [default: `now()`]
-  updated_at timestamp [default: `now()`]
+Enum media_grouping_enum {
+  payments
+  dokum_tahun_lalu
+  competition_submission
+  twibbon
 }
 
-Table user_identity {
-  id text [pk, not null]
-  user_id text [not null]
-  email text [not null]
-  provider user_identity_provider_enum [not null]
-  hash text [not null]
-  is_verified boolean [not null, default: false]
-  verification_token text
-  verification_token_expiration timestamp
-  password_recovery_token text
-  password_recovery_token_expiration timestamp
-  refresh_token text
-  role user_identity_role_enum [not null, default: 'user']
-  created_at timestamp [default: `now()`]
-  updated_at timestamp [default: `now()`]
+Enum media_type_enum {
+  image
+  pdf
 }
 
-// Relationships
-Ref: user_identity.user_id > user.id
+Ref: competition_announcement.competition_id > competition.id
+
+Ref: competition_announcement.author_id > user.id
+
+Ref: competition_submission.team_id > team.id
+
+Ref: competition_submission.competition_id > competition.id
+
+Ref: competition_submission.media_id - media.id
+
+Ref: competition_timeline.competition_id > competition.id
+
+Ref: media.uploader_id > user.id
+
+Ref: team.competition_id > competition.id
+
+Ref: team_member.payment_proof_media_id - media.id
+
+Ref: team_member.user_id > user.id
+
+Ref: team_member.team_id > team.id
+
+Ref: team_member.twibbon_media_id - media.id
+
+Ref: team_member.kartu_media_id - media.id
+
+Ref: user_identity.id - user.id

@@ -1,14 +1,17 @@
 import Joi from "joi";
+import loginSchema from "../validators/loginValidationSchema.mjs";
+import rateLimit from "express-rate-limit";
 
-const loginSchema = Joi.object({
-    email: Joi.string().email().required().messages({
-        "string.email": "A valid email is required.",
-        "any.required": "Email is required.",
-    }),
-    password: Joi.string().min(6).required().messages({
-        "string.min": "Password must be at least 6 characters long.",
-        "any.required": "Password is required.",
-    }),
+const loginLimiter = rateLimit({
+    windowMs: 15 * 60 * 1000,
+    max: 5,
+    keyGenerator: req => req.body.email || req.ip,
+    handler: (req, res) =>
+        res
+            .status(429)
+            .json({ message: "Too many login attempts. Try again later." }),
+    standardHeaders: true,
+    legacyHeaders: false,
 });
 
 const validateLogin = (req, res, next) => {
@@ -21,4 +24,11 @@ const validateLogin = (req, res, next) => {
     next();
 };
 
-export { validateLogin };
+const isAuthenticated = (req, res, next) => {
+    if (!req.user) {
+        return res.status(401).json({ message: "Unauthorized" });
+    }
+    next();
+};
+
+export { validateLogin, loginLimiter, isAuthenticated };
