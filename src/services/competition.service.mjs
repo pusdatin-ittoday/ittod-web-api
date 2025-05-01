@@ -51,45 +51,38 @@ export const registerTeamThenInsertLeader = async ({
 };
 
 export const memberJoinWithTeamCode = async ({ user_id, team_code }) => {
-    // Validate if the team exists with the given team_code
-    const team = await prisma.team.findUnique({ where: { team_code } });
-    if (!team) throw { status: 404, message: "Invalid team code" };
+    return prisma.$transaction(async (tx) => {
+        const team = await tx.team.findUnique({ where: { team_code } });
+        if (!team) throw { status: 404, message: "Invalid team code" };
 
-    // Check if the user is already a member of the team
-    const existingMember = await prisma.team_member.findUnique({
-        where: { user_id_team_id: { user_id, team_id: team.id } },
-    });
-    if (existingMember)
-        throw { status: 409, message: "User is already a member of this team" };
+        const existingMember = await tx.team_member.findUnique({
+            where: { user_id_team_id: { user_id, team_id: team.id } },
+        });
+        if (existingMember)
+            throw { status: 409, message: "User is already a member of this team" };
 
-    // Check if the team has reached the max_team_member limit
-    const teamMemberCount = await prisma.team_member.count({
-        where: { team_id: team.id },
-    });
-    const competition = await prisma.competition.findUnique({
-        where: { id: team.competition_id },
-    });
-    if (teamMemberCount >= competition.max_team_member)
-        throw {
-            status: 403,
-            message: "Team has reached the maximum member limit",
-        };
+        const teamMemberCount = await tx.team_member.count({
+            where: { team_id: team.id },
+        });
+        const competition = await tx.competition.findUnique({
+            where: { id: team.competition_id },
+        });
 
-    try {
-        // Add the user as a member of the team
-        await prisma.team_member.create({
+        if (teamMemberCount >= competition.max_team_member)
+            throw {
+                status: 403,
+                message: "Team has reached the maximum member limit",
+            };
+
+        await tx.team_member.create({
             data: {
                 user_id,
                 team_id: team.id,
-                role: "member", // Default role for new members
+                role: "member",
             },
         });
+
         return { message: "Successfully joined the team" };
-    } catch (err) {
-        console.error("Member Join error:", err);
-        throw {
-            status: 500,
-            message: "Failed to join the team, please contact admin",
-        };
-    }
+    }, { isolationLevel: 'Serializable' }); // Important!
 };
+
