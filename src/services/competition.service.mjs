@@ -1,26 +1,12 @@
 import prisma from "../prisma.mjs";
 import crypto from "crypto";
-
+import { checkUserCompetitionLimit } from "../helpers/checkUserCompetitionLimit.mjs";
 export const registerTeamThenInsertLeader = async ({
     competition_id,
     team_name,
     leader_id,
 }) => {
-    // Check if the user is already registered in more than 2 competitions
-    const userCompetitionsCount = await prisma.team_member.count({
-        where: {
-            user_id: leader_id,
-        },
-        distinct: ["team.competition_id"],
-    });
-
-    if (userCompetitionsCount >= 2) {
-        throw {
-            status: 403,
-            message: "You can only participate in at most 2 competitions",
-        };
-    }
-
+    await checkUserCompetitionLimit(prisma, leader_id);
     const random_id = crypto.randomUUID();
     const MAX_RETRIES = 10;
     let retryCount = 0;
@@ -48,7 +34,7 @@ export const registerTeamThenInsertLeader = async ({
         throw { status: 404, message: "competition_id not found" };
 
     const teamExists = await prisma.team.findFirst({ where: { team_name } });
-    if (teamExists) throw { status: 406, message: "Team name already exists" };
+    if (teamExists) throw { status: 409, message: "Team name already exists" };
 
     const leaderExists = await prisma.user.findUnique({
         where: { id: leader_id },
@@ -86,21 +72,7 @@ export const registerTeamThenInsertLeader = async ({
 export const memberJoinWithTeamCode = async ({ user_id, team_code }) => {
     return prisma.$transaction(
         async tx => {
-            // Check if the user is already registered in more than 2 competitions
-            const userCompetitionsCount = await tx.team_member.count({
-                where: {
-                    user_id,
-                },
-                distinct: ["team.competition_id"],
-            });
-
-            if (userCompetitionsCount >= 2) {
-                throw {
-                    status: 403,
-                    message:
-                        "You can only participate in at most 2 competitions",
-                };
-            }
+            await checkUserCompetitionLimit(tx, user_id);
 
             const team = await tx.team.findUnique({ where: { team_code } });
             if (!team) throw { status: 404, message: "Invalid team code" };
