@@ -6,6 +6,23 @@ export const registerTeamThenInsertLeader = async ({
     team_name,
     leader_id,
 }) => {
+    // Check if the user is already registered in any competition
+    const existingRegistration = await prisma.team_member.findFirst({
+        where: {
+            user_id: leader_id,
+        },
+        include: {
+            team: true,
+        },
+    });
+
+    if (existingRegistration) {
+        throw {
+            status: 403,
+            message: "You are already registered in another competition",
+        };
+    }
+
     const random_id = crypto.randomUUID();
     let team_code;
     let existingTeamWithCode;
@@ -58,7 +75,6 @@ export const registerTeamThenInsertLeader = async ({
         throw { status: 500, message: "Failed to register team" };
     }
 };
-
 export const memberJoinWithTeamCode = async ({ user_id, team_code }) => {
     return prisma.$transaction(
         async tx => {
