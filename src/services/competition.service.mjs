@@ -2,24 +2,22 @@ import prisma from "../prisma.mjs";
 import crypto from "crypto";
 
 export const registerTeamThenInsertLeader = async ({
-    competition_id,
-    team_name,
-    leader_id,
-}) => {
-    // Check if the user is already registered in any competition
-    const existingRegistration = await prisma.team_member.findFirst({
+                                                       competition_id,
+                                                       team_name,
+                                                       leader_id,
+                                                   }) => {
+    // Check if the user is already registered in more than 2 competitions
+    const userCompetitionsCount = await prisma.team_member.count({
         where: {
             user_id: leader_id,
         },
-        include: {
-            team: true,
-        },
+        distinct: ["team.competition_id"],
     });
 
-    if (existingRegistration) {
+    if (userCompetitionsCount >= 2) {
         throw {
             status: 403,
-            message: "You are already registered in another competition",
+            message: "You can only participate in at most 2 competitions",
         };
     }
 
@@ -75,6 +73,7 @@ export const registerTeamThenInsertLeader = async ({
         throw { status: 500, message: "Failed to register team" };
     }
 };
+
 export const memberJoinWithTeamCode = async ({ user_id, team_code }) => {
     return prisma.$transaction(
         async tx => {
