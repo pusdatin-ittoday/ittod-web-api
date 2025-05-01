@@ -12,7 +12,7 @@ export const register = async (req, res) => {
 export const verifyEmail = async (req, res) => {
     try {
         const result = await authService.verifyEmail(req.query.token);
-        res.send(result.message);
+        res.json({ message: result.message });
     } catch (err) {
         res.status(err.status || 500).json({ error: err.message });
     }
