@@ -45,7 +45,7 @@ export const joinCompetitionWithTeamCode = async (req, res) => {
         }
         const user_id = req.user.id;
         const result = await compService.memberJoinWithTeamCode({
-            ...req.body,
+            team_code,
             user_id,
         });
         res.status(201).json(result);
