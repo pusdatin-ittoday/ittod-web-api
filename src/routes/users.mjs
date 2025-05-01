@@ -1,3 +1,5 @@
+// @deprecated
+
 import { Router } from "express";
 import { changeUsername } from "../services/user.service.mjs";
 import { validateChangeUsername } from "../middleware/userMiddleware.mjs";

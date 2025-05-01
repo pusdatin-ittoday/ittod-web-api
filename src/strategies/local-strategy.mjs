@@ -12,6 +12,9 @@ passport.serializeUser((user, done) => {
 passport.deserializeUser(async (id, done) => {
     try {
         const user = await prisma.user.findUnique({ where: { id } });
+        if (!user) {
+            return done(null, false);
+        }
         done(null, user);
     } catch (err) {
         console.error("Deserialization error:", err);
@@ -30,22 +33,28 @@ passport.use(
 
                 // Check user existence and hash existence
                 if (!user || !user.hash) {
-                    return done(null, false, { message: 'Invalid email or password' });
+                    return done(null, false, {
+                        message: "Invalid email or password",
+                    });
                 }
 
                 // Check verification status
                 if (!user.is_verified) {
-                    return done(null, false, { message: 'Please verify your email before logging in' });
+                    return done(null, false, {
+                        message: "Please verify your email before logging in",
+                    });
                 }
 
                 // Verify password
                 const valid = await argon2.verify(user.hash, password);
                 if (!valid) {
-                    return done(null, false, { message: 'Invalid email or password' });
+                    return done(null, false, {
+                        message: "Invalid email or password",
+                    });
                 }
                 return done(null, user);
             } catch (err) {
-                console.error('Authentication error:', err);
+                console.error("Authentication error:", err);
                 return done(err);
             }
         }
