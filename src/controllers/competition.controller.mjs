@@ -35,6 +35,13 @@ export const registerCompetition = async (req, res) => {
 
 export const joinCompetitionWithTeamCode = async (req, res) => {
     try {
+        // Ensure required field
+        const { team_code } = req.body;
+        if (!team_code) {
+            return res
+                .status(400)
+                .json({ error: "Team code is required" });
+        }
         const user_id = req.user.id;
         const result = await compService.memberJoinWithTeamCode({
             ...req.body,
@@ -42,6 +49,17 @@ export const joinCompetitionWithTeamCode = async (req, res) => {
         });
         res.status(201).json(result);
     } catch (err) {
-        res.status(err.status || 500).json({ error: err.message });
+        console.error("Error in joinCompetitionWithTeamCode:", err);
+        // Map known errors to status codes
+        if (err.message.includes("not found")) {
+            return res.status(404).json({ error: err.message });
+        }
+        if (err.message.includes("already a member")) {
+            return res.status(409).json({ error: err.message });
+        }
+        // Fallback for other errors
+        res
+            .status(err.status || 500)
+            .json({ error: err.message || "Failed to join competition" });
     }
 };
