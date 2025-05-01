@@ -7,7 +7,11 @@ import { validateRegister } from "../middleware/registerValidationMiddleware.mjs
 import preventLoginIfAuthenticated from "../middleware/preventLoginIfAuthenticated.mjs";
 import googleStrategy from "../strategies/google-strategy.mjs";
 import LocalStrategy from "../strategies/local-strategy.mjs";
-import { register, verifyEmail } from "../controllers/auth.controller.mjs";
+import {
+    login,
+    register,
+    verifyEmail,
+} from "../controllers/auth.controller.mjs";
 
 const authRouter = Router();
 
@@ -18,8 +22,8 @@ authRouter.post(
     preventLoginIfAuthenticated,
     validateLogin,
     passport.authenticate("local"),
-    (req, res) => {
-        res.status(200).send("Login successful");
+    (req, res, next) => {
+        login(req, res, next);
     }
 );
 
