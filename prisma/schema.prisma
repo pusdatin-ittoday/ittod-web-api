@@ -13,6 +13,156 @@ datasource db {
   url      = env("DATABASE_URL")
 }
 
+model competition_submission {
+  team_id        String
+  competition_id String
+  media_id       String      @unique
+  created_at     DateTime    @default(now())
+  updated_at     DateTime?   @updatedAt
+  competition    competition @relation(fields: [competition_id], references: [id])
+  media          media       @relation(fields: [media_id], references: [id])
+  team           team        @relation(fields: [team_id], references: [id])
+
+  @@id([team_id, competition_id])
+  @@index([competition_id], map: "competition_submission_competition_id_fkey")
+}
+
+model media {
+  id                                                    String                  @id
+  uploader_id                                           String
+  name                                                  String                  @unique
+  grouping                                              media_grouping_enum?
+  type                                                  media_type_enum
+  url                                                   String
+  created_at                                            DateTime                @default(now())
+  submission                                            competition_submission?
+  uploader                                              user                    @relation(fields: [uploader_id], references: [id])
+  kartu                                                 team_member?            @relation("kartu-mahasiswa")
+  team_member_team_member_payment_proof_media_idTomedia team_member?            @relation("team_member_payment_proof_media_idTomedia")
+  twibbon                                               team_member?            @relation("twibbon")
+
+  @@index([uploader_id], map: "media_uploader_id_fkey")
+}
+
+model team {
+  id                 String                   @id
+  competition_id     String
+  team_name          String                   @db.Text
+  team_code          String                   @unique
+  is_verified        Boolean                  @default(false)
+  verification_error String?                  @db.Text
+  created_at         DateTime                 @default(now())
+  updated_at         DateTime?                @updatedAt
+  submission         competition_submission[]
+  competition        competition              @relation(fields: [competition_id], references: [id])
+  members            team_member[]
+
+  @@index([competition_id], map: "team_competition_id_fkey")
+}
+
+model team_member {
+  user_id                                         String
+  team_id                                         String
+  role                                            team_member_role_enum
+  kartu_media_id                                  String?               @unique
+  twibbon_media_id                                String?               @unique
+  payment_proof_media_id                          String?               @unique
+  is_verified                                     Boolean               @default(false)
+  verification_error                              String?               @db.Text
+  kartu                                           media?                @relation("kartu-mahasiswa", fields: [kartu_media_id], references: [id])
+  media_team_member_payment_proof_media_idTomedia media?                @relation("team_member_payment_proof_media_idTomedia", fields: [payment_proof_media_id], references: [id])
+  team                                            team                  @relation(fields: [team_id], references: [id])
+  twibbon                                         media?                @relation("twibbon", fields: [twibbon_media_id], references: [id])
+  user                                            user                  @relation(fields: [user_id], references: [id])
+
+  @@id([user_id, team_id])
+  @@index([team_id], map: "team_member_team_id_fkey")
+}
+
+model user {
+  id                       String                     @id
+  email                    String                     @unique
+  full_name                String
+  birth_date               DateTime?
+  pendidikan               education_enum?
+  nama_sekolah             String?
+  entry_source             String?
+  phone_number             String?
+  id_line                  String?
+  id_discord               String?
+  id_instagram             String?
+  consent                  Boolean                    @default(false)
+  is_registration_complete Boolean                    @default(false)
+  created_at               DateTime                   @default(now())
+  updated_at               DateTime?                  @updatedAt
+  competition_announcement competition_announcement[]
+  uploaded                 media[]
+  member                   team_member[]
+  identity                 user_identity?
+}
+
+model user_identity {
+  id                                 String                      @id
+  email                              String                      @unique
+  provider                           user_identity_provider_enum
+  hash                               String?
+  is_verified                        Boolean                     @default(false)
+  verification_token                 String
+  verification_token_expiration      DateTime
+  password_recovery_token            String?
+  password_recovery_token_expiration DateTime?
+  refresh_token                      String?
+  role                               user_identity_role_enum?
+  created_at                         DateTime                    @default(now())
+  updated_at                         DateTime?                   @updatedAt
+  user                               user                        @relation(fields: [id], references: [id])
+}
+
+model Session {
+  id      String   @id @default(cuid())
+  expires DateTime
+  data    Json
+
+  @@map("sessions")
+}
+
+model competition {
+  id                       String                     @id
+  title                    String                     @db.Text
+  description              String                     @db.Text
+  max_team_member          Int                        @default(3)
+  guide_book_url           String                     @db.Text
+  competition_announcement competition_announcement[]
+  submissions              competition_submission[]
+  competition_timeline     competition_timeline[]
+  teams                    team[]
+}
+
+model competition_announcement {
+  id             String      @id
+  competition_id String
+  author_id      String
+  title          String      @db.Text
+  description    String      @db.Text
+  created_at     DateTime    @default(now())
+  updated_at     DateTime
+  user           user        @relation(fields: [author_id], references: [id])
+  competition    competition @relation(fields: [competition_id], references: [id])
+
+  @@index([author_id], map: "competition_announcement_author_id_fkey")
+  @@index([competition_id], map: "competition_announcement_competition_id_fkey")
+}
+
+model competition_timeline {
+  id             String      @id
+  competition_id String
+  title          String      @db.Text
+  date           DateTime
+  competition    competition @relation(fields: [competition_id], references: [id])
+
+  @@index([competition_id], map: "competition_timeline_competition_id_fkey")
+}
+
 enum education_enum {
   sma
   s1
@@ -46,165 +196,4 @@ enum media_grouping_enum {
 enum media_type_enum {
   image
   pdf
-}
-
-enum event_type_enum {
-  competition
-  non_competition
-}
-
-model event {
-  id              String @id
-  title           String @db.Text
-  description     String @db.Text
-  guide_book_url  String @db.Text
-  type            event_type_enum
-  contact_person1 String
-  contact_person2 String?
-  max_noncompetition_participant Int?
-
-  announcements event_announcement[]
-  submissions   competition_submission[]
-  timelines     event_timeline[]
-  teams         team[]
-  participants  user[]
-}
-
-model event_announcement{
-  id             String   @id
-  event_id String
-  author_id      String
-  title          String   @db.Text
-  description    String   @db.Text
-  created_at     DateTime @default(now())
-  updated_at     DateTime @updatedAt
-
-  competition event       @relation(fields: [event_id], references: [id])
-  author      user        @relation(fields: [author_id], references: [id])
-}
-
-model competition_submission {
-  team_id        String
-  competition_id String
-  media_id       String    @unique
-  created_at     DateTime  @default(now())
-  updated_at     DateTime? @updatedAt
-
-  team           team      @relation(fields: [team_id], references: [id])
-  competition    event     @relation(fields: [competition_id], references: [id])
-  media          media     @relation(fields: [media_id], references: [id])
-
-  @@id([team_id, competition_id])
-}
-
-model event_timeline {
-  id             String   @id
-  event_id       String
-  title          String   @db.Text
-  date           DateTime
-
-  event          event @relation(fields: [event_id], references: [id])
-}
-
-model media {
-  id          String        @id
-  uploader_id String
-  name        String        @unique
-  grouping    media_grouping_enum?
-  type        media_type_enum
-  url         String
-  created_at  DateTime      @default(now())
-
-  uploader    user          @relation(fields: [uploader_id], references: [id])
-
-  paymentproof team?        @relation("paymentProof")
-  twibbon      team_member? @relation("twibbon")
-  kartu        team_member? @relation("kartu-mahasiswa")
-  submission   competition_submission?
-}
-
-model team {
-  id                     String    @id
-  competition_id         String
-  team_name              String    @db.Text
-  team_code              String    @unique
-  max_member             Int       @default(3)
-  payment_proof_media_id String?   @unique
-  is_verified            Boolean   @default(false)
-  verification_error     String?   @db.Text
-  created_at             DateTime  @default(now())
-  updated_at             DateTime? @updatedAt
-
-  competition            event  @relation(fields: [competition_id], references: [id])
-  paymentProof           media? @relation("paymentProof", fields: [payment_proof_media_id], references: [id])
-
-  members                team_member[]
-  submission             competition_submission[]
-}
-
-model team_member {
-  user_id                String
-  team_id                String
-  role                   team_member_role_enum
-  kartu_media_id         String?               @unique
-  twibbon_media_id       String?               @unique
-  is_verified            Boolean               @default(false)
-  verification_error     String?               @db.Text
-
-  user         user   @relation(fields: [user_id], references: [id])
-  team         team   @relation(fields: [team_id], references: [id])
-  twibbon      media? @relation("twibbon", fields: [twibbon_media_id], references: [id])
-  kartu        media? @relation("kartu-mahasiswa", fields: [kartu_media_id], references: [id])
-
-  @@id([user_id, team_id])
-}
-
-model user {
-  id                       String          @id
-  email                    String          @unique
-  full_name                String
-  birth_date               DateTime?
-  pendidikan               education_enum?
-  nama_sekolah             String?
-  entry_source             String?
-  phone_number             String?
-  id_line                  String?
-  id_discord               String?
-  id_instagram             String?
-  consent                  Boolean         @default(false)
-  is_registration_complete Boolean         @default(false)
-  created_at               DateTime        @default(now())
-  updated_at               DateTime?       @updatedAt
-
-  uploaded                 media[]
-  identity                 user_identity?
-  announcements            event_announcement[]
-  member                   team_member[]
-  noncompetition_events   event[]
-}
-
-model user_identity {
-  id                                 String                      @id
-  email                              String                      @unique
-  provider                           user_identity_provider_enum
-  hash                               String?
-  is_verified                        Boolean                     @default(false)
-  verification_token                 String
-  verification_token_expiration      DateTime
-  password_recovery_token            String?
-  password_recovery_token_expiration DateTime?
-  refresh_token                      String?
-  role                               user_identity_role_enum?
-  created_at                         DateTime                    @default(now())
-  updated_at                         DateTime?                   @updatedAt
-
-  user user @relation(fields: [id], references: [id])
-}
-
-model Session {
-  id      String   @id @default(cuid())
-  expires DateTime
-  data    Json
-
-  @@map("sessions") // Match the table name created by express-mysql-session
 }
