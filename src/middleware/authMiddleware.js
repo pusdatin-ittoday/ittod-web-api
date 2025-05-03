@@ -1,5 +1,5 @@
 const Joi = require('joi');
-const loginSchema = require('../validators/loginValidationSchema.cjs');
+const loginSchema = require('../validators/loginValidationSchema.js');
 const rateLimit = require('express-rate-limit');
 
 const loginLimiter = rateLimit({

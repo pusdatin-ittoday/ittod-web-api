@@ -1,6 +1,6 @@
 // noinspection DuplicatedCode
 
-const prisma = require('../prisma.cjs');
+const prisma = require('../prisma.js');
 const passport = require('passport');
 const { Strategy as LocalStrategy } = require('passport-local');
 import * as argon2 from "argon2";

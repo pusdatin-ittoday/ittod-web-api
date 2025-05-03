@@ -1,4 +1,4 @@
-const prisma = require('../prisma.cjs');
+const prisma = require('../prisma.js');
 const passport = require('passport');
 const { Strategy as GoogleStrategy } = require('passport-google-oauth20');
 

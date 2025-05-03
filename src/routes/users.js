@@ -1,8 +1,8 @@
 // @deprecated
 
 const { Router } = require('express');
-const { changeUsername } = require('../services/user.service.cjs');
-const { validateChangeUsername } = require('../middleware/userMiddleware.cjs');
+const { changeUsername } = require('../services/user.service.js');
+const { validateChangeUsername } = require('../middleware/userMiddleware.js');
 
 const usersRouter = Router();
 

@@ -1,5 +1,5 @@
 const Joi = require('joi');
-const registerSchema = require('../validators/registerValidationSchema.cjs');
+const registerSchema = require('../validators/registerValidationSchema.js');
 
 const validateRegister = (req, res, next) => {
     const { error } = registerSchema.validate(req.body, { abortEarly: false });
