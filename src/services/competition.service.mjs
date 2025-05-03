@@ -41,7 +41,7 @@ export const registerTeamThenInsertLeader = async ({
         }
     } while (existingTeamWithCode);
 
-    const competitionExists = await prisma.event.findUnique({
+    const competitionExists = await prisma.event.findFirst({
         where: { id: competition_id , type: "competition"},
     });
     if (!competitionExists)
@@ -103,9 +103,16 @@ export const memberJoinWithTeamCode = async ({ user_id, team_code }) => {
             const teamMemberCount = await tx.team_member.count({
                 where: { team_id: team.id },
             });
-            const competition = await tx.event.findUnique({
-                where: { id: team.competition_id },
+            // Verify team's competition exists
+            const competitionExists = await tx.event.findFirst({
+                where: { id: team.competition_id, type: "competition" },
             });
+            if (!competitionExists) {
+                throw {
+                    status: 404,
+                    message: "Competition not found for this team",
+                };
+            }
 
             if (teamMemberCount >= team.max_member)
                 throw {
