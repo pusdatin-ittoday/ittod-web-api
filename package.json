@@ -15,8 +15,7 @@
     "dependencies": {
         "@dotenvx/dotenvx": "^1.41.0",
         "@prisma/client": "^6.6.0",
-        "@supabase/supabase-js": "^2.49.4",
-        "argon2": "^0.43.0",
+        "argon2": "^0.28.4",
         "cookie-parser": "^1.4.7",
         "dotenv": "^16.5.0",
         "express": "^5.1.0",

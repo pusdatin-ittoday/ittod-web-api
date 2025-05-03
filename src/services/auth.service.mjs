@@ -25,7 +25,6 @@ export const register = async ({ email, password, full_name }) => {
             full_name,
             identity: {
                 create: {
-                    // id: generatedId,
                     provider,
                     email,
                     hash: hashed,
