@@ -5,8 +5,8 @@ const passport = require('passport');
 const cookieParser = require('cookie-parser');
 require('@dotenvx/dotenvx/config');
 
-const routes = require('./routes/index.cjs');
-const sessionConfig = require('./config/session.config.cjs');
+const routes = require('./routes/index.js');
+const sessionConfig = require('./config/session.config.js');
 
 const app = express();
 

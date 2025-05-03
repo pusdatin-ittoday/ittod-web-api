@@ -1,6 +1,6 @@
-const prisma = require('../prisma.cjs');
+const prisma = require('../prisma.js');
 const crypto = require('crypto');
-const { checkUserCompetitionLimit } = require('../helpers/checkUserCompetitionLimit.cjs');
+const { checkUserCompetitionLimit } = require('../helpers/checkUserCompetitionLimit.js');
 
 exports.registerTeamThenInsertLeader = = async ({
     competition_id,

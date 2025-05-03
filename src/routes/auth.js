@@ -2,14 +2,14 @@
 
 const { Router } = require('express');
 const passport = require('passport');
-const { validateLogin, loginLimiter } = require('../middleware/authMiddleware.cjs');
-const { validateRegister } = require('../middleware/registerValidationMiddleware.cjs');
-const preventLoginIfAuthenticated = require('../middleware/preventLoginIfAuthenticated.cjs');
-const googleStrategy = require('../strategies/google-strategy.cjs');
-const LocalStrategy = require('../strategies/local-strategy.cjs');
+const { validateLogin, loginLimiter } = require('../middleware/authMiddleware.js');
+const { validateRegister } = require('../middleware/registerValidationMiddleware.js');
+const preventLoginIfAuthenticated = require('../middleware/preventLoginIfAuthenticated.js');
+const googleStrategy = require('../strategies/google-strategy.js');
+const LocalStrategy = require('../strategies/local-strategy.js');
 const { login,
     register,
-    verifyEmail, } = require('../controllers/auth.controller.cjs');
+    verifyEmail, } = require('../controllers/auth.controller.js');
 
 const authRouter = Router();
 

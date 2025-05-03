@@ -1,7 +1,7 @@
-const prisma = require('../prisma.cjs');
+const prisma = require('../prisma.js');
 const argon2 = require('argon2');
 const crypto = require('crypto');
-const { sendVerificationEmail } = require('../utils/mailer.cjs');
+const { sendVerificationEmail } = require('../utils/mailer.js');
 
 exports.register = = async ({ email, password, full_name }) => {
     if (password.length < 8)
