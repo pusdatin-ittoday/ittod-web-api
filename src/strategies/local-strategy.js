@@ -1,9 +1,9 @@
 // noinspection DuplicatedCode
 
-const prisma = require('../prisma.js');
-const passport = require('passport');
-const { Strategy as LocalStrategy } = require('passport-local');
-import * as argon2 from "argon2";
+const prisma = require("../prisma.js");
+const passport = require("passport");
+const { Strategy: LocalStrategy } = require("passport-local");
+const argon2 = require("argon2");
 
 passport.serializeUser((user, done) => {
     done(null, user.id);

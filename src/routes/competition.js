@@ -1,7 +1,9 @@
-const { Router } = require('express');
-const { joinCompetitionWithTeamCode,
-    registerCompetition, } = require('../controllers/competition.controller.js');
-const { isAuthenticated } = require('../middleware/authMiddleware.js');
+const { Router } = require("express");
+const {
+    joinCompetitionWithTeamCode,
+    registerCompetition,
+} = require("../controllers/competition.controller.js");
+const { isAuthenticated } = require("../middleware/authMiddleware.js");
 
 const compeRouter = Router();
 

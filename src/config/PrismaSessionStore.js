@@ -1,5 +1,5 @@
-const session = require('express-session');
-const prisma = require('../prisma.js');
+const session = require("express-session");
+const prisma = require("../prisma.js");
 
 class PrismaSessionStore extends session.Store {
     static async deleteExpiredSessions() {

@@ -1,5 +1,4 @@
-const Joi = require('joi');
-const changeUsernameSchema = require('../validators/changeUsernameValidationSchema.js');
+const changeUsernameSchema = require("../validators/changeUsernameValidationSchema.js");
 
 const validateChangeUsername = (req, res, next) => {
     const { error } = changeUsernameSchema.validate(req.body, {

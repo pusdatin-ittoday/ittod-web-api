@@ -1,8 +1,10 @@
-const prisma = require('../prisma.js');
-const crypto = require('crypto');
-const { checkUserCompetitionLimit } = require('../helpers/checkUserCompetitionLimit.js');
+const prisma = require("../prisma.js");
+const crypto = require("crypto");
+const {
+    checkUserCompetitionLimit,
+} = require("../helpers/checkUserCompetitionLimit.js");
 
-exports.registerTeamThenInsertLeader = = async ({
+exports.registerTeamThenInsertLeader = async ({
     competition_id,
     team_name,
     leader_id,
@@ -42,7 +44,7 @@ exports.registerTeamThenInsertLeader = = async ({
     } while (existingTeamWithCode);
 
     const competitionExists = await prisma.event.findFirst({
-        where: { id: competition_id , type: "competition"},
+        where: { id: competition_id, type: "competition" },
     });
     if (!competitionExists)
         throw { status: 404, message: "competition_id not found" };
@@ -83,7 +85,7 @@ exports.registerTeamThenInsertLeader = = async ({
     }
 };
 
-exports.memberJoinWithTeamCode = = async ({ user_id, team_code }) => {
+exports.memberJoinWithTeamCode = async ({ user_id, team_code }) => {
     return prisma.$transaction(
         async tx => {
             await checkUserCompetitionLimit(tx, user_id);

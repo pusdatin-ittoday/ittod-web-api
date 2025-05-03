@@ -1,6 +1,6 @@
-import * as compService from "../services/competition.service.mjs";
+const compService = require("../services/competition.service.js");
 
-exports.registerCompetition = = async (req, res) => {
+exports.registerCompetition = async (req, res) => {
     try {
         // Validate required fields
         const { competition_id, team_name } = req.body;
@@ -38,7 +38,7 @@ exports.registerCompetition = = async (req, res) => {
     }
 };
 
-exports.joinCompetitionWithTeamCode = = async (req, res) => {
+exports.joinCompetitionWithTeamCode = async (req, res) => {
     try {
         // Ensure required field
         const { team_code } = req.body;

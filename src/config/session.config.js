@@ -1,4 +1,4 @@
-const PrismaSessionStore = require('./PrismaSessionStore.js');
+const PrismaSessionStore = require("./PrismaSessionStore.js");
 
 const sessionSecret = process.env.SECRET_KEY_SESSION;
 if (!sessionSecret) {
