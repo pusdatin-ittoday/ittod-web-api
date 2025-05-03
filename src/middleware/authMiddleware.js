@@ -1,6 +1,5 @@
-const Joi = require('joi');
-const loginSchema = require('../validators/loginValidationSchema.js');
-const rateLimit = require('express-rate-limit');
+const loginSchema = require("../validators/loginValidationSchema.js");
+const rateLimit = require("express-rate-limit");
 
 const loginLimiter = rateLimit({
     windowMs: 15 * 60 * 1000,
@@ -31,4 +30,4 @@ const isAuthenticated = (req, res, next) => {
     next();
 };
 
-export { validateLogin, loginLimiter, isAuthenticated };
+module.exports = { validateLogin, loginLimiter, isAuthenticated };

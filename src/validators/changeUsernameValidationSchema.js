@@ -1,4 +1,4 @@
-const Joi = require('joi');
+const Joi = require("joi");
 
 const changeUsernameSchema = Joi.object({
     oldUsername: Joi.string().required().messages({

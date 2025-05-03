@@ -1,4 +1,4 @@
-exports.mailerConfig = = {
+exports.mailerConfig = {
     host: process.env.EMAIL_HOST,
     port: parseInt(process.env.EMAIL_PORT, 10),
     auth: {

@@ -1,9 +1,9 @@
-const prisma = require('../prisma.js');
-const argon2 = require('argon2');
-const crypto = require('crypto');
-const { sendVerificationEmail } = require('../utils/mailer.js');
+const prisma = require("../prisma.js");
+const argon2 = require("argon2");
+const crypto = require("crypto");
+const { sendVerificationEmail } = require("../utils/mailer.js");
 
-exports.register = = async ({ email, password, full_name }) => {
+exports.register = async ({ email, password, full_name }) => {
     if (password.length < 8)
         throw {
             status: 400,
@@ -45,7 +45,7 @@ exports.register = = async ({ email, password, full_name }) => {
     return { message: "Registered. Please verify your email." };
 };
 
-exports.verifyEmail = = async token => {
+exports.verifyEmail = async token => {
     const user = await prisma.user_identity.findFirst({
         where: {
             verification_token: token,

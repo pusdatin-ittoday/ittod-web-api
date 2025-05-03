@@ -3,4 +3,4 @@ module.exports = function preventLoginIfAuthenticated(req, res, next) {
         return res.status(403).send("Already logged in.");
     }
     next();
-}
+};

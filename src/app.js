@@ -1,12 +1,12 @@
-const express = require('express');
-const { json } = require('express');
-const session = require('express-session');
-const passport = require('passport');
-const cookieParser = require('cookie-parser');
-require('@dotenvx/dotenvx/config');
+const express = require("express");
+const { json } = require("express");
+const session = require("express-session");
+const passport = require("passport");
+const cookieParser = require("cookie-parser");
+require("@dotenvx/dotenvx/config");
 
-const routes = require('./routes/index.js');
-const sessionConfig = require('./config/session.config.js');
+const routes = require("./routes/index.js");
+const sessionConfig = require("./config/session.config.js");
 
 const app = express();
 
