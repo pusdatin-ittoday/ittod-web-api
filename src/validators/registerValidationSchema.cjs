@@ -1,4 +1,4 @@
-import Joi from "joi";
+const Joi = require('joi');
 
 const registerSchema = Joi.object({
     email: Joi.string().email().required().messages({
@@ -15,4 +15,4 @@ const registerSchema = Joi.object({
     }),
 });
 
-export default registerSchema;
+module.exports = registerSchema;

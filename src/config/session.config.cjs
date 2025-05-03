@@ -1,11 +1,11 @@
-import PrismaSessionStore from "./PrismaSessionStore.mjs";
+const PrismaSessionStore = require('./PrismaSessionStore.cjs');
 
 const sessionSecret = process.env.SECRET_KEY_SESSION;
 if (!sessionSecret) {
     throw new Error("Missing SECRET_KEY_SESSION environment variable");
 }
 
-export default {
+module.exports = {
     secret: sessionSecret,
     resave: false,
     saveUninitialized: false,

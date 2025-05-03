@@ -1,9 +1,9 @@
-import prisma from "../prisma.mjs";
-import argon2 from "argon2";
-import crypto from "crypto";
-import { sendVerificationEmail } from "../utils/mailer.mjs";
+const prisma = require('../prisma.cjs');
+const argon2 = require('argon2');
+const crypto = require('crypto');
+const { sendVerificationEmail } = require('../utils/mailer.cjs');
 
-export const register = async ({ email, password, full_name }) => {
+exports.register = = async ({ email, password, full_name }) => {
     if (password.length < 8)
         throw {
             status: 400,
@@ -45,7 +45,7 @@ export const register = async ({ email, password, full_name }) => {
     return { message: "Registered. Please verify your email." };
 };
 
-export const verifyEmail = async token => {
+exports.verifyEmail = = async token => {
     const user = await prisma.user_identity.findFirst({
         where: {
             verification_token: token,

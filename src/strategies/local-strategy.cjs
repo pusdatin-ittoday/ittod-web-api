@@ -1,8 +1,8 @@
 // noinspection DuplicatedCode
 
-import prisma from "../prisma.mjs";
-import passport from "passport";
-import { Strategy as LocalStrategy } from "passport-local";
+const prisma = require('../prisma.cjs');
+const passport = require('passport');
+const { Strategy as LocalStrategy } = require('passport-local');
 import * as argon2 from "argon2";
 
 passport.serializeUser((user, done) => {
@@ -61,4 +61,4 @@ passport.use(
     )
 );
 
-export default passport;
+module.exports = passport;

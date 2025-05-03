@@ -1,5 +1,5 @@
-import Joi from "joi";
-import registerSchema from "../validators/registerValidationSchema.mjs";
+const Joi = require('joi');
+const registerSchema = require('../validators/registerValidationSchema.cjs');
 
 const validateRegister = (req, res, next) => {
     const { error } = registerSchema.validate(req.body, { abortEarly: false });

@@ -1,6 +1,6 @@
-import Joi from "joi";
-import loginSchema from "../validators/loginValidationSchema.mjs";
-import rateLimit from "express-rate-limit";
+const Joi = require('joi');
+const loginSchema = require('../validators/loginValidationSchema.cjs');
+const rateLimit = require('express-rate-limit');
 
 const loginLimiter = rateLimit({
     windowMs: 15 * 60 * 1000,

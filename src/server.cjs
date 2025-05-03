@@ -1,4 +1,4 @@
-import app from "./app.mjs";
+const app = require('./app.cjs');
 
 const PORT = process.env.PORT || 3000;
 
