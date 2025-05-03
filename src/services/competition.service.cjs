@@ -1,8 +1,8 @@
-import prisma from "../prisma.mjs";
-import crypto from "crypto";
-import { checkUserCompetitionLimit } from "../helpers/checkUserCompetitionLimit.mjs";
+const prisma = require('../prisma.cjs');
+const crypto = require('crypto');
+const { checkUserCompetitionLimit } = require('../helpers/checkUserCompetitionLimit.cjs');
 
-export const registerTeamThenInsertLeader = async ({
+exports.registerTeamThenInsertLeader = = async ({
     competition_id,
     team_name,
     leader_id,
@@ -83,7 +83,7 @@ export const registerTeamThenInsertLeader = async ({
     }
 };
 
-export const memberJoinWithTeamCode = async ({ user_id, team_code }) => {
+exports.memberJoinWithTeamCode = = async ({ user_id, team_code }) => {
     return prisma.$transaction(
         async tx => {
             await checkUserCompetitionLimit(tx, user_id);

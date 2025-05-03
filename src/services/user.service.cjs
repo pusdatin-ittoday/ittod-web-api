@@ -3,7 +3,7 @@
  * for user management functionality.
  */
 
-import prisma from "../prisma.mjs";
+const prisma = require('../prisma.cjs');
 
 export async function changeUsername(oldUsername, newUsername) {
     try {
