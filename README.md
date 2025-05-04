@@ -1,80 +1,97 @@
 # IT-TODAY Backend API
 
-A RESTful backend service for the IT-TODAY 2025 platform, built with **Node.js**, **Express.js**, **MySQL**, and **Prisma ORM**. This API handles user data, products, and other endpoints related to the IT-TODAY event.
+A robust RESTful backend service for the IT-TODAY 2025 platform, built with **Node.js**, **Express.js**, **MySQL**, and **Prisma ORM**. This API manages user data, team registrations, competitions, and other functionalities for the IT-TODAY event.
 
 ---
 
-## 🚀 Installation
+## 🚀 Features
+
+- User authentication and authorization
+- Team registration and management
+- Competition participation limits
+- Leader assignment and validation
+- Integration with Google OAuth2
+- Scalable database design with Prisma ORM
+
+---
+
+## 🛠️ Tech Stack
+
+- **Node.js**: Backend runtime
+- **Express.js**: Web framework
+- **MySQL**: Relational database
+- **Prisma ORM**: Database management
+- **Supabase**: Object storage
+- **Prettier**: Code formatting
+
+---
+
+## 📦 Installation
 
 Follow these steps to set up the project locally:
 
-#### 1. Clone the repository
+### 1. Clone the repository
 
 ```bash
 git clone https://github.com/pusdatin-ittoday/ittod-web-api.git
 ```
 
-#### 2. Navigate to the project directory
+### 2. Navigate to the project directory
 
 ```bash
 cd ittod-web-api
 ```
 
-#### 3. Install dependencies
+### 3. Install dependencies
 
 ```bash
 npm install
 ```
 
-#### 4. Configure .env
+### 4. Configure environment variables
 
-Google client id is necessary for this step. For more details visit: https://developers.google.com/identity/protocols/oauth2
+Create a `.env` file in the project root and add the following variables:
 
-```bash
-DATABASE_URL=mysql:xxxx
-SECRET_KEY_SESSION=xxxx
-GOOGLE_CLIENT_SECRET=xxxx
-GOOGLE_CLIENT_ID=xxxx
-GOOGLE_REDIRECT=https://xxxx
+```env
+DATABASE_URL=mysql://<username>:<password>@<host>:<port>/<database>
+SECRET_KEY_SESSION=<your_secret_key>
+GOOGLE_CLIENT_SECRET=<your_google_client_secret>
+GOOGLE_CLIENT_ID=<your_google_client_id>
+GOOGLE_REDIRECT=<your_google_redirect_url>
 ```
 
-Save .env to project root folder
+### 5. Set up the database
 
-#### 5. Configure Prisma
-
-Asumption: Empty database
+Run the following Prisma commands to configure the database:
 
 ```bash
-npx prisma generate       # generates the Prisma client
-npx prisma migrate dev    # runs migrations and creates the database
-# or if you're not using migrations:
-npx prisma db push        # pushes the schema to the database without migrations
+npx prisma generate       # Generate the Prisma client
+npx prisma migrate dev    # Apply migrations and create the database
+# Or, if not using migrations:
+npx prisma db push        # Push the schema to the database
 ```
 
 ---
 
 ## 🧪 Usage
 
-Start the development server:
+### Start the development server
 
 ```bash
 npm run dev
 ```
 
-Or start the production build:
+### Start the production server
 
 ```bash
 npm run serve
 ```
 
-Access the API at:  
-🌐 `http://localhost:3000`
-
-Make sure to configure your `.env` file with the required database credentials.
+Access the API at: `http://localhost:3000`
 
 ---
 
-## 📦 API Endpoints
+## 📄 API Endpoints
 
 ### 🔐 Users
 
@@ -85,13 +102,21 @@ Make sure to configure your `.env` file with the required database credentials.
 | GET    | `/api/users/:id` | Get user by ID     |
 | PUT    | `/api/users/:id` | Update user by ID  |
 
-### 🛍️ Products
+### 🏆 Competitions
 
-| Method | Endpoint        | Description           |
-| ------ | --------------- | --------------------- |
-| GET    | `/api/products` | Retrieve all products |
+| Method | Endpoint                  | Description                          |
+| ------ | ------------------------- | ------------------------------------ |
+| GET    | `/api/competitions`       | Retrieve all competitions            |
+| POST   | `/api/competitions`       | Add a new competition                |
+| GET    | `/api/competitions/:id`   | Get competition details by ID        |
 
-_More endpoints will be added soon._
+### 👥 Teams
+
+| Method | Endpoint                  | Description                          |
+| ------ | ------------------------- | ------------------------------------ |
+| POST   | `/api/teams`              | Register a new team                  |
+| POST   | `/api/teams/join`         | Join a team using a team code        |
+| GET    | `/api/teams/:id`          | Get team details by ID               |
 
 ---
 
@@ -101,31 +126,16 @@ _More endpoints will be added soon._
 
 ---
 
-## ⚙️ Tech Stack
+## 🧑‍💻 Contributors
 
-- **Node.js**
-- **Express.js**
-- **MySQL**
-- **Prisma ORM**
-- **Supabase** (for object storage)
-- **Prettier** (as linter)
+- **Walid Nadirul Ahnaf**
+- **Aldi Pramudya**
+- **Ilham Edgar Maulana Goesasi**
+- **Qois Firosi**
+- **Jeremy Tjahjana**
 
 ---
 
 ## 📄 License
 
 This project is licensed under the [MIT License](LICENSE).
-
----
-
-## 👨‍💻 Maintainers
-
-- Divisi PDI – IT-TODAY 2025
-
-```
-- Walid Nadirul ahnaf
-- Aldi Pramudya
-- Ilham Edgar Maulana Goesasi
-- Qois Firosi
-- Jeremy Tjahjana
-```
