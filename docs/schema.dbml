@@ -61,6 +61,7 @@ Table media {
   type media_type_enum [not null]
   url String [not null]
   created_at DateTime [default: `now()`, not null]
+  updated_at DateTime [default: `now()`, not null]
   uploader user [not null]
   paymentproof team
   twibbon team_member
