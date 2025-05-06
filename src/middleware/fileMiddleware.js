@@ -1,4 +1,4 @@
-const fileSchema =  require( "../validators/fileValidationSchema.js");
+const fileSchema = require("../validators/fileValidationSchema.js");
 const prisma = require("../prisma");
 
 const validateFile = (req, res, next) => {
@@ -11,14 +11,16 @@ const validateFile = (req, res, next) => {
     next();
 };
 
-const isMemberOfTeam = async (req,res,next) => {
-    const {team_id} = req.body;
+const isMemberOfTeam = async (req, res, next) => {
+    const { team_id } = req.body;
     const user_id = req.user.id;
 
-    const result = await prisma.team_member.findFirst({where: {user_id, team_id}})
+    const result = await prisma.team_member.findFirst({
+        where: { user_id, team_id },
+    });
     if (!result) {
-        return res.status(403).json({error: "You are not in this team!"})
+        return res.status(403).json({ error: "You are not in this team!" });
     }
     next();
-}
-module.exports = {isMemberOfTeam,validateFile};
+};
+module.exports = { isMemberOfTeam, validateFile };

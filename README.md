@@ -104,19 +104,19 @@ Access the API at: `http://localhost:3000`
 
 ### 🏆 Competitions
 
-| Method | Endpoint                  | Description                          |
-| ------ | ------------------------- | ------------------------------------ |
-| GET    | `/api/competitions`       | Retrieve all competitions            |
-| POST   | `/api/competitions`       | Add a new competition                |
-| GET    | `/api/competitions/:id`   | Get competition details by ID        |
+| Method | Endpoint                | Description                   |
+| ------ | ----------------------- | ----------------------------- |
+| GET    | `/api/competitions`     | Retrieve all competitions     |
+| POST   | `/api/competitions`     | Add a new competition         |
+| GET    | `/api/competitions/:id` | Get competition details by ID |
 
 ### 👥 Teams
 
-| Method | Endpoint                  | Description                          |
-| ------ | ------------------------- | ------------------------------------ |
-| POST   | `/api/teams`              | Register a new team                  |
-| POST   | `/api/teams/join`         | Join a team using a team code        |
-| GET    | `/api/teams/:id`          | Get team details by ID               |
+| Method | Endpoint          | Description                   |
+| ------ | ----------------- | ----------------------------- |
+| POST   | `/api/teams`      | Register a new team           |
+| POST   | `/api/teams/join` | Join a team using a team code |
+| GET    | `/api/teams/:id`  | Get team details by ID        |
 
 ---
 
