@@ -1,6 +1,6 @@
-import Joi from "joi";
+const Joi = require("joi");
 
-export const fileSchema = Joi.object({
+const fileSchema = Joi.object({
     title: Joi.string().min(3).required().messages({
         "string.min": "Title must be at least 3 characters long.",
         "any.required": "Title is required.",
@@ -14,3 +14,5 @@ export const fileSchema = Joi.object({
         "any.required": "Team ID is required.",
     }),
 });
+
+module.exports = fileSchema;

@@ -1,7 +1,7 @@
-import prisma from "../prisma.mjs";
-import crypto from "crypto";
+const prisma = require("../prisma.js")
+const crypto = require("crypto")
 
-export const submitTeamFile = async ({ user_id, team_id, title, url_file }) => {
+const submitTeamFile = async ({ user_id, team_id, title, url_file }) => {
     const existingFile = await prisma.competition_submission.findFirst({
         where: { team_id },
     });
@@ -45,3 +45,5 @@ export const submitTeamFile = async ({ user_id, team_id, title, url_file }) => {
         throw { status: 500, message: "Submission Failed" };
     }
 };
+
+module.exports = { submitTeamFile };

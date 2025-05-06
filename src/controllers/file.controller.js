@@ -1,4 +1,4 @@
-import * as fileService from "../services/file.service.mjs";
+const fileService = require("../services/file.service.js");
 
 export const fileServ = async (req, res) => {
     try {

@@ -1,5 +1,4 @@
-
-import {fileSchema} from "../validators/fileValidationSchema.mjs";
+const fileSchema =  require( "../validators/fileValidationSchema.js");
 
 const validateFile = (req, res, next) => {
     const { error } = fileSchema.validate(req.body, { abortEarly: false });
@@ -11,4 +10,4 @@ const validateFile = (req, res, next) => {
     next();
 };
 
-export {validateFile};
+module.exports = validateFile;
