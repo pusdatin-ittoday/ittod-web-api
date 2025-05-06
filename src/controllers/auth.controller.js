@@ -1,6 +1,6 @@
-import * as authService from "../services/auth.service.mjs";
+const authService = require("../services/auth.service.js");
 
-export const register = async (req, res) => {
+exports.register = async (req, res) => {
     try {
         const result = await authService.register(req.body);
         res.status(201).json(result);
@@ -9,7 +9,7 @@ export const register = async (req, res) => {
     }
 };
 
-export const verifyEmail = async (req, res) => {
+exports.verifyEmail = async (req, res) => {
     try {
         const result = await authService.verifyEmail(req.query.token);
         res.json({ message: result.message });
@@ -18,7 +18,7 @@ export const verifyEmail = async (req, res) => {
     }
 };
 
-export const login = (req, res) => {
+exports.login = (req, res) => {
     const { id, email, name } = req.user;
     res.json({
         message: "Login successful",

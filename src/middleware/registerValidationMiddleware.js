@@ -1,5 +1,4 @@
-import Joi from "joi";
-import registerSchema from "../validators/registerValidationSchema.mjs";
+const registerSchema = require("../validators/registerValidationSchema.js");
 
 const validateRegister = (req, res, next) => {
     const { error } = registerSchema.validate(req.body, { abortEarly: false });
@@ -11,4 +10,4 @@ const validateRegister = (req, res, next) => {
     next();
 };
 
-export { validateRegister };
+module.exports = { validateRegister };

@@ -1,8 +1,10 @@
-import prisma from "../prisma.mjs";
-import crypto from "crypto";
-import { checkUserCompetitionLimit } from "../helpers/checkUserCompetitionLimit.mjs";
+const prisma = require("../prisma.js");
+const crypto = require("crypto");
+const {
+    checkUserCompetitionLimit,
+} = require("../helpers/checkUserCompetitionLimit.js");
 
-export const registerTeamThenInsertLeader = async ({
+exports.registerTeamThenInsertLeader = async ({
     competition_id,
     team_name,
     leader_id,
@@ -42,7 +44,7 @@ export const registerTeamThenInsertLeader = async ({
     } while (existingTeamWithCode);
 
     const competitionExists = await prisma.event.findFirst({
-        where: { id: competition_id , type: "competition"},
+        where: { id: competition_id, type: "competition" },
     });
     if (!competitionExists)
         throw { status: 404, message: "competition_id not found" };
@@ -83,7 +85,7 @@ export const registerTeamThenInsertLeader = async ({
     }
 };
 
-export const memberJoinWithTeamCode = async ({ user_id, team_code }) => {
+exports.memberJoinWithTeamCode = async ({ user_id, team_code }) => {
     return prisma.$transaction(
         async tx => {
             await checkUserCompetitionLimit(tx, user_id);

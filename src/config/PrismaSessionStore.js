@@ -1,5 +1,5 @@
-import session from "express-session";
-import prisma from "../prisma.mjs";
+const session = require("express-session");
+const prisma = require("../prisma.js");
 
 class PrismaSessionStore extends session.Store {
     static async deleteExpiredSessions() {
@@ -71,4 +71,4 @@ class PrismaSessionStore extends session.Store {
     }
 }
 
-export default PrismaSessionStore;
+module.exports = PrismaSessionStore;

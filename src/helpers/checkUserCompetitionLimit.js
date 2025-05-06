@@ -1,4 +1,4 @@
-export async function checkUserCompetitionLimit(prismaClient, userId) {
+async function checkUserCompetitionLimit(prismaClient, userId) {
     const userCompetitionsCount = await prismaClient.team_member
         .groupBy({
             by: ["team_id"],
@@ -16,3 +16,5 @@ export async function checkUserCompetitionLimit(prismaClient, userId) {
         };
     }
 }
+
+module.exports = { checkUserCompetitionLimit };

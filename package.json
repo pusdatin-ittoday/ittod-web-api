@@ -1,11 +1,11 @@
 {
     "name": "ittod-web-api",
     "version": "1.0.0",
-    "main": "src/server.mjs",
+    "main": "src/server.js",
     "scripts": {
         "test": "echo \"Error: no test specified\" && exit 1",
-        "dev": "nodemon src/server.mjs",
-        "serve": "node src/server.mjs",
+        "dev": "nodemon src/server.js",
+        "serve": "node src/server.js",
         "format": "prettier --write ."
     },
     "keywords": [],

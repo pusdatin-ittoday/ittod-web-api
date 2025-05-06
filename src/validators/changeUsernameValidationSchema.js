@@ -1,4 +1,4 @@
-import Joi from "joi";
+const Joi = require("joi");
 
 const changeUsernameSchema = Joi.object({
     oldUsername: Joi.string().required().messages({
@@ -13,4 +13,4 @@ const changeUsernameSchema = Joi.object({
     }),
 });
 
-export default changeUsernameSchema;
+module.exports = changeUsernameSchema;
