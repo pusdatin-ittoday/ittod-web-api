@@ -54,13 +54,13 @@ enum event_type_enum {
 }
 
 model event {
-  id              String @id
-  title           String @db.Text
-  description     String @db.Text
-  guide_book_url  String @db.Text
-  type            event_type_enum
-  contact_person1 String
-  contact_person2 String?
+  id                             String          @id
+  title                          String          @db.Text
+  description                    String          @db.Text
+  guide_book_url                 String          @db.Text
+  type                           event_type_enum
+  contact_person1                String
+  contact_person2                String?
   max_noncompetition_participant Int?
 
   announcements event_announcement[]
@@ -70,17 +70,17 @@ model event {
   participants  user[]
 }
 
-model event_announcement{
-  id             String   @id
-  event_id String
-  author_id      String
-  title          String   @db.Text
-  description    String   @db.Text
-  created_at     DateTime @default(now())
-  updated_at     DateTime @updatedAt
+model event_announcement {
+  id          String   @id
+  event_id    String
+  author_id   String
+  title       String   @db.Text
+  description String   @db.Text
+  created_at  DateTime @default(now())
+  updated_at  DateTime @updatedAt
 
-  competition event       @relation(fields: [event_id], references: [id])
-  author      user        @relation(fields: [author_id], references: [id])
+  competition event @relation(fields: [event_id], references: [id])
+  author      user  @relation(fields: [author_id], references: [id])
 }
 
 model competition_submission {
@@ -90,36 +90,37 @@ model competition_submission {
   created_at     DateTime  @default(now())
   updated_at     DateTime? @updatedAt
 
-  team           team      @relation(fields: [team_id], references: [id])
-  competition    event     @relation(fields: [competition_id], references: [id])
-  media          media     @relation(fields: [media_id], references: [id])
+  team        team  @relation(fields: [team_id], references: [id])
+  competition event @relation(fields: [competition_id], references: [id])
+  media       media @relation(fields: [media_id], references: [id])
 
   @@id([team_id, competition_id])
 }
 
 model event_timeline {
-  id             String   @id
-  event_id       String
-  title          String   @db.Text
-  date           DateTime
+  id       String   @id
+  event_id String
+  title    String   @db.Text
+  date     DateTime
 
-  event          event @relation(fields: [event_id], references: [id])
+  event event @relation(fields: [event_id], references: [id])
 }
 
 model media {
-  id          String        @id
+  id          String               @id
   uploader_id String
-  name        String        @unique
+  name        String               @unique
   grouping    media_grouping_enum?
   type        media_type_enum
   url         String
-  created_at  DateTime      @default(now())
+  created_at  DateTime             @default(now())
+  updated_at  DateTime             @default(now())
 
-  uploader    user          @relation(fields: [uploader_id], references: [id])
+  uploader user @relation(fields: [uploader_id], references: [id])
 
-  paymentproof team?        @relation("paymentProof")
-  twibbon      team_member? @relation("twibbon")
-  kartu        team_member? @relation("kartu-mahasiswa")
+  paymentproof team?                   @relation("paymentProof")
+  twibbon      team_member?            @relation("twibbon")
+  kartu        team_member?            @relation("kartu-mahasiswa")
   submission   competition_submission?
 }
 
@@ -135,26 +136,26 @@ model team {
   created_at             DateTime  @default(now())
   updated_at             DateTime? @updatedAt
 
-  competition            event  @relation(fields: [competition_id], references: [id])
-  paymentProof           media? @relation("paymentProof", fields: [payment_proof_media_id], references: [id])
+  competition  event  @relation(fields: [competition_id], references: [id])
+  paymentProof media? @relation("paymentProof", fields: [payment_proof_media_id], references: [id])
 
-  members                team_member[]
-  submission             competition_submission[]
+  members    team_member[]
+  submission competition_submission[]
 }
 
 model team_member {
-  user_id                String
-  team_id                String
-  role                   team_member_role_enum
-  kartu_media_id         String?               @unique
-  twibbon_media_id       String?               @unique
-  is_verified            Boolean               @default(false)
-  verification_error     String?               @db.Text
+  user_id            String
+  team_id            String
+  role               team_member_role_enum
+  kartu_media_id     String?               @unique
+  twibbon_media_id   String?               @unique
+  is_verified        Boolean               @default(false)
+  verification_error String?               @db.Text
 
-  user         user   @relation(fields: [user_id], references: [id])
-  team         team   @relation(fields: [team_id], references: [id])
-  twibbon      media? @relation("twibbon", fields: [twibbon_media_id], references: [id])
-  kartu        media? @relation("kartu-mahasiswa", fields: [kartu_media_id], references: [id])
+  user    user   @relation(fields: [user_id], references: [id])
+  team    team   @relation(fields: [team_id], references: [id])
+  twibbon media? @relation("twibbon", fields: [twibbon_media_id], references: [id])
+  kartu   media? @relation("kartu-mahasiswa", fields: [kartu_media_id], references: [id])
 
   @@id([user_id, team_id])
 }
@@ -176,11 +177,11 @@ model user {
   created_at               DateTime        @default(now())
   updated_at               DateTime?       @updatedAt
 
-  uploaded                 media[]
-  identity                 user_identity?
-  announcements            event_announcement[]
-  member                   team_member[]
-  noncompetition_events   event[]
+  uploaded              media[]
+  identity              user_identity?
+  announcements         event_announcement[]
+  member                team_member[]
+  noncompetition_events event[]
 }
 
 model user_identity {
