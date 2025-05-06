@@ -8,7 +8,7 @@ const submitTeamFile = async ({ user_id, team_id, title, url_file }) => {
     if (existingFile) {
         throw {
             status: 409,
-            message: "You can only register one team as a leader",
+            message: "Team already submitted file!",
         };
     }
     const file_id = crypto.randomUUID();
@@ -27,6 +27,7 @@ const submitTeamFile = async ({ user_id, team_id, title, url_file }) => {
                     name: title,
                     type: "pdf",
                     url: url_file,
+                    grouping: "competition_submission"
                 },
             });
 

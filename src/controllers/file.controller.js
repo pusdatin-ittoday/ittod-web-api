@@ -1,11 +1,11 @@
-const fileService = require("../services/file.service.js");
+const { submitTeamFile } = require("../services/file.service.js");
 
-export const fileServ = async (req, res) => {
+const fileServ = async (req, res) => {
     try {
         const { title, url_file, team_id } = req.body;
         const user_id = req.user.id;
 
-        const result = await fileService.submitTeamFile({
+        const result = await submitTeamFile({
             title,
             url_file,
             team_id,
@@ -16,3 +16,5 @@ export const fileServ = async (req, res) => {
         res.status(err.status || 500).json({ error: err.message });
     }
 };
+
+module.exports = {fileServ}
