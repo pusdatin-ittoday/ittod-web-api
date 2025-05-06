@@ -1,5 +1,5 @@
 const {
-    PrismaClient
+    PrismaClient,
 } = require("../prisma/app/generated/prisma/client/client.js");
 
 const prisma = new PrismaClient();

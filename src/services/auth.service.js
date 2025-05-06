@@ -32,7 +32,7 @@ exports.register = async ({ email, password, full_name }) => {
                     verification_token_expiration: new Date(
                         Date.now() + 60 * 5 * 1000
                     ),
-                    role: "user"
+                    role: "user",
                 },
             },
         },

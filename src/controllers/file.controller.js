@@ -1,4 +1,7 @@
-const { submitTeamFile, updateTeamFile } = require("../services/file.service.js");
+const {
+    submitTeamFile,
+    updateTeamFile,
+} = require("../services/file.service.js");
 
 const fileServ = async (req, res) => {
     try {
@@ -34,4 +37,4 @@ const fileServUpdate = async (req, res) => {
     }
 };
 
-module.exports = {fileServUpdate , fileServ}
+module.exports = { fileServUpdate, fileServ };

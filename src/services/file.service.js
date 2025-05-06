@@ -79,8 +79,8 @@ const updateTeamFile = async ({ user_id, team_id, title, url_file }) => {
                     media_id,
                 },
                 data: {
-                    updated_at: new Date()
-                }
+                    updated_at: new Date(),
+                },
             });
         });
         return { message: "File Updated Successfuly" };
