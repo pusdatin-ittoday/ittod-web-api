@@ -1,8 +1,10 @@
-import prisma from "../prisma.mjs";
-import crypto from "crypto";
-import { checkUserCompetitionLimit } from "../helpers/checkUserCompetitionLimit.mjs";
+const prisma = require("../prisma.js");
+const crypto = require("crypto");
+const {
+    checkUserCompetitionLimit,
+} = require("../helpers/checkUserCompetitionLimit.js");
 
-export const registerTeamThenInsertLeader = async ({
+exports.registerTeamThenInsertLeader = async ({
     competition_id,
     team_name,
     leader_id,
@@ -41,8 +43,8 @@ export const registerTeamThenInsertLeader = async ({
         }
     } while (existingTeamWithCode);
 
-    const competitionExists = await prisma.competition.findUnique({
-        where: { id: competition_id },
+    const competitionExists = await prisma.event.findFirst({
+        where: { id: competition_id, type: "competition" },
     });
     if (!competitionExists)
         throw { status: 404, message: "competition_id not found" };
@@ -83,7 +85,7 @@ export const registerTeamThenInsertLeader = async ({
     }
 };
 
-export const memberJoinWithTeamCode = async ({ user_id, team_code }) => {
+exports.memberJoinWithTeamCode = async ({ user_id, team_code }) => {
     return prisma.$transaction(
         async tx => {
             await checkUserCompetitionLimit(tx, user_id);
@@ -103,11 +105,18 @@ export const memberJoinWithTeamCode = async ({ user_id, team_code }) => {
             const teamMemberCount = await tx.team_member.count({
                 where: { team_id: team.id },
             });
-            const competition = await tx.competition.findUnique({
-                where: { id: team.competition_id },
+            // Verify team's competition exists
+            const competitionExists = await tx.event.findFirst({
+                where: { id: team.competition_id, type: "competition" },
             });
+            if (!competitionExists) {
+                throw {
+                    status: 404,
+                    message: "Competition not found for this team",
+                };
+            }
 
-            if (teamMemberCount >= competition.max_team_member)
+            if (teamMemberCount >= team.max_member)
                 throw {
                     status: 403,
                     message: "Team has reached the maximum member limit",

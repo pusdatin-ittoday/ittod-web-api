@@ -1,6 +1,6 @@
-import Joi from "joi";
+const Joi = require("joi");
 
-const loginSchema = Joi.object({
+const registerSchema = Joi.object({
     email: Joi.string().email().required().messages({
         "string.email": "A valid email is required.",
         "any.required": "Email is required.",
@@ -9,6 +9,10 @@ const loginSchema = Joi.object({
         "string.min": "Password must be at least 8 characters long.",
         "any.required": "Password is required.",
     }),
+    full_name: Joi.string().min(2).required().messages({
+        "string.min": "Full name must be at least 2 characters long.",
+        "any.required": "Full name is required.",
+    }),
 });
 
-export default loginSchema;
+module.exports = registerSchema;

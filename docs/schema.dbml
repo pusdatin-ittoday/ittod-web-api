@@ -2,27 +2,31 @@
 //// THIS FILE WAS AUTOMATICALLY GENERATED (DO NOT MODIFY)
 //// ------------------------------------------------------
 
-Table competition {
+Table event {
   id String [pk]
   title String [not null]
   description String [not null]
-  max_team_member Int [not null, default: 3]
   guide_book_url String [not null]
-  announcements competition_announcement [not null]
+  type event_type_enum [not null]
+  contact_person1 String [not null]
+  contact_person2 String
+  max_noncompetition_participant Int
+  announcements event_announcement [not null]
   submissions competition_submission [not null]
-  timelines competition_timeline [not null]
+  timelines event_timeline [not null]
   teams team [not null]
+  participants user [not null]
 }
 
-Table competition_announcement {
+Table event_announcement {
   id String [pk]
-  competition_id String [not null]
+  event_id String [not null]
   author_id String [not null]
   title String [not null]
   description String [not null]
   created_at DateTime [default: `now()`, not null]
   updated_at DateTime [not null]
-  competition competition [not null]
+  competition event [not null]
   author user [not null]
 }
 
@@ -33,7 +37,7 @@ Table competition_submission {
   created_at DateTime [default: `now()`, not null]
   updated_at DateTime
   team team [not null]
-  competition competition [not null]
+  competition event [not null]
   media media [not null]
 
   indexes {
@@ -41,12 +45,12 @@ Table competition_submission {
   }
 }
 
-Table competition_timeline {
+Table event_timeline {
   id String [pk]
-  competition_id String [not null]
+  event_id String [not null]
   title String [not null]
   date DateTime [not null]
-  competition competition [not null]
+  event event [not null]
 }
 
 Table media {
@@ -57,8 +61,9 @@ Table media {
   type media_type_enum [not null]
   url String [not null]
   created_at DateTime [default: `now()`, not null]
+  updated_at DateTime [default: `now()`, not null]
   uploader user [not null]
-  paymentproof team_member
+  paymentproof team
   twibbon team_member
   kartu team_member
   submission competition_submission
@@ -69,11 +74,14 @@ Table team {
   competition_id String [not null]
   team_name String [not null]
   team_code String [unique, not null]
+  max_member Int [not null, default: 3]
+  payment_proof_media_id String [unique]
   is_verified Boolean [not null, default: false]
   verification_error String
   created_at DateTime [default: `now()`, not null]
   updated_at DateTime
-  competition competition [not null]
+  competition event [not null]
+  paymentProof media
   members team_member [not null]
   submission competition_submission [not null]
 }
@@ -84,10 +92,8 @@ Table team_member {
   role team_member_role_enum [not null]
   kartu_media_id String [unique]
   twibbon_media_id String [unique]
-  payment_proof_media_id String [unique]
   is_verified Boolean [not null, default: false]
   verification_error String
-  paymentProof media
   user user [not null]
   team team [not null]
   twibbon media
@@ -116,8 +122,9 @@ Table user {
   updated_at DateTime
   uploaded media [not null]
   identity user_identity
-  announcements competition_announcement [not null]
+  announcements event_announcement [not null]
   member team_member [not null]
+  noncompetition_events event [not null]
 }
 
 Table user_identity {
@@ -141,6 +148,11 @@ Table sessions {
   id String [pk]
   expires DateTime [not null]
   data Json [not null]
+}
+
+Table eventTouser {
+  participantsId String [ref: > user.id]
+  noncompetition_eventsId String [ref: > event.id]
 }
 
 Enum education_enum {
@@ -178,23 +190,28 @@ Enum media_type_enum {
   pdf
 }
 
-Ref: competition_announcement.competition_id > competition.id
+Enum event_type_enum {
+  competition
+  non_competition
+}
 
-Ref: competition_announcement.author_id > user.id
+Ref: event_announcement.event_id > event.id
+
+Ref: event_announcement.author_id > user.id
 
 Ref: competition_submission.team_id > team.id
 
-Ref: competition_submission.competition_id > competition.id
+Ref: competition_submission.competition_id > event.id
 
 Ref: competition_submission.media_id - media.id
 
-Ref: competition_timeline.competition_id > competition.id
+Ref: event_timeline.event_id > event.id
 
 Ref: media.uploader_id > user.id
 
-Ref: team.competition_id > competition.id
+Ref: team.competition_id > event.id
 
-Ref: team_member.payment_proof_media_id - media.id
+Ref: team.payment_proof_media_id - media.id
 
 Ref: team_member.user_id > user.id
 

@@ -1,5 +1,4 @@
-import Joi from "joi";
-import changeUsernameSchema from "../validators/changeUsernameValidationSchema.mjs";
+const changeUsernameSchema = require("../validators/changeUsernameValidationSchema.js");
 
 const validateChangeUsername = (req, res, next) => {
     const { error } = changeUsernameSchema.validate(req.body, {

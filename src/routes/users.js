@@ -1,8 +1,8 @@
 // @deprecated
 
-import { Router } from "express";
-import { changeUsername } from "../services/user.service.mjs";
-import { validateChangeUsername } from "../middleware/userMiddleware.mjs";
+const { Router } = require("express");
+const { changeUsername } = require("../services/user.service.js");
+const { validateChangeUsername } = require("../middleware/userMiddleware.js");
 
 const usersRouter = Router();
 
@@ -16,4 +16,4 @@ usersRouter.post(
     }
 );
 
-export default usersRouter;
+module.exports = usersRouter;

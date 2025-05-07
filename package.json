@@ -1,12 +1,15 @@
 {
     "name": "ittod-web-api",
     "version": "1.0.0",
-    "main": "src/server.mjs",
+    "main": "src/server.js",
     "scripts": {
         "test": "echo \"Error: no test specified\" && exit 1",
-        "dev": "nodemon src/server.mjs",
-        "serve": "node src/server.mjs",
+        "dev": "nodemon src/server.js",
+        "serve": "node src/server.js",
         "format": "prettier --write ."
+    },
+    "prisma": {
+        "seed": "node prisma/seed.js"
     },
     "keywords": [],
     "author": "",
@@ -15,8 +18,7 @@
     "dependencies": {
         "@dotenvx/dotenvx": "^1.41.0",
         "@prisma/client": "^6.6.0",
-        "@supabase/supabase-js": "^2.49.4",
-        "argon2": "^0.43.0",
+        "argon2": "^0.28.4",
         "cookie-parser": "^1.4.7",
         "dotenv": "^16.5.0",
         "express": "^5.1.0",
@@ -30,8 +32,7 @@
         "passport-google-oauth20": "^2.0.0",
         "passport-local": "^1.0.0",
         "serve-favicon": "^2.5.0",
-        "url": "^0.11.4",
-        "uuid": "^11.1.0"
+        "url": "^0.11.4"
     },
     "devDependencies": {
         "@biomejs/biome": "1.9.4",

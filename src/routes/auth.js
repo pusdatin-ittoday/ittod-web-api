@@ -1,17 +1,22 @@
 // noinspection ES6UnusedImports
 
-import { Router } from "express";
-import passport from "passport";
-import { validateLogin, loginLimiter } from "../middleware/authMiddleware.mjs";
-import { validateRegister } from "../middleware/registerValidationMiddleware.mjs";
-import preventLoginIfAuthenticated from "../middleware/preventLoginIfAuthenticated.mjs";
-import googleStrategy from "../strategies/google-strategy.mjs";
-import LocalStrategy from "../strategies/local-strategy.mjs";
-import {
+const { Router } = require("express");
+const passport = require("passport");
+const {
+    validateLogin,
+    loginLimiter,
+} = require("../middleware/authMiddleware.js");
+const {
+    validateRegister,
+} = require("../middleware/registerValidationMiddleware.js");
+const preventLoginIfAuthenticated = require("../middleware/preventLoginIfAuthenticated.js");
+const googleStrategy = require("../strategies/google-strategy.js");
+const LocalStrategy = require("../strategies/local-strategy.js");
+const {
     login,
     register,
     verifyEmail,
-} from "../controllers/auth.controller.mjs";
+} = require("../controllers/auth.controller.js");
 
 const authRouter = Router();
 
@@ -65,4 +70,4 @@ authRouter.get("/api/auth/status", (req, res) => {
     }
 });
 
-export default authRouter;
+module.exports = authRouter;

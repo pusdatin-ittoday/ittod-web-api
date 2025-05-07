@@ -1,9 +1,9 @@
-import { Router } from "express";
-import {
+const { Router } = require("express");
+const {
     joinCompetitionWithTeamCode,
     registerCompetition,
-} from "../controllers/competition.controller.mjs";
-import { isAuthenticated } from "../middleware/authMiddleware.mjs";
+} = require("../controllers/competition.controller.js");
+const { isAuthenticated } = require("../middleware/authMiddleware.js");
 
 const compeRouter = Router();
 
@@ -19,4 +19,4 @@ compeRouter.post(
     joinCompetitionWithTeamCode
 );
 
-export default compeRouter;
+module.exports = compeRouter;
