@@ -20,6 +20,3 @@ public/uploads
 
 #vscode
 .vscode
-prisma/migrations/20250507103135_init/migration.sql
-prisma/migrations/migration_lock.toml
-docs/schema.dbml
