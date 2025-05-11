@@ -1,5 +1,5 @@
 const prisma = require("../prisma.js");
-const {uploadFileToR2, getFileFromR2} = require("./r2.service");
+const { uploadFileToR2 } = require("./r2.service");
 
 const editUserProfile = async ({
     full_name,
@@ -10,10 +10,58 @@ const editUserProfile = async ({
     id_discord,
     id_instagram,
     pendidikan,
-    pendidikan_lainnya,
     nama_sekolah,
     ktm,
-    user_id
+    user_id,
 }) => {
-    const user = await prisma.user.
+    // Validate required fields
+    if (!user_id) {
+        throw { status: 400, message: "User ID is required!" };
+    }
+
+    const user = await prisma.user.findUnique({ where: { id: user_id } });
+    if (!user) {
+        throw { status: 404, message: "User not found!" };
+    }
+
+    try {
+        await prisma.$transaction(async tx => {
+            let ktmUrl = null;
+
+            if (ktm) {
+                ktmUrl = await uploadFileToR2(ktm);
+            }
+
+            const updateData = {
+                full_name,
+                birth_date,
+                pendidikan,
+                nama_sekolah,
+                id_discord,
+                id_line,
+                id_instagram,
+                jenis_kelamin,
+                phone_number,
+                ...(ktmUrl && { ktm_key: ktmUrl }),
+            };
+
+            // Remove undefined fields
+            Object.keys(updateData).forEach(
+                key => updateData[key] === undefined && delete updateData[key]
+            );
+
+            // Update user profile
+            await tx.user.update({
+                where: { id: user_id },
+                data: updateData,
+            });
+        });
+
+        return { message: "Profile updated successfully!" };
+    } catch (err) {
+        console.error("Edit Error:", err);
+        throw { status: 500, message: "Failed to edit profile." };
+    }
 };
+
+module.exports = { editUserProfile };
