@@ -53,6 +53,11 @@ enum event_type_enum {
   non_competition
 }
 
+enum jenis_kelamin_enum {
+  laki2
+  perempuan
+}
+
 model event {
   id                             String          @id
   title                          String          @db.Text
@@ -161,8 +166,8 @@ model team_member {
 }
 
 model user {
-  id                       String          @id
-  email                    String          @unique
+  id                       String              @id
+  email                    String              @unique
   full_name                String
   birth_date               DateTime?
   pendidikan               education_enum?
@@ -172,11 +177,12 @@ model user {
   id_line                  String?
   id_discord               String?
   id_instagram             String?
-  ktm                      String?
-  consent                  Boolean         @default(false)
-  is_registration_complete Boolean         @default(false)
-  created_at               DateTime        @default(now())
-  updated_at               DateTime?       @updatedAt
+  ktm_key                  String?
+  jenis_kelamin            jenis_kelamin_enum?
+  consent                  Boolean             @default(false)
+  is_registration_complete Boolean             @default(false)
+  created_at               DateTime            @default(now())
+  updated_at               DateTime?           @updatedAt
 
   uploaded              media[]
   identity              user_identity?
