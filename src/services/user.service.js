@@ -14,7 +14,6 @@ const editUserProfile = async ({
     ktm,
     user_id,
 }) => {
-    // Validate required fields
     if (!user_id) {
         throw { status: 400, message: "User ID is required!" };
     }
@@ -29,7 +28,7 @@ const editUserProfile = async ({
             let ktmUrl = null;
 
             if (ktm) {
-                ktmUrl = await uploadFileToR2(ktm);
+                ktmUrl = (await uploadFileToR2(ktm)).url;
             }
 
             const updateData = {
