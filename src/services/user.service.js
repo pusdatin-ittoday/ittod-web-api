@@ -1,4 +1,5 @@
 const prisma = require("../prisma.js");
+const {uploadFileToR2, getFileFromR2} = require("./r2.service");
 
 const editUserProfile = async ({
     full_name,
@@ -12,4 +13,7 @@ const editUserProfile = async ({
     pendidikan_lainnya,
     nama_sekolah,
     ktm,
-}) => {};
+    user_id
+}) => {
+    const user = await prisma.user.
+};

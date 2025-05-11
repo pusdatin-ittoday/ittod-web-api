@@ -116,6 +116,7 @@ Table user {
   id_line String
   id_discord String
   id_instagram String
+  ktm String
   consent Boolean [not null, default: false]
   is_registration_complete Boolean [not null, default: false]
   created_at DateTime [default: `now()`, not null]
