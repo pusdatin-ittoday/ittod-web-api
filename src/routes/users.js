@@ -4,5 +4,4 @@ const { validateChangeUsername } = require("../middleware/userMiddleware.js");
 
 const usersRouter = Router();
 
-
 module.exports = usersRouter;

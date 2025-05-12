@@ -13,9 +13,12 @@ const getFileFromBucket = async (req, res) => {
         res.status(200).send(fileBuffer);
     } catch (error) {
         console.error("Failed to fetch file:", error);
-        res.status(500).json({ message: "Failed to fetch file", error: error.message });
+        res.status(500).json({
+            message: "Failed to fetch file",
+            error: error.message,
+        });
     }
-}
+};
 
 const uploadFileToBucket = async (req, res) => {
     try {
@@ -27,11 +30,7 @@ const uploadFileToBucket = async (req, res) => {
 
         const { buffer, originalname, mimetype } = file;
 
-        const { key } = await uploadFileToR2(
-            buffer,
-            originalname,
-            mimetype
-        );
+        const { key } = await uploadFileToR2(buffer, originalname, mimetype);
 
         res.status(200).json({
             message: "File uploaded successfully",
@@ -44,6 +43,6 @@ const uploadFileToBucket = async (req, res) => {
             error: error.message,
         });
     }
-}
+};
 
-module.exports = {getFileFromBucket, uploadFileToBucket}
+module.exports = { getFileFromBucket, uploadFileToBucket };

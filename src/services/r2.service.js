@@ -28,7 +28,6 @@ async function uploadFileToR2(fileBuffer, originalName, mimeType) {
     }
 }
 
-
 async function getFileFromR2(fileName) {
     const command = new GetObjectCommand({
         Bucket: "ittoday",
