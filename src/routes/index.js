@@ -2,7 +2,7 @@ const { Router } = require("express");
 const authRouter = require("./auth.js");
 const compeRouter = require("./competition.js");
 const fileRouter = require("./file");
-const uploadRouter = require("./upload");
+const uploadRouter = require("./images");
 
 const router = Router();
 
