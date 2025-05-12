@@ -4,13 +4,16 @@ const crypto = require("crypto");
 const dayjs = require("dayjs");
 
 async function uploadFileToR2(fileBuffer, originalName, mimeType) {
-    const datePath = dayjs().format("YYYY-MM-DD");
+    if (!Buffer.isBuffer(fileBuffer)) {
+        throw new Error("Invalid fileBuffer: Expected a Buffer.");
+    }
+
     const uniqueName = `${crypto.randomUUID()}_${originalName}`;
-    const fileKey = `uploads/${datePath}/${uniqueName}`;
+    const fileKey = `uploads/${uniqueName}`;
 
     const command = new PutObjectCommand({
         Bucket: "ittoday",
-        Key: fileKey,
+        Key: uniqueName,
         Body: fileBuffer,
         ContentType: mimeType,
     });
@@ -34,7 +37,15 @@ async function getFileFromR2(fileName) {
 
     try {
         const response = await r2.send(command);
-        return response.Body; // Readable stream
+        const stream = response.Body; // Readable stream
+
+        // Convert the stream to a buffer
+        const chunks = [];
+        for await (const chunk of stream) {
+            chunks.push(chunk);
+        }
+        const fileBuffer = Buffer.concat(chunks);
+        return fileBuffer;
     } catch (err) {
         console.error("R2 Fetch Failed:", err);
         throw err;
