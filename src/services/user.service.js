@@ -2,18 +2,18 @@ const prisma = require("../prisma.js");
 const { uploadFileToR2 } = require("./r2.service");
 
 const editUserProfile = async ({
-    full_name,
-    birth_date,
-    phone_number,
-    jenis_kelamin,
-    id_line,
-    id_discord,
-    id_instagram,
-    pendidikan,
-    nama_sekolah,
-    ktm,
-    user_id,
-}) => {
+                                   full_name,
+                                   birth_date,
+                                   phone_number,
+                                   jenis_kelamin,
+                                   id_line,
+                                   id_discord,
+                                   id_instagram,
+                                   pendidikan,
+                                   nama_sekolah,
+                                   ktm,
+                                   user_id,
+                               }) => {
     if (!user_id) {
         throw { status: 400, message: "User ID is required!" };
     }
@@ -25,10 +25,11 @@ const editUserProfile = async ({
 
     try {
         await prisma.$transaction(async tx => {
-            let ktmUrl = null;
+            let ktm_key = null;
 
             if (ktm) {
-                ktmUrl = (await uploadFileToR2(ktm)).url;
+                const { buffer, originalname, mimetype } = ktm;
+                ktm_key = (await uploadFileToR2(buffer, originalname, mimetype)).key;
             }
 
             const updateData = {
@@ -41,7 +42,7 @@ const editUserProfile = async ({
                 id_instagram,
                 jenis_kelamin,
                 phone_number,
-                ...(ktmUrl && { ktm_key: ktmUrl }),
+                ...(ktm_key && { ktm_key: ktm_key }),
             };
 
             // Remove undefined fields
