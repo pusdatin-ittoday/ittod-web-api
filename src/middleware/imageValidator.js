@@ -1,17 +1,18 @@
+const path = require('path');
+const { fileTypeFromBuffer } = require('file-type');
+
 const validateOptionalFile = async (req, res, next) => {
     if (!req.file) return next()
     const file = req.file;
 
     // 1. Verify extension
-    const path = require('path');
     const allowedExts = ['png', 'jpg', 'jpeg'];
     const ext = path.extname(file.originalname).slice(1).toLowerCase();
     if (!allowedExts.includes(ext)) {
         return res.status(400).json({ message: "Invalid file extension" });
     }
     // 2. Verify magic number
-    const FileType = require('file-type');
-    const detected = await FileType.fileTypeFromBuffer(file.buffer);
+    const detected = await fileTypeFromBuffer(file.buffer);
     if (!detected || !['image/png', 'image/jpeg'].includes(detected.mime)) {
         return res.status(400).json({ message: "Invalid file content" });
     }
