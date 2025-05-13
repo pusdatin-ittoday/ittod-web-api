@@ -116,6 +116,8 @@ Table user {
   id_line String
   id_discord String
   id_instagram String
+  ktm_key String
+  jenis_kelamin jenis_kelamin_enum
   consent Boolean [not null, default: false]
   is_registration_complete Boolean [not null, default: false]
   created_at DateTime [default: `now()`, not null]
@@ -193,6 +195,11 @@ Enum media_type_enum {
 Enum event_type_enum {
   competition
   non_competition
+}
+
+Enum jenis_kelamin_enum {
+  laki2
+  perempuan
 }
 
 Ref: event_announcement.event_id > event.id

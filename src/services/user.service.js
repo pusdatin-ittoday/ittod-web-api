@@ -1,38 +1,90 @@
-/**
- * @deprecated This service is deprecated. Please use the auth service instead
- * for user management functionality.
- */
-
 const prisma = require("../prisma.js");
+const { uploadFileToR2 } = require("./r2.service");
 
-export async function changeUsername(oldUsername, newUsername) {
+const editUserProfile = async ({
+    full_name,
+    birth_date,
+    phone_number,
+    jenis_kelamin,
+    id_line,
+    id_discord,
+    id_instagram,
+    pendidikan,
+    nama_sekolah,
+    ktm,
+    user_id,
+}) => {
+    if (!user_id) {
+        throw { status: 400, message: "User ID is required!" };
+    }
+
+    const user = await prisma.user.findUnique({ where: { id: user_id } });
+    if (!user) {
+        throw { status: 404, message: "User not found!" };
+    }
+
     try {
-        const result = await prisma.$transaction(async prisma => {
-            const existingUser = await prisma.user.findUnique({
-                where: { username: newUsername },
-            });
-            if (existingUser) {
-                throw new Error("Username is already taken.");
+        await prisma.$transaction(async tx => {
+            let ktm_key = null;
+
+            if (ktm) {
+                try {
+                    const { buffer, originalname, mimetype } = ktm;
+                    ktm_key = (
+                        await uploadFileToR2(buffer, originalname, mimetype)
+                    ).key;
+                } catch (uploadError) {
+                    console.error("KTM upload failed:", uploadError);
+                    throw {
+                        status: 500,
+                        message: "Failed to upload KTM file.",
+                    };
+                }
             }
 
-            // Use a transaction to ensure both updates succeed or both fail atomically
-            await prisma.$transaction([
-                prisma.user.update({
-                    where: { username: oldUsername },
-                    data: { username: newUsername },
-                }),
-                prisma.user_identity.update({
-                    where: { username: oldUsername },
-                    data: { username: newUsername },
-                }),
-            ]);
+            const updateData = {
+                full_name,
+                birth_date,
+                pendidikan,
+                nama_sekolah,
+                id_discord,
+                id_line,
+                id_instagram,
+                jenis_kelamin,
+                phone_number,
+                ...(ktm_key && { ktm_key: ktm_key }),
+            };
 
-            return { success: true, message: "Username updated successfully." };
+            // Remove undefined fields
+            Object.keys(updateData).forEach(
+                key => updateData[key] === undefined && delete updateData[key]
+            );
+
+            // Update user profile
+            await tx.user.update({
+                where: { id: user_id },
+                data: updateData,
+            });
         });
 
-        return result;
-    } catch (error) {
-        console.error(error);
-        return { success: false, message: error.message };
+        return { message: "Profile updated successfully!" };
+    } catch (err) {
+        console.error("Edit Error:", err);
+        if (err.status) {
+            // If it's already a structured error with status, rethrow it
+            throw err;
+        } else if (err.code === "P2002") {
+            // Handle Prisma unique constraint violation
+            throw { status: 400, message: "A field value must be unique." };
+        } else {
+            // For other errors
+            throw {
+                status: 500,
+                message: "Failed to edit profile.",
+                details: err.message,
+            };
+        }
     }
-}
+};
+
+module.exports = { editUserProfile };
