@@ -9,7 +9,7 @@ const multer = require("multer");
 const images = multer({ storage: multer.memoryStorage() }); // Use memory storage for Buffer
 const usersRouter = Router();
 
-usersRouter.put(
+usersRouter.patch(
     "/api/user",
     isAuthenticated,
     images.single("image"),
