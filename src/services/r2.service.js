@@ -12,7 +12,7 @@ async function uploadFileToR2(fileBuffer, originalName, mimeType) {
     const fileKey = `uploads/${uniqueName}`;
 
     const command = new PutObjectCommand({
-        Bucket: "ittoday",
+        Bucket: process.env.R2_BUCKET_NAME || "ittoday",
         Key: uniqueName,
         Body: fileBuffer,
         ContentType: mimeType,
@@ -30,7 +30,7 @@ async function uploadFileToR2(fileBuffer, originalName, mimeType) {
 
 async function getFileFromR2(fileName) {
     const command = new GetObjectCommand({
-        Bucket: "ittoday",
+        Bucket: process.env.R2_BUCKET_NAME || "ittoday",
         Key: fileName,
     });
 
