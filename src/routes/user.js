@@ -13,8 +13,8 @@ usersRouter.put(
     "/api/user",
     isAuthenticated,
     images.single("image"),
-    validateUserProfile,
     validateFile,
+    validateUserProfile,
     editUserProfileController
 );
 
