@@ -17,7 +17,10 @@ const getFileFromBucket = async (req, res) => {
         console.error("Failed to fetch file:", error);
         res.status(500).json({
             message: "Failed to fetch file",
-            error: error.message,
+            error:
+                process.env.NODE_ENV === "production"
+                    ? "Internal server error"
+                    : error.message,
         });
     }
 };
@@ -28,6 +31,14 @@ const uploadFileToBucket = async (req, res) => {
 
         if (!file) {
             return res.status(400).json({ message: "No file uploaded" });
+        }
+
+        const allowedMimeTypes = ['image/jpeg', 'image/png', 'image/gif', 'application/pdf'];
+
+        if (!allowedMimeTypes.includes(file.mimetype)) {
+            return res.status(400).json({
+                message: "Invalid file type. Allowed types: JPEG, PNG, GIF, PDF"
+            });
         }
 
         const { buffer, originalname, mimetype } = file;
