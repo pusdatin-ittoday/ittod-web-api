@@ -1,7 +1,7 @@
-const validateFile = async (req, res, next) => {
+const validateOptionalFile = async (req, res, next) => {
     if (!req.file) return next()
     const file = req.file;
-    
+
     // 1. Verify extension
     const path = require('path');
     const allowedExts = ['png', 'jpg', 'jpeg'];
@@ -21,4 +21,4 @@ const validateFile = async (req, res, next) => {
     next();
 };
 
-module.exports = { validateFile };
+module.exports = { validateFile: validateOptionalFile };
