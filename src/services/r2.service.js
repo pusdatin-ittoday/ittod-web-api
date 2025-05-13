@@ -21,7 +21,7 @@ async function uploadFileToR2(fileBuffer, originalName, mimeType) {
     try {
         await r2.send(command);
         const fileUrl = `${process.env.R2_PUBLIC}/${fileKey}`;
-        return { key: fileKey, url: fileUrl };
+        return { key: uniqueName, url: fileUrl };
     } catch (err) {
         console.error("R2 Upload Failed:", err);
         throw err;
