@@ -1,5 +1,5 @@
 const { getFileFromR2, uploadFileToR2 } = require("../services/r2.service");
-
+const { getContentTypeFromKey } = require("../helpers/getContentTypeFromKey");
 const getFileFromBucket = async (req, res) => {
     const key = req.params.key;
 
@@ -7,7 +7,9 @@ const getFileFromBucket = async (req, res) => {
         const fileBuffer = await getFileFromR2(key);
 
         // Set headers for image content
-        res.setHeader("Content-Type", "image/png"); // Always set as image/png
+        const contentType =
+            getContentTypeFromKey(key) || "application/octet-stream";
+        res.setHeader("Content-Type", contentType);
         res.setHeader("Content-Disposition", `inline; filename="${key}"`);
 
         res.status(200).send(fileBuffer);
