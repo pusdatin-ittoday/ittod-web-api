@@ -6,7 +6,12 @@ const { validateFile } = require("../middleware/imageValidator");
 
 const multer = require("multer");
 
-const images = multer({ storage: multer.memoryStorage() }); // Use memory storage for Buffer
+const images = multer({
+    storage: multer.memoryStorage(),
+    limits: {
+        fileSize: 2 * 1024 * 1024, // 2MB limit
+    }
+}); // Use memory storage for Buffer
 const usersRouter = Router();
 
 usersRouter.patch(
