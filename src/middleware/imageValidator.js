@@ -1,8 +1,7 @@
 const validateFile = async (req, res, next) => {
+    if (!req.file) return next()
     const file = req.file;
-    if (!file) {
-        return res.status(400).json({ message: "File is required" });
-    }
+    
     // 1. Verify extension
     const path = require('path');
     const allowedExts = ['png', 'jpg', 'jpeg'];
