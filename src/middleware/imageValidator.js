@@ -12,7 +12,7 @@ const validateFile = async (req, res, next) => {
     }
     // 2. Verify magic number
     const FileType = require('file-type');
-    const detected = await FileType.fromBuffer(file.buffer);
+    const detected = await FileType.fileTypeFromBuffer(file.buffer);
     if (!detected || !['image/png', 'image/jpeg'].includes(detected.mime)) {
         return res.status(400).json({ message: "Invalid file content" });
     }
