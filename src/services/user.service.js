@@ -28,8 +28,13 @@ const editUserProfile = async ({
             let ktm_key = null;
 
             if (ktm) {
-                const { buffer, originalname, mimetype } = ktm;
-                ktm_key = (await uploadFileToR2(buffer, originalname, mimetype)).key;
+                try {
+                    const { buffer, originalname, mimetype } = ktm;
+                    ktm_key = (await uploadFileToR2(buffer, originalname, mimetype)).key;
+                } catch (uploadError) {
+                    console.error("KTM upload failed:", uploadError);
+                    throw { status: 500, message: "Failed to upload KTM file." };
+                }
             }
 
             const updateData = {
