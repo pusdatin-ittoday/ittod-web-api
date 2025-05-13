@@ -2,18 +2,18 @@ const prisma = require("../prisma.js");
 const { uploadFileToR2 } = require("./r2.service");
 
 const editUserProfile = async ({
-                                   full_name,
-                                   birth_date,
-                                   phone_number,
-                                   jenis_kelamin,
-                                   id_line,
-                                   id_discord,
-                                   id_instagram,
-                                   pendidikan,
-                                   nama_sekolah,
-                                   ktm,
-                                   user_id,
-                               }) => {
+    full_name,
+    birth_date,
+    phone_number,
+    jenis_kelamin,
+    id_line,
+    id_discord,
+    id_instagram,
+    pendidikan,
+    nama_sekolah,
+    ktm,
+    user_id,
+}) => {
     if (!user_id) {
         throw { status: 400, message: "User ID is required!" };
     }
@@ -30,10 +30,15 @@ const editUserProfile = async ({
             if (ktm) {
                 try {
                     const { buffer, originalname, mimetype } = ktm;
-                    ktm_key = (await uploadFileToR2(buffer, originalname, mimetype)).key;
+                    ktm_key = (
+                        await uploadFileToR2(buffer, originalname, mimetype)
+                    ).key;
                 } catch (uploadError) {
                     console.error("KTM upload failed:", uploadError);
-                    throw { status: 500, message: "Failed to upload KTM file." };
+                    throw {
+                        status: 500,
+                        message: "Failed to upload KTM file.",
+                    };
                 }
             }
 
@@ -65,7 +70,20 @@ const editUserProfile = async ({
         return { message: "Profile updated successfully!" };
     } catch (err) {
         console.error("Edit Error:", err);
-        throw { status: 500, message: "Failed to edit profile." };
+        if (err.status) {
+            // If it's already a structured error with status, rethrow it
+            throw err;
+        } else if (err.code === "P2002") {
+            // Handle Prisma unique constraint violation
+            throw { status: 400, message: "A field value must be unique." };
+        } else {
+            // For other errors
+            throw {
+                status: 500,
+                message: "Failed to edit profile.",
+                details: err.message,
+            };
+        }
     }
 };
 
