@@ -125,7 +125,6 @@ model media {
 
   paymentproof team?                   @relation("paymentProof")
   twibbon      team_member?            @relation("twibbon")
-  kartu        team_member?            @relation("kartu-mahasiswa")
   submission   competition_submission?
 }
 
@@ -160,7 +159,6 @@ model team_member {
   user    user   @relation(fields: [user_id], references: [id])
   team    team   @relation(fields: [team_id], references: [id])
   twibbon media? @relation("twibbon", fields: [twibbon_media_id], references: [id])
-  kartu   media? @relation("kartu-mahasiswa", fields: [kartu_media_id], references: [id])
 
   @@id([user_id, team_id])
 }
