@@ -1,5 +1,4 @@
-const { PrismaClient } = require('../../prisma/app/generated/prisma/client');
-const prisma = new PrismaClient();
+const prisma = require("../prisma.js");
 
 exports.getAllTimelines = async (req, res) => {
     try {
