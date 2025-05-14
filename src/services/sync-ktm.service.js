@@ -1,5 +1,4 @@
 const prisma = require("../prisma.js");
-const crypto = require("crypto");
 
 const syncKtmPrisma = async () => {
     const userList = await prisma.user.findMany({
