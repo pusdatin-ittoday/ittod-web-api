@@ -20,17 +20,18 @@ const {
 
 const authRouter = Router();
 
-authRouter.post("/api/auth/register", validateRegister, register);
 authRouter.post(
     "/api/auth/login",
     loginLimiter,
     preventLoginIfAuthenticated,
     validateLogin,
     passport.authenticate("local"),
-    (req, res, next) => {
-        login(req, res, next);
+    (req, res) => {
+        login(req, res);
     }
 );
+
+authRouter.post("/api/auth/register", validateRegister, register);
 
 authRouter.get("/api/auth/verify", verifyEmail);
 
