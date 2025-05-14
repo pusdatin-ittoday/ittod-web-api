@@ -17,7 +17,7 @@ const {
     register,
     verifyEmail,
 } = require("../controllers/auth.controller.js");
-
+const passportAuthMiddleware = require("../middleware/passportAuthMiddleware")
 const authRouter = Router();
 
 authRouter.post(
@@ -25,10 +25,8 @@ authRouter.post(
     loginLimiter,
     preventLoginIfAuthenticated,
     validateLogin,
-    passport.authenticate('local', { failureMessage: true }),
-    (req, res) => {
-        login(req, res);
-    }
+    passportAuthMiddleware("local"),
+    login
 );
 
 authRouter.post("/api/auth/register", validateRegister, register);
