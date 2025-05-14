@@ -25,7 +25,7 @@ authRouter.post(
     loginLimiter,
     preventLoginIfAuthenticated,
     validateLogin,
-    passport.authenticate("local"),
+    passport.authenticate('local', { failureMessage: true }),
     (req, res) => {
         login(req, res);
     }
