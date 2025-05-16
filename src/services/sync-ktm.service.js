@@ -6,18 +6,25 @@ const syncKtmPrisma = async () => {
         select: { id: true, ktm_key: true },
     });
     try {
-        await prisma.$transaction(async tx => {
+        const updateResults = await prisma.$transaction(async tx => {
+            const results = [];
             for (const user of userList) {
-                await tx.team_member.updateMany({
+                const result = await tx.team_member.updateMany({
                     where: { user_id: user.id },
                     data: { kartu_id: user.ktm_key },
                 });
+                results.push(result);
             }
+            return results;
         });
+        console.log("Update results:", updateResults);
+        return updateResults;
     } catch (err) {
         console.error("Error syncing ktm_key to team_member:", err);
         throw err;
     }
 };
+
+module.exports = { syncKtmPrisma };
 
 module.exports = {syncKtmPrisma}
