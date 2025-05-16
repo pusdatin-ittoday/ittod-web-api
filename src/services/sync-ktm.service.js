@@ -26,5 +26,3 @@ const syncKtmPrisma = async () => {
 };
 
 module.exports = { syncKtmPrisma };
-
-module.exports = {syncKtmPrisma}

@@ -46,7 +46,6 @@ passport.use(
                 }
 
                 // Verify password
-                console.log(email," Verifying password:", password, "with hash:", user.hash);
                 const valid = await argon2.verify(user.hash, password);
                 if (!valid) {
                     return done(null, false, {
