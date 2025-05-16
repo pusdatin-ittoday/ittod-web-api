@@ -12,6 +12,9 @@ const uploadPaymentCompetition = async ({ team_id, payment_proof }) => {
 
     try {
         return await prisma.$transaction(async tx => {
+            // payment_proof is optional:
+            // may be null when the user skips uploading a file,
+            // the file fails validation, upload is cancelled, etc.
             let payment_proof_key = null;
 
             if (payment_proof) {

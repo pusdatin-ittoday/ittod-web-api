@@ -16,7 +16,7 @@ const validateOptionalFile = async (req, res, next) => {
     if (!detected || !["image/png", "image/jpeg"].includes(detected.mime)) {
         return res.status(400).json({ message: "Invalid file content" });
     }
-    if (file.size > 1024 * 1024) {
+    if (file.size > 2 * 1024 * 1024) {
         // 1MB limit
         return res.status(400).json({ message: "File size exceeds limit" });
     }
