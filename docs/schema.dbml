@@ -63,9 +63,9 @@ Table media {
   created_at DateTime [default: `now()`, not null]
   updated_at DateTime [default: `now()`, not null]
   uploader user [not null]
-  paymentproof team
   twibbon team_member
   submission competition_submission
+  teamId String
 }
 
 Table team {
@@ -74,13 +74,12 @@ Table team {
   team_name String [not null]
   team_code String [unique, not null]
   max_member Int [not null, default: 3]
-  payment_proof_media_id String [unique]
+  payment_proof_id String [unique]
   is_verified Boolean [not null, default: false]
   verification_error String
   created_at DateTime [default: `now()`, not null]
   updated_at DateTime
   competition event [not null]
-  paymentProof media
   members team_member [not null]
   submission competition_submission [not null]
 }
@@ -215,8 +214,6 @@ Ref: event_timeline.event_id > event.id
 Ref: media.uploader_id > user.id
 
 Ref: team.competition_id > event.id
-
-Ref: team.payment_proof_media_id - media.id
 
 Ref: team_member.user_id > user.id
 

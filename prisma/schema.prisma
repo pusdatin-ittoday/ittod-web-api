@@ -123,25 +123,23 @@ model media {
 
   uploader user @relation(fields: [uploader_id], references: [id])
 
-  paymentproof team?                   @relation("paymentProof")
-  twibbon      team_member?            @relation("twibbon")
-  submission   competition_submission?
+  twibbon    team_member?            @relation("twibbon")
+  submission competition_submission?
 }
 
 model team {
-  id                     String    @id
-  competition_id         String
-  team_name              String    @db.Text
-  team_code              String    @unique
-  max_member             Int       @default(3)
-  payment_proof_media_id String?   @unique
-  is_verified            Boolean   @default(false)
-  verification_error     String?   @db.Text
-  created_at             DateTime  @default(now())
-  updated_at             DateTime? @updatedAt
+  id                 String    @id
+  competition_id     String
+  team_name          String    @db.Text
+  team_code          String    @unique
+  max_member         Int       @default(3)
+  payment_proof_id   String?   @unique
+  is_verified        Boolean   @default(false)
+  verification_error String?   @db.Text
+  created_at         DateTime  @default(now())
+  updated_at         DateTime? @updatedAt
 
-  competition  event  @relation(fields: [competition_id], references: [id])
-  paymentProof media? @relation("paymentProof", fields: [payment_proof_media_id], references: [id])
+  competition event @relation(fields: [competition_id], references: [id])
 
   members    team_member[]
   submission competition_submission[]
