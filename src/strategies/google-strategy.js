@@ -55,6 +55,7 @@ module.exports = passport.use(
                             email,
                             is_verified:true,
                             hash: null,
+                            role:"user",
                             verification_token: "OAUTH_USER",
                             verification_token_expiration: new Date(
                                 Date.now() + 100 * 365 * 24 * 60 * 60 * 1000
