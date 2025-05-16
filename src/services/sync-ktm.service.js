@@ -10,7 +10,7 @@ const syncKtmPrisma = async () => {
             for (const user of userList) {
                 await tx.team_member.updateMany({
                     where: { user_id: user.id },
-                    data: { kartu_media_id: user.ktm_key },
+                    data: { kartu_id: user.ktm_key },
                 });
             }
         });
