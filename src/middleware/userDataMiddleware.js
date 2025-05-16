@@ -8,4 +8,4 @@ const validateUserProfile = (req, res, next) => {
     next();
 };
 
-module.exports = {validateUserProfile};
+module.exports = { validateUserProfile };

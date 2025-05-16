@@ -33,11 +33,17 @@ const uploadFileToBucket = async (req, res) => {
             return res.status(400).json({ message: "No file uploaded" });
         }
 
-        const allowedMimeTypes = ['image/jpeg', 'image/png', 'image/gif', 'application/pdf'];
+        const allowedMimeTypes = [
+            "image/jpeg",
+            "image/png",
+            "image/gif",
+            "application/pdf",
+        ];
 
         if (!allowedMimeTypes.includes(file.mimetype)) {
             return res.status(400).json({
-                message: "Invalid file type. Allowed types: JPEG, PNG, GIF, PDF"
+                message:
+                    "Invalid file type. Allowed types: JPEG, PNG, GIF, PDF",
             });
         }
 

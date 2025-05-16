@@ -8,9 +8,16 @@ const images = multer({ storage: multer.memoryStorage() }); // Use memory storag
 const uploadRouter = Router();
 const { isAuthenticated } = require("../middleware/authMiddleware.js");
 const { validateFile } = require("../middleware/imageValidator.js");
-const {getImageFromR2Validator} = require("../middleware/getImageFromR2Validator")
+const {
+    getImageFromR2Validator,
+} = require("../middleware/getImageFromR2Validator");
 
-uploadRouter.get("/api/images/:key", isAuthenticated,getImageFromR2Validator, getFileFromBucket);
+uploadRouter.get(
+    "/api/images/:key",
+    isAuthenticated,
+    getImageFromR2Validator,
+    getFileFromBucket
+);
 
 uploadRouter.post(
     "/api/images/",

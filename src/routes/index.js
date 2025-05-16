@@ -4,8 +4,8 @@ const compeRouter = require("./competition.js");
 const fileRouter = require("./file");
 const timelineRouter = require("./timeline");
 const uploadRouter = require("./images");
-const usersRouter = require("./user")
-const adminRouter = require("./admin")
+const usersRouter = require("./user");
+const adminRouter = require("./admin");
 
 const router = Router();
 
@@ -19,6 +19,5 @@ router.use(timelineRouter);
 router.use(uploadRouter);
 router.use(usersRouter);
 router.use(adminRouter);
-
 
 module.exports = router;

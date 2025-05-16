@@ -17,7 +17,7 @@ const {
     register,
     verifyEmail,
 } = require("../controllers/auth.controller.js");
-const passportAuthMiddleware = require("../middleware/passportAuthMiddleware")
+const passportAuthMiddleware = require("../middleware/passportAuthMiddleware");
 const authRouter = Router();
 
 authRouter.post(
@@ -36,7 +36,7 @@ authRouter.get("/api/auth/verify", verifyEmail);
 authRouter.get(
     "/api/auth/google",
     passport.authenticate("google", { scope: ["profile", "email"] })
-); 
+);
 
 authRouter.get(
     "/api/auth/google/redirect",

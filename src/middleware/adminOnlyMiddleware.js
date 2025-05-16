@@ -1,9 +1,9 @@
-const prisma = require("../prisma")
+const prisma = require("../prisma");
 
 const checkAdmin = async (req, res, next) => {
     try {
         const user = await prisma.user_identity.findUnique({
-            where: { id: req.user.id }
+            where: { id: req.user.id },
         });
         const role = user?.role;
         if (role !== "admin") {
@@ -14,6 +14,6 @@ const checkAdmin = async (req, res, next) => {
         console.error("Error in admin middleware:", error);
         return res.status(500).json({ message: "Internal server error" });
     }
-}
+};
 
-module.exports = {checkAdmin}
+module.exports = { checkAdmin };

@@ -1,5 +1,8 @@
 const { Router } = require("express");
-const { getAllTimelines, getTimelineByEventId } = require("../controllers/timeline.controller.js");
+const {
+    getAllTimelines,
+    getTimelineByEventId,
+} = require("../controllers/timeline.controller.js");
 
 const timelineRouter = Router();
 
@@ -9,4 +12,4 @@ timelineRouter.get("/api/timeline", getAllTimelines);
 // Get timeline by event ID
 timelineRouter.get("/api/timeline/:eventId", getTimelineByEventId);
 
-module.exports = timelineRouter; 
+module.exports = timelineRouter;

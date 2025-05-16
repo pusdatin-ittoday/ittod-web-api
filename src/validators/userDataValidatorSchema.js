@@ -8,14 +8,20 @@ const userProfileSchema = Joi.object({
     birth_date: Joi.date().optional().messages({
         "date.base": "Birth date must be a valid date.",
     }),
-    phone_number: Joi.string().pattern(/^[0-9+\-\s]+$/).optional().messages({
-        "string.base": "Phone number must be a string.",
-        "string.pattern.base": "Please provide a valid phone number.",
-    }),
-    jenis_kelamin: Joi.string().valid("laki2", "perempuan").optional().messages({
-        "string.base": "Gender must be a string.",
-        "any.only": "Gender must be either 'laki2' or 'perempuan'.",
-    }),
+    phone_number: Joi.string()
+        .pattern(/^[0-9+\-\s]+$/)
+        .optional()
+        .messages({
+            "string.base": "Phone number must be a string.",
+            "string.pattern.base": "Please provide a valid phone number.",
+        }),
+    jenis_kelamin: Joi.string()
+        .valid("laki2", "perempuan")
+        .optional()
+        .messages({
+            "string.base": "Gender must be a string.",
+            "any.only": "Gender must be either 'laki2' or 'perempuan'.",
+        }),
     id_line: Joi.string().optional().messages({
         "string.base": "Line ID must be a string.",
     }),

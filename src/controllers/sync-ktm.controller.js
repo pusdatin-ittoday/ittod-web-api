@@ -1,4 +1,4 @@
-const {syncKtmPrisma} = require("../services/sync-ktm.service")
+const { syncKtmPrisma } = require("../services/sync-ktm.service");
 
 const syncKtm = async (req, res, next) => {
     try {
@@ -9,4 +9,4 @@ const syncKtm = async (req, res, next) => {
     }
 };
 
-module.exports = { syncKtm}
+module.exports = { syncKtm };

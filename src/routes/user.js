@@ -10,7 +10,7 @@ const images = multer({
     storage: multer.memoryStorage(),
     limits: {
         fileSize: 2 * 1024 * 1024, // 2MB limit
-    }
+    },
 }); // Use memory storage for Buffer
 const usersRouter = Router();
 
