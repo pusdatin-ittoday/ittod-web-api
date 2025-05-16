@@ -5,6 +5,13 @@ const uploadPaymentController = async (req, res) => {
         const { team_id } = req.body;
         const payment_proof = req.file;
 
+        if (!team_id) {
+            return res.status(400).json({ message: "Team ID is required" });
+        }
+        if (!payment_proof) {
+            return res.status(400).json({ message: "Payment proof file is required" });
+        }
+
         const result = await uploadPaymentCompetition({
             team_id,
             payment_proof,
