@@ -53,6 +53,7 @@ module.exports = passport.use(
                             id: externalId,
                             provider,
                             email,
+                            is_verified:true,
                             hash: null,
                             verification_token: "OAUTH_USER",
                             verification_token_expiration: new Date(
