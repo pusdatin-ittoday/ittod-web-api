@@ -8,7 +8,8 @@ async function uploadFileToR2(fileBuffer, originalName, mimeType) {
         throw new Error("Invalid fileBuffer: Expected a Buffer.");
     }
 
-    const uniqueName = `${crypto.randomUUID()}_${originalName}`;
+    const safeOriginalName = originalName.replace(/\s+/g, "_");
+    const uniqueName = `${crypto.randomUUID()}_${safeOriginalName}`;
     const fileKey = `uploads/${uniqueName}`;
 
     const command = new PutObjectCommand({
