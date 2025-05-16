@@ -89,7 +89,7 @@ Table team_member {
   user_id String [not null]
   team_id String [not null]
   role team_member_role_enum [not null]
-  kartu_media_id String [unique]
+  kartu_id String [unique]
   twibbon_media_id String [unique]
   is_verified Boolean [not null, default: false]
   verification_error String

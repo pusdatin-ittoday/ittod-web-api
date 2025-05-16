@@ -151,7 +151,7 @@ model team_member {
   user_id            String
   team_id            String
   role               team_member_role_enum
-  kartu_media_id     String?               @unique
+  kartu_id           String?               @unique
   twibbon_media_id   String?               @unique
   is_verified        Boolean               @default(false)
   verification_error String?               @db.Text

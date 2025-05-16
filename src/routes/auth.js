@@ -36,7 +36,7 @@ authRouter.get("/api/auth/verify", verifyEmail);
 authRouter.get(
     "/api/auth/google",
     passport.authenticate("google", { scope: ["profile", "email"] })
-);
+); 
 
 authRouter.get(
     "/api/auth/google/redirect",
