@@ -9,7 +9,9 @@ const uploadPaymentController = async (req, res) => {
             return res.status(400).json({ message: "Team ID is required" });
         }
         if (!payment_proof) {
-            return res.status(400).json({ message: "Payment proof file is required" });
+            return res
+                .status(400)
+                .json({ message: "Payment proof file is required" });
         }
 
         const result = await uploadPaymentCompetition({
@@ -23,4 +25,4 @@ const uploadPaymentController = async (req, res) => {
     }
 };
 
-module.exports = {uploadPaymentController}
+module.exports = { uploadPaymentController };

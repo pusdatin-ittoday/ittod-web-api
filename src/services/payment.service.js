@@ -20,11 +20,9 @@ const uploadPaymentCompetition = async ({ team_id, payment_proof }) => {
             if (payment_proof) {
                 try {
                     const { buffer, originalname, mimetype } = payment_proof;
-                    payment_proof_key = (await uploadFileToR2(
-                        buffer,
-                        originalname,
-                        mimetype
-                    )).key;
+                    payment_proof_key = (
+                        await uploadFileToR2(buffer, originalname, mimetype)
+                    ).key;
                 } catch (uploadError) {
                     console.error("Payment_Proof upload failed:", uploadError);
                     throw {
@@ -39,7 +37,10 @@ const uploadPaymentCompetition = async ({ team_id, payment_proof }) => {
                 data: { payment_proof_id: payment_proof_key },
             });
 
-            return { message: "Payment uploaded successfully!", team: updatedTeam };
+            return {
+                message: "Payment uploaded successfully!",
+                team: updatedTeam,
+            };
         });
     } catch (err) {
         console.error("Edit Error:", err);
