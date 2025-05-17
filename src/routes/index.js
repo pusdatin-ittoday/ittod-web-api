@@ -7,7 +7,7 @@ const uploadRouter = require("./images");
 const usersRouter = require("./user");
 const adminRouter = require("./admin");
 const announcementRouter = require("./announcement.js");
-
+const competitionDataRouter = require("./competition-data.js");
 const router = Router();
 
 router.get("/", (req, res) => {
@@ -21,5 +21,6 @@ router.use(uploadRouter);
 router.use(usersRouter);
 router.use(adminRouter);
 router.use(announcementRouter);
+router.use(competitionDataRouter);
 
 module.exports = router;
