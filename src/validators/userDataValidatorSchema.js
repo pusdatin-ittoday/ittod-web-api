@@ -5,9 +5,13 @@ const userProfileSchema = Joi.object({
         "string.base": "Full name must be a string.",
         "any.required": "Full name is required.",
     }),
-    birth_date: Joi.date().optional().messages({
-        "date.base": "Birth date must be a valid date.",
-    }),
+    birth_date: Joi.string()
+        .isoDate()
+        .optional()
+        .messages({
+            "string.base": "Birth date must be a string.",
+            "string.isoDate": "Birth date must be a valid ISO-8601 date.",
+        }),
     phone_number: Joi.string()
         .pattern(/^[0-9+\-\s]+$/)
         .optional()
