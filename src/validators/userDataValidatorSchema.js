@@ -6,11 +6,12 @@ const userProfileSchema = Joi.object({
         "any.required": "Full name is required.",
     }),
     birth_date: Joi.string()
-        .isoDate()
+        .isoDate({ format: "date-time" })
         .optional()
         .messages({
             "string.base": "Birth date must be a string.",
-            "string.isoDate": "Birth date must be a valid ISO-8601 date.",
+            "string.isoDate":
+                "Birth date must be a valid ISO-8601 date-time (with time).",
         }),
     phone_number: Joi.string()
         .pattern(/^[0-9+\-\s]+$/)
