@@ -6,8 +6,10 @@ const timelineRouter = require("./timeline");
 const uploadRouter = require("./images");
 const usersRouter = require("./user");
 const adminRouter = require("./admin");
-const fetchHalamanKompetisiEventRouter = require("./fetch-halaman-kompetisi-event.js");
 const announcementRouter = require("./announcement.js");
+const competitionDataRouter = require("./competition-data.js");
+const fetchHalamanKompetisiEventRouter = require("./fetch-halaman-kompetisi-event.js");
+
 
 const router = Router();
 
@@ -21,6 +23,8 @@ router.use(timelineRouter);
 router.use(uploadRouter);
 router.use(usersRouter);
 router.use(adminRouter);
+router.use(announcementRouter);
+router.use(competitionDataRouter);
 router.use(fetchHalamanKompetisiEventRouter);
 router.use(announcementRouter);
 
