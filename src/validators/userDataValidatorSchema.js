@@ -5,8 +5,9 @@ const userProfileSchema = Joi.object({
         "string.base": "Full name must be a string.",
         "any.required": "Full name is required.",
     }),
-    birth_date: Joi.string()
-        .isoDate({ format: "date-time" })
+    birth_date: Joi
+        .date()
+        .iso()
         .optional()
         .messages({
             "string.base": "Birth date must be a string.",
