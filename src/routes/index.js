@@ -9,7 +9,7 @@ const adminRouter = require("./admin");
 const announcementRouter = require("./announcement.js");
 const competitionDataRouter = require("./competition-data.js");
 const fetchHalamanKompetisiEventRouter = require("./fetch-halaman-kompetisi-event.js");
-const announcementRouter = require("./announcement.js");
+
 
 const router = Router();
 
