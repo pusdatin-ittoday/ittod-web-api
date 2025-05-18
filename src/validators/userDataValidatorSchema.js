@@ -1,4 +1,4 @@
-const Joi = require("joi");
+const Joi = require("joi").extend(require('@joi/date'));
 
 const userProfileSchema = Joi.object({
     full_name: Joi.string().required().messages({
@@ -6,8 +6,7 @@ const userProfileSchema = Joi.object({
         "any.required": "Full name is required.",
     }),
     birth_date: Joi
-        .date()
-        .iso()
+        .dateTime()
         .optional()
         .messages({
             "string.base": "Birth date must be a string.",
