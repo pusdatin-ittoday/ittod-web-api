@@ -6,7 +6,11 @@ const timelineRouter = require("./timeline");
 const uploadRouter = require("./images");
 const usersRouter = require("./user");
 const adminRouter = require("./admin");
+<<<<<<< HEAD
 const fetchHalamanKompetisiEventRouter = require("./fetch-halaman-kompetisi-event.js");
+=======
+const announcementRouter = require("./announcement.js");
+>>>>>>> 89b99ec52ab117d9615cdc6df7159cf9a6af59db
 
 const router = Router();
 
@@ -20,6 +24,10 @@ router.use(timelineRouter);
 router.use(uploadRouter);
 router.use(usersRouter);
 router.use(adminRouter);
+<<<<<<< HEAD
 router.use(fetchHalamanKompetisiEventRouter);
+=======
+router.use(announcementRouter);
+>>>>>>> 89b99ec52ab117d9615cdc6df7159cf9a6af59db
 
 module.exports = router;
