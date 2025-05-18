@@ -16,6 +16,7 @@
         "@aws-sdk/client-s3": "^3.806.0",
         "@dotenvx/dotenvx": "^1.41.0",
         "@joi/date": "^2.1.1",
+        "@lib-tj/joi-date-time-zone": "^1.0.3",
         "@prisma/client": "^6.6.0",
         "argon2": "^0.28.4",
         "cookie-parser": "^1.4.7",

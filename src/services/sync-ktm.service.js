@@ -9,11 +9,22 @@ const syncKtmPrisma = async () => {
         const updateResults = await prisma.$transaction(async tx => {
             const results = [];
             for (const user of userList) {
-                const result = await tx.team_member.updateMany({
-                    where: { user_id: user.id },
-                    data: { kartu_id: user.ktm_key },
+                // Check for existing kartu_id to avoid unique constraint violation
+                const existing = await tx.team_member.findFirst({
+                    where: { kartu_id: user.ktm_key },
                 });
-                results.push(result);
+
+                if (!existing) {
+                    const result = await tx.team_member.updateMany({
+                        where: { user_id: user.id },
+                        data: { kartu_id: user.ktm_key },
+                    });
+                    results.push(result);
+                } else {
+                    console.warn(
+                        `Skipping update for user_id ${user.id}: kartu_id ${user.ktm_key} already exists`
+                    );
+                }
             }
             return results;
         });
@@ -24,5 +35,6 @@ const syncKtmPrisma = async () => {
         throw err;
     }
 };
+
 
 module.exports = { syncKtmPrisma };
