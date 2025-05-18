@@ -1,7 +1,7 @@
 const { getFileFromR2, uploadFileToR2 } = require("../services/r2.service");
 const { getContentTypeFromKey } = require("../helpers/getContentTypeFromKey");
 const getFileFromBucket = async (req, res) => {
-    const key = req.params.key;
+    const key = decodeURIComponent(req.params.key); // Decode the key
 
     try {
         const fileBuffer = await getFileFromR2(key);
