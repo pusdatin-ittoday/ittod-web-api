@@ -8,6 +8,9 @@ const usersRouter = require("./user");
 const adminRouter = require("./admin");
 const announcementRouter = require("./announcement.js");
 const competitionDataRouter = require("./competition-data.js");
+const fetchHalamanKompetisiEventRouter = require("./fetch-halaman-kompetisi-event.js");
+const announcementRouter = require("./announcement.js");
+
 const router = Router();
 
 router.get("/", (req, res) => {
@@ -22,5 +25,7 @@ router.use(usersRouter);
 router.use(adminRouter);
 router.use(announcementRouter);
 router.use(competitionDataRouter);
+router.use(fetchHalamanKompetisiEventRouter);
+router.use(announcementRouter);
 
 module.exports = router;
