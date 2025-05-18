@@ -65,7 +65,6 @@ Table media {
   uploader user [not null]
   twibbon team_member
   submission competition_submission
-  teamId String
 }
 
 Table team {
@@ -88,7 +87,7 @@ Table team_member {
   user_id String [not null]
   team_id String [not null]
   role team_member_role_enum [not null]
-  kartu_id String [unique]
+  kartu_id String
   twibbon_media_id String [unique]
   is_verified Boolean [not null, default: false]
   verification_error String
