@@ -63,7 +63,6 @@ Table media {
   created_at DateTime [default: `now()`, not null]
   updated_at DateTime [default: `now()`, not null]
   uploader user [not null]
-  twibbon team_member
   submission competition_submission
 }
 
@@ -88,12 +87,10 @@ Table team_member {
   team_id String [not null]
   role team_member_role_enum [not null]
   kartu_id String
-  twibbon_media_id String [unique]
   is_verified Boolean [not null, default: false]
   verification_error String
   user user [not null]
   team team [not null]
-  twibbon media
 
   indexes {
     (user_id, team_id) [pk]
@@ -113,6 +110,7 @@ Table user {
   id_discord String
   id_instagram String
   ktm_key String
+  twibbon_key String
   jenis_kelamin jenis_kelamin_enum
   consent Boolean [not null, default: false]
   is_registration_complete Boolean [not null, default: false]
@@ -217,7 +215,5 @@ Ref: team.competition_id > event.id
 Ref: team_member.user_id > user.id
 
 Ref: team_member.team_id > team.id
-
-Ref: team_member.twibbon_media_id - media.id
 
 Ref: user_identity.id - user.id
