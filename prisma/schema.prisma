@@ -123,7 +123,6 @@ model media {
 
   uploader user @relation(fields: [uploader_id], references: [id])
 
-  twibbon    team_member?            @relation("twibbon")
   submission competition_submission?
 }
 
@@ -150,13 +149,11 @@ model team_member {
   team_id            String
   role               team_member_role_enum
   kartu_id           String?
-  twibbon_media_id   String?               @unique
   is_verified        Boolean               @default(false)
   verification_error String?               @db.Text
 
-  user    user   @relation(fields: [user_id], references: [id])
-  team    team   @relation(fields: [team_id], references: [id])
-  twibbon media? @relation("twibbon", fields: [twibbon_media_id], references: [id])
+  user user @relation(fields: [user_id], references: [id])
+  team team @relation(fields: [team_id], references: [id])
 
   @@id([user_id, team_id])
 }
@@ -174,6 +171,7 @@ model user {
   id_discord               String?
   id_instagram             String?
   ktm_key                  String?
+  twibbon_key              String?
   jenis_kelamin            jenis_kelamin_enum?
   consent                  Boolean             @default(false)
   is_registration_complete Boolean             @default(false)
