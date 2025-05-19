@@ -11,14 +11,13 @@ const sessionConfig = require("./config/session.config.js");
 
 const app = express();
 
+// CORS configuration
 app.use(cors({
-    origin: true, // Reflects the request origin
+    origin: true,
     credentials: true,
     methods: ['GET', 'POST', 'PUT', 'DELETE', 'PATCH', 'OPTIONS'],
-    allowedHeaders: ['Content-Type', 'Authorization', 'X-Requested-With'], // Explicitly list expected headers
+    allowedHeaders: ['Content-Type', 'Authorization']
 }));
-
-app.options('*', cors());
 
 //middlewares
 app.use(json());
