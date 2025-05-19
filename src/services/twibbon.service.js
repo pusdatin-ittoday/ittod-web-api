@@ -41,7 +41,7 @@ const twibbonUploadService = async ({ user_id, twibbon }) => {
 
             return {
                 message: "Twibbon uploaded successfully!",
-                team: updatedUser,
+                user: updatedUser,
             };
         });
     } catch (err) {
@@ -53,7 +53,7 @@ const twibbonUploadService = async ({ user_id, twibbon }) => {
         } else {
             throw {
                 status: 500,
-                message: "Failed to upload Payment.",
+                message: "Failed to upload Twibbon.",
                 details: err.message,
             };
         }
