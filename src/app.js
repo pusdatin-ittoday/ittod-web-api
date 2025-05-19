@@ -11,13 +11,14 @@ const sessionConfig = require("./config/session.config.js");
 
 const app = express();
 
-// CORS configuration
 app.use(cors({
-    origin: ['http://localhost:3000', 'http://localhost:5173', 'http://127.0.0.1:3000'],
+    origin: true, // Reflects the request origin
     credentials: true,
     methods: ['GET', 'POST', 'PUT', 'DELETE', 'PATCH', 'OPTIONS'],
-    allowedHeaders: ['Content-Type', 'Authorization']
+    allowedHeaders: ['Content-Type', 'Authorization', 'X-Requested-With'], // Explicitly list expected headers
 }));
+
+app.options('*', cors());
 
 //middlewares
 app.use(json());
