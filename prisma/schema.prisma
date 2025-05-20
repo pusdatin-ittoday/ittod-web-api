@@ -149,7 +149,6 @@ model team_member {
   team_id            String
   role               team_member_role_enum
   kartu_id           String?
-  is_verified        Boolean               @default(false)
   verification_error String?               @db.Text
 
   user user @relation(fields: [user_id], references: [id])
@@ -173,7 +172,6 @@ model user {
   ktm_key                  String?
   twibbon_key              String?
   jenis_kelamin            jenis_kelamin_enum?
-  consent                  Boolean             @default(false)
   is_registration_complete Boolean             @default(false)
   created_at               DateTime            @default(now())
   updated_at               DateTime?           @updatedAt

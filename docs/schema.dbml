@@ -87,7 +87,6 @@ Table team_member {
   team_id String [not null]
   role team_member_role_enum [not null]
   kartu_id String
-  is_verified Boolean [not null, default: false]
   verification_error String
   user user [not null]
   team team [not null]
@@ -112,7 +111,6 @@ Table user {
   ktm_key String
   twibbon_key String
   jenis_kelamin jenis_kelamin_enum
-  consent Boolean [not null, default: false]
   is_registration_complete Boolean [not null, default: false]
   created_at DateTime [default: `now()`, not null]
   updated_at DateTime
