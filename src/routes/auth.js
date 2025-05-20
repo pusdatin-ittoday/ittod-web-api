@@ -42,7 +42,7 @@ authRouter.get(
     "/api/auth/google/redirect",
     passport.authenticate("google", { failureRedirect: "/login" }),
     (req, res) => {
-        res.redirect("/");
+        res.redirect(process.env.APP_BASE_URL + "/dashboard");
     }
 );
 
