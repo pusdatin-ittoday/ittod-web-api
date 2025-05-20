@@ -5,7 +5,7 @@ const { isAuthenticated } = require("../middleware/authMiddleware.js");
 const passport = require("../strategies/admin-strategy");
 const { validateLogin, loginLimiter } = require("../middleware/authMiddleware");
 const passportAuthMiddleware = require("../middleware/passportAuthMiddleware");
-const { login } = require("../controllers/auth.controller");
+const { loginAdmin } = require("../controllers/auth.controller");
 const preventLoginIfAuthenticated = require("../middleware/preventLoginIfAuthenticated");
 
 const adminRouter = Router();
@@ -17,6 +17,6 @@ adminRouter.post(
     preventLoginIfAuthenticated,
     validateLogin,
     passportAuthMiddleware("local"),
-    login
+    loginAdmin
 );
 module.exports = adminRouter;

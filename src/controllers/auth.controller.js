@@ -25,3 +25,11 @@ exports.login = (req, res) => {
         user: { id, email, name, role },
     });
 };
+
+exports.loginAdmin = (req, res) => {
+    const { id, email, name, role } = req.user;
+    res.json({
+        message: "Admin login successful",
+        user: { id, email, name, role },
+    });
+};
