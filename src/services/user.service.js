@@ -87,4 +87,31 @@ const editUserProfile = async ({
     }
 };
 
-module.exports = { editUserProfile };
+const viewUserDataService = async user_id => {
+    if (!user_id) {
+        throw { status: 400, message: "User ID is required!" };
+    }
+
+    const user = await prisma.user.findUnique({
+        where: { id: user_id },
+        select: {
+            id: true,
+            full_name: true,
+            email: true,
+            birth_date: true,
+            pendidikan: true,
+            nama_sekolah: true,
+            phone_number: true,
+            id_line: true,
+            id_discord: true,
+            id_instagram: true,
+            is_registration_complete: true,
+            ktm_key: true,
+            twibbon_key: true,
+        },
+    });
+
+    if (!user) return null;
+    return user;
+};
+module.exports = { editUserProfile, viewUserDataService };
