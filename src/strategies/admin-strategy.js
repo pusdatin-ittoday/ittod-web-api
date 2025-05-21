@@ -18,6 +18,7 @@ passport.deserializeUser(async (id, done) => {
 });
 
 passport.use(
+    "admin",
     new LocalStrategy(
         { usernameField: "email" },
         async (email, password, done) => {
@@ -62,3 +63,5 @@ passport.use(
         }
     )
 );
+
+module.exports = passport;
