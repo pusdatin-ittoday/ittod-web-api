@@ -72,7 +72,7 @@ model event {
   submissions       competition_submission[]
   timelines         event_timeline[]
   teams             team[]
-  participants      user[]
+  // participants      user[]                // Removed implicit many-to-many
   event_participant event_participant[]
 }
 
@@ -188,12 +188,12 @@ model user {
   created_at               DateTime            @default(now())
   updated_at               DateTime?           @updatedAt
 
-  uploaded              media[]
-  identity              user_identity?
-  announcements         event_announcement[]
-  member                team_member[]
-  noncompetition_events event[]
-  event_participant     event_participant[]
+  uploaded          media[]
+  identity          user_identity?
+  announcements     event_announcement[]
+  member            team_member[]
+  // noncompetition_events event[]           // Removed obsolete field
+  event_participant event_participant[]
 }
 
 model user_identity {
