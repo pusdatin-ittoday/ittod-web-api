@@ -16,6 +16,8 @@ const {
     login,
     register,
     verifyEmail,
+    forgotPassword,
+    resetPassword,
 } = require("../controllers/auth.controller.js");
 const passportAuthMiddleware = require("../middleware/passportAuthMiddleware");
 const authRouter = Router();
@@ -69,5 +71,8 @@ authRouter.get("/api/auth/status", (req, res) => {
         res.status(200).json({ authenticated: false });
     }
 });
+
+authRouter.post("/api/auth/forgot-password", forgotPassword);
+authRouter.post("/api/auth/reset-password", resetPassword);
 
 module.exports = authRouter;
