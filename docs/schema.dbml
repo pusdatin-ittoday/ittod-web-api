@@ -16,6 +16,7 @@ Table event {
   timelines event_timeline [not null]
   teams team [not null]
   participants user [not null]
+  event_participant event_participant [not null]
 }
 
 Table event_announcement {
@@ -82,6 +83,18 @@ Table team {
   submission competition_submission [not null]
 }
 
+Table event_participant {
+  user_id String [not null]
+  event_id String [not null]
+  date_added DateTime [default: `now()`, not null]
+  user user [not null]
+  event event [not null]
+
+  indexes {
+    (user_id, event_id) [pk]
+  }
+}
+
 Table team_member {
   user_id String [not null]
   team_id String [not null]
@@ -119,6 +132,7 @@ Table user {
   announcements event_announcement [not null]
   member team_member [not null]
   noncompetition_events event [not null]
+  event_participant event_participant [not null]
 }
 
 Table user_identity {
@@ -209,6 +223,10 @@ Ref: event_timeline.event_id > event.id
 Ref: media.uploader_id > user.id
 
 Ref: team.competition_id > event.id
+
+Ref: event_participant.user_id > user.id
+
+Ref: event_participant.event_id > event.id
 
 Ref: team_member.user_id > user.id
 
