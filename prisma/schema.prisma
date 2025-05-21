@@ -68,11 +68,12 @@ model event {
   contact_person2                String?
   max_noncompetition_participant Int?
 
-  announcements event_announcement[]
-  submissions   competition_submission[]
-  timelines     event_timeline[]
-  teams         team[]
-  participants  user[]
+  announcements     event_announcement[]
+  submissions       competition_submission[]
+  timelines         event_timeline[]
+  teams             team[]
+  participants      user[]
+  event_participant event_participant[]
 }
 
 model event_announcement {
@@ -144,6 +145,16 @@ model team {
   submission competition_submission[]
 }
 
+model event_participant {
+  user_id  String
+  event_id String
+
+  user  user  @relation(fields: [user_id], references: [id])
+  event event @relation(fields: [event_id], references: [id])
+
+  @@id([user_id, event_id])
+}
+
 model team_member {
   user_id            String
   team_id            String
@@ -181,6 +192,7 @@ model user {
   announcements         event_announcement[]
   member                team_member[]
   noncompetition_events event[]
+  event_participant     event_participant[]
 }
 
 model user_identity {
