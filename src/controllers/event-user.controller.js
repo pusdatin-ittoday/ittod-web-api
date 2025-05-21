@@ -26,10 +26,9 @@ eventShowController = async (req, res) => {
     try {
         const user_id = req.user.id;
         const result = await prisma.event_participant.findMany({
-            where: {
-                user_id,
-            },
-            include: {
+            where: { user_id },
+            select: {
+                event_id: true,
                 event: {
                     select: { title: true },
                 },
