@@ -12,4 +12,5 @@ eventRouter.post(
     eventJoinController
 );
 
+eventRouter.get("/api/event/", isAuthenticated, )
 module.exports = eventRouter;
