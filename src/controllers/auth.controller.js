@@ -33,3 +33,23 @@ exports.loginAdmin = (req, res) => {
         user: { id, email, name, role },
     });
 };
+
+exports.forgotPassword = async (req, res) => {
+    try {
+        const { email } = req.body;
+        await authService.sendPasswordResetEmail(email);
+        res.json({ message: "Password reset instructions have been sent to your email" });
+    } catch (err) {
+        res.status(err.status || 500).json({ error: err.message });
+    }
+};
+
+exports.resetPassword = async (req, res) => {
+    try {
+        const { token, newPassword } = req.body;
+        await authService.resetPassword(token, newPassword);
+        res.json({ message: "Password has been reset successfully" });
+    } catch (err) {
+        res.status(err.status || 500).json({ error: err.message });
+    }
+};

@@ -1,7 +1,7 @@
 const prisma = require("../prisma.js");
 const argon2 = require("argon2");
 const crypto = require("crypto");
-const { sendVerificationEmail } = require("../utils/mailer.js");
+const { sendVerificationEmail, sendPasswordResetEmail } = require("../utils/mailer.js");
 
 exports.register = async ({ email, password, full_name }) => {
     if (password.length < 8)
@@ -72,4 +72,57 @@ exports.verifyEmail = async token => {
     });
 
     return { message: "Email verified. You can now login." };
+};
+
+exports.sendPasswordResetEmail = async (email) => {
+    const user = await prisma.user.findUnique({
+        where: { email },
+        include: { identity: true }
+    });
+
+    if (!user) {
+        throw { status: 404, message: "User not found" };
+    }
+
+    const resetToken = crypto.randomBytes(32).toString("hex");
+    const resetTokenExpiration = new Date(Date.now() + 60 * 60 * 1000); // 1 hour
+
+    await prisma.user_identity.update({
+        where: { id: user.identity.id },
+        data: {
+            password_recovery_token: resetToken,
+            password_recovery_token_expiration: resetTokenExpiration
+        }
+    });
+
+    // Send reset email
+    await sendPasswordResetEmail(email, resetToken, user.full_name);
+};
+
+exports.resetPassword = async (token, newPassword) => {
+    if (newPassword.length < 8) {
+        throw { status: 400, message: "Password must be at least 8 characters" };
+    }
+
+    const user = await prisma.user_identity.findFirst({
+        where: {
+            password_recovery_token: token,
+            password_recovery_token_expiration: { gt: new Date() }
+        }
+    });
+
+    if (!user) {
+        throw { status: 400, message: "Invalid or expired reset token" };
+    }
+
+    const hashedPassword = await argon2.hash(newPassword);
+
+    await prisma.user_identity.update({
+        where: { id: user.id },
+        data: {
+            hash: hashedPassword,
+            password_recovery_token: null,
+            password_recovery_token_expiration: null
+        }
+    });
 };
