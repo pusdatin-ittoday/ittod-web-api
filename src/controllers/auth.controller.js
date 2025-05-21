@@ -37,6 +37,9 @@ exports.loginAdmin = (req, res) => {
 exports.forgotPassword = async (req, res) => {
     try {
         const { email } = req.body;
+        if (!email || !email.trim()) {
+            return res.status(400).json({ error: "Email is required" });
+        }
         await authService.sendPasswordResetEmail(email);
         res.json({ message: "Password reset instructions have been sent to your email" });
     } catch (err) {
@@ -47,6 +50,12 @@ exports.forgotPassword = async (req, res) => {
 exports.resetPassword = async (req, res) => {
     try {
         const { token, newPassword } = req.body;
+        if (!token || !token.trim()) {
+            return res.status(400).json({ error: "Token is required" });
+        }
+        if (!newPassword) {
+            return res.status(400).json({ error: "New password is required" });
+        }
         await authService.resetPassword(token, newPassword);
         res.json({ message: "Password has been reset successfully" });
     } catch (err) {

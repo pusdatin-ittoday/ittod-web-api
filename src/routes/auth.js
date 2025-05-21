@@ -9,6 +9,12 @@ const {
 const {
     validateRegister,
 } = require("../middleware/registerValidationMiddleware.js");
+const {
+    forgotPasswordLimiter,
+    resetPasswordLimiter,
+    validateForgotPassword,
+    validateResetPassword
+} = require("../middleware/passwordResetMiddleware.js");
 const preventLoginIfAuthenticated = require("../middleware/preventLoginIfAuthenticated.js");
 const googleStrategy = require("../strategies/google-strategy.js");
 const LocalStrategy = require("../strategies/local-strategy.js");
@@ -72,7 +78,18 @@ authRouter.get("/api/auth/status", (req, res) => {
     }
 });
 
-authRouter.post("/api/auth/forgot-password", forgotPassword);
-authRouter.post("/api/auth/reset-password", resetPassword);
+authRouter.post(
+    "/api/auth/forgot-password", 
+    forgotPasswordLimiter,
+    validateForgotPassword,
+    forgotPassword
+);
+
+authRouter.post(
+    "/api/auth/reset-password",
+    resetPasswordLimiter,
+    validateResetPassword,
+    resetPassword
+);
 
 module.exports = authRouter;
