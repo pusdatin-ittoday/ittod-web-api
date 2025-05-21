@@ -1,6 +1,7 @@
 const prisma = require("../prisma.js");
 const passport = require("passport");
 const { Strategy: GoogleStrategy } = require("passport-google-oauth20");
+const { checkAdmin } = require("../middleware/adminOnlyMiddleware");
 
 passport.serializeUser((user, done) => {
     done(null, user.id);
@@ -17,6 +18,7 @@ passport.deserializeUser(async (id, done) => {
 });
 
 module.exports = passport.use(
+    "google-user",
     new GoogleStrategy(
         {
             clientID: process.env.GOOGLE_CLIENT_ID,
@@ -48,14 +50,25 @@ module.exports = passport.use(
                 });
 
                 if (existingUser) {
+                    const CheckGoogle = await prisma.user_identity.findUnique({
+                        where: { id: existingUser.id },
+                        select: { provider: true },
+                    });
+
+                    if (CheckGoogle.provider !== "google") {
+                        return done(
+                            "You already registered without google, please login with your email.",
+                            null
+                        );
+                    }
                     await prisma.user_identity.create({
                         data: {
                             id: externalId,
                             provider,
                             email,
-                            is_verified:true,
+                            is_verified: true,
                             hash: null,
-                            role:"user",
+                            role: "user",
                             verification_token: "OAUTH_USER",
                             verification_token_expiration: new Date(
                                 Date.now() + 100 * 365 * 24 * 60 * 60 * 1000
@@ -92,3 +105,5 @@ module.exports = passport.use(
         }
     )
 );
+
+module.exports = passport;

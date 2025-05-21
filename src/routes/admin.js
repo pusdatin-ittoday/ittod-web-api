@@ -16,7 +16,7 @@ adminRouter.post(
     loginLimiter,
     preventLoginIfAuthenticated,
     validateLogin,
-    passportAuthMiddleware("local"),
+    passportAuthMiddleware("admin"),
     loginAdmin
 );
 module.exports = adminRouter;
