@@ -95,8 +95,13 @@ exports.sendPasswordResetEmail = async (email) => {
         }
     });
 
-    // Send reset email
-    await sendPasswordResetEmail(email, resetToken, user.full_name);
+    // Send reset email with error handling
+    try {
+        await sendPasswordResetEmail(email, resetToken, user.full_name);
+    } catch (err) {
+        console.error("Failed to send password reset email: ", err);
+        // Continue execution, as the token was still successfully generated
+    }
 };
 
 exports.resetPassword = async (token, newPassword) => {
