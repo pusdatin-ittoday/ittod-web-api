@@ -11,3 +11,5 @@ eventRouter.post(
     validateRequest(loginSchema),
     eventJoinController
 );
+
+module.exports = eventRouter;
