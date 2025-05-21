@@ -19,6 +19,20 @@ const registerUserIntoEvent = async (
         },
     });
 
+    const eventParticipantCount = await prisma.event_participant.count({
+        where: { event_id },
+    });
+    const isEventFull =
+        eventExists.max_noncompetition_participant !== null &&
+        eventParticipantCount >= eventExists.max_noncompetition_participant;
+
+    if (isEventFull) {
+        throw {
+            status: 403,
+            message: "Event is full. Registration is not allowed.",
+        };
+    }
+
     if (!eventExists) {
         throw {
             status: 404,
