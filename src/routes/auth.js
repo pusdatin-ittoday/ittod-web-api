@@ -42,7 +42,8 @@ authRouter.get(
     "/api/auth/google/redirect",
     passport.authenticate("google-user", { failureRedirect: "/login" }),
     (req, res) => {
-        res.redirect(process.env.APP_BASE_URL + "/dashboard/beranda");
+        const baseUrl = (process.env.APP_BASE_URL || "").replace(/\/+$/, "");
+        res.redirect(`${baseUrl}/dashboard/beranda`);
     }
 );
 
