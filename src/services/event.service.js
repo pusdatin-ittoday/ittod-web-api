@@ -6,32 +6,9 @@ const registerUserIntoEvent = async (
     institution_name,
     phone_number
 ) => {
-    const userAlreadyInEvent = await prisma.event_participant.findFirst({
-        where: {
-            user_id,
-            event_id,
-        },
-    });
-
     const eventExists = await prisma.event.findFirst({
-        where: {
-            id: event_id,
-        },
+        where: { id: event_id },
     });
-
-    const eventParticipantCount = await prisma.event_participant.count({
-        where: { event_id },
-    });
-    const isEventFull =
-        eventExists.max_noncompetition_participant !== null &&
-        eventParticipantCount >= eventExists.max_noncompetition_participant;
-
-    if (isEventFull) {
-        throw {
-            status: 403,
-            message: "Event is full. Registration is not allowed.",
-        };
-    }
 
     if (!eventExists) {
         throw {
@@ -39,6 +16,11 @@ const registerUserIntoEvent = async (
             message: `There's no event with event_id ${event_id}`,
         };
     }
+
+    const userAlreadyInEvent = await prisma.event_participant.findFirst({
+        where: { user_id, event_id },
+    });
+
     if (userAlreadyInEvent) {
         throw {
             status: 403,
@@ -48,10 +30,30 @@ const registerUserIntoEvent = async (
 
     try {
         await prisma.$transaction(async tx => {
+            // Lock the event row to prevent race conditions
+            const lockedEvent = await tx.event.findFirst({
+                where: { id: event_id },
+                select: { max_noncompetition_participant: true },
+                lock: { mode: "for update" },
+            });
+
+            const eventParticipantCount = await tx.event_participant.count({
+                where: { event_id },
+            });
+
+            const isEventFull =
+                lockedEvent.max_noncompetition_participant !== null &&
+                eventParticipantCount >= lockedEvent.max_noncompetition_participant;
+
+            if (isEventFull) {
+                throw {
+                    status: 403,
+                    message: "Event is full. Registration is not allowed.",
+                };
+            }
+
             await tx.user.update({
-                where: {
-                    id: user_id,
-                },
+                where: { id: user_id },
                 data: {
                     nama_sekolah: institution_name,
                     phone_number,
@@ -66,8 +68,9 @@ const registerUserIntoEvent = async (
                 },
             });
         });
+
         return {
-            message: `User have been registered into event with id ${event_id}`,
+            message: `User has been registered into event with id ${event_id}`,
         };
     } catch (err) {
         console.error("Registration error:", err);
