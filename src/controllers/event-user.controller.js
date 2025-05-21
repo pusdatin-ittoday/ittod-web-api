@@ -44,4 +44,4 @@ eventShowController = async (req, res) => {
     }
 };
 
-module.exports = { eventJoinController };
+module.exports = { eventJoinController, eventShowController };

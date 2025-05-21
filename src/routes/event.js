@@ -1,6 +1,9 @@
 const { Router } = require("express");
 const { isAuthenticated } = require("../middleware/authMiddleware.js");
-const { eventJoinController } = require("../controllers/event-user.controller");
+const {
+    eventJoinController,
+    eventShowController,
+} = require("../controllers/event-user.controller");
 const loginSchema = require("../validators/eventRegisterValidationSchema");
 const { validateRequest } = require("../middleware/joiMiddleware");
 const eventRouter = Router();
@@ -12,5 +15,5 @@ eventRouter.post(
     eventJoinController
 );
 
-eventRouter.get("/api/event/", isAuthenticated, )
+eventRouter.get("/api/event/", isAuthenticated, eventShowController);
 module.exports = eventRouter;
