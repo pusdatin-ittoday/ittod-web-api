@@ -22,7 +22,7 @@ const eventJoinController = async (req, res) => {
     }
 };
 
-eventShowController = async (req, res) => {
+const eventShowController = async (req, res) => {
     try {
         const user_id = req.user.id;
         const result = await prisma.event_participant.findMany({

@@ -30,7 +30,6 @@ const registerUserIntoEvent = async (
 
     try {
         await prisma.$transaction(async tx => {
-            // Lock the event row to prevent race conditions
             const lockedEvent = await tx.event.findFirst({
                 where: { id: event_id },
                 select: { max_noncompetition_participant: true },
@@ -81,5 +80,4 @@ const registerUserIntoEvent = async (
         };
     }
 };
-
 module.exports = { registerUserIntoEvent };
