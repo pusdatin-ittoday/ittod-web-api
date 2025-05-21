@@ -23,7 +23,6 @@ router.use(timelineRouter);
 router.use(uploadRouter);
 router.use(usersRouter);
 router.use(adminRouter);
-router.use(announcementRouter);
 router.use(competitionDataRouter);
 router.use(fetchHalamanKompetisiEventRouter);
 router.use(announcementRouter);
