@@ -11,6 +11,9 @@ const getCompetitionData = async (req, res) => {
             select: {
                 id: true,
                 team_name: true,
+                team_code: true,
+                is_verified: true,
+                verification_error: true,
                 competition: {
                     select: {
                         title: true
@@ -20,7 +23,8 @@ const getCompetitionData = async (req, res) => {
                     select: {
                         user: {
                             select: {
-                                full_name: true
+                                full_name: true,
+                                is_registration_complete: true
                             }
                         }
                     }
@@ -30,9 +34,15 @@ const getCompetitionData = async (req, res) => {
 
         const formattedData = competitionData.map(team => ({
             teamID: team.id,
+            teamJoinCode: team.team_code,
             teamName: team.team_name,
+            isVerified: team.is_verified,
+            verificationError: team.verification_error,
             competitionName: team.competition?.title ?? 'N/A',
-            members: team.members.map(member => member.user.full_name)
+            members: team.members.map(member => ({
+                fullName: member.user.full_name,
+                isRegistrationComplete: member.user.is_registration_complete
+            }))
         }));
 
         return res.status(200).json(formattedData);

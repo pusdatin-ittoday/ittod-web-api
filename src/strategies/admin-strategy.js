@@ -1,5 +1,3 @@
-// noinspection DuplicatedCode
-
 const prisma = require("../prisma.js");
 const passport = require("passport");
 const { Strategy: LocalStrategy } = require("passport-local");
@@ -12,9 +10,6 @@ passport.serializeUser((user, done) => {
 passport.deserializeUser(async (id, done) => {
     try {
         const user = await prisma.user.findUnique({ where: { id } });
-        if (!user) {
-            return done(null, false);
-        }
         done(null, user);
     } catch (err) {
         console.error("Deserialization error:", err);
@@ -23,7 +18,7 @@ passport.deserializeUser(async (id, done) => {
 });
 
 passport.use(
-    "basic-user",
+    "admin",
     new LocalStrategy(
         { usernameField: "email" },
         async (email, password, done) => {
@@ -36,6 +31,13 @@ passport.use(
                 if (!user || !user.hash) {
                     return done(null, false, {
                         message: "Invalid email or password",
+                    });
+                }
+
+                // Check if the user is an admin
+                if (user.role !== "admin") {
+                    return done(null, false, {
+                        message: "Access denied. Admins only.",
                     });
                 }
 

@@ -87,4 +87,44 @@ const editUserProfile = async ({
     }
 };
 
-module.exports = { editUserProfile };
+const viewUserDataService = async user_id => {
+    if (!user_id) {
+        throw { status: 400, message: "User ID is required!" };
+    }
+    try {
+        const user = await prisma.user.findUnique({
+            where: { id: user_id },
+            select: {
+                id: true,
+                full_name: true,
+                email: true,
+                birth_date: true,
+                pendidikan: true,
+                nama_sekolah: true,
+                phone_number: true,
+                id_line: true,
+                id_discord: true,
+                id_instagram: true,
+                is_registration_complete: true,
+                ktm_key: true,
+                twibbon_key: true,
+            },
+        });
+        if (!user) {
+            throw { status: 404, message: "User not found!" };
+        }
+        return user;
+    } catch (err) {
+        console.error("View User Data Error:", err);
+        if (err.status) {
+            throw err;
+        } else {
+            throw {
+                status: 500,
+                message: "Failed to retrieve user data.",
+                details: err.message,
+            };
+        }
+    }
+};
+module.exports = { editUserProfile, viewUserDataService };

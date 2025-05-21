@@ -25,7 +25,7 @@ authRouter.post(
     loginLimiter,
     preventLoginIfAuthenticated,
     validateLogin,
-    passportAuthMiddleware("local"),
+    passportAuthMiddleware("basic-user"),
     login
 );
 
@@ -35,14 +35,15 @@ authRouter.get("/api/auth/verify", verifyEmail);
 
 authRouter.get(
     "/api/auth/google",
-    passport.authenticate("google", { scope: ["profile", "email"] })
+    passport.authenticate("google-user", { scope: ["profile", "email"] })
 );
 
 authRouter.get(
     "/api/auth/google/redirect",
-    passport.authenticate("google", { failureRedirect: "/login" }),
+    passport.authenticate("google-user", { failureRedirect: "/login" }),
     (req, res) => {
-        res.redirect("/");
+        const baseUrl = (process.env.APP_BASE_URL || "").replace(/\/+$/, "");
+        res.redirect(`${baseUrl}/dashboard/beranda`);
     }
 );
 
