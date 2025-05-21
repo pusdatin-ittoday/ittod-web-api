@@ -50,12 +50,14 @@ module.exports = passport.use(
                 });
 
                 if (existingUser) {
-                    const CheckGoogle = await prisma.user_identity.findUnique({
-                        where: { id: existingUser.id },
-                        select: { provider: true },
+                    const checkGoogle = await prisma.user_identity.findFirst({
+                        where: {
+                            id: existingUser.id,
+                            provider: "google",
+                        },
                     });
 
-                    if (CheckGoogle.provider !== "google") {
+                    if (!checkGoogle) {
                         return done(
                             "You already registered without google, please login with your email.",
                             null
