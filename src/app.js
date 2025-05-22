@@ -12,7 +12,13 @@ const sessionConfig = require("./config/session.config.js");
 
 const app = express();
 const corsOptions = {
-    origin: "*", // Adjust this to your needs
+    origin: (origin, callback) => {
+        if (!origin || /^(http:\/\/localhost(:\d+)?)/.test(origin)) {
+            callback(null, true);
+        } else {
+            callback(new Error("Not allowed by CORS"));
+        }
+    },
     methods: ["GET", "POST", "PUT", "DELETE"],
     allowedHeaders: ["Content-Type", "Authorization"],
     optionsSuccessStatus: 200,
