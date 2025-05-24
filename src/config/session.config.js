@@ -14,7 +14,8 @@ module.exports = {
         domain: process.env.COOKIE_DOMAIN || ".ittoday.web.id",
         secure: process.env.NODE_ENV === "production" || false,
         httpOnly: true,
+        signed: true,
         maxAge: 1000 * 60 * 60 * 24,
-        sameSite: "Strict",
+        sameSite: "None",
     },
 };
