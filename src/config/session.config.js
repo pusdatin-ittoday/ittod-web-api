@@ -12,9 +12,7 @@ module.exports = {
     store: new PrismaSessionStore(),
     cookie: {
         domain: process.env.COOKIE_DOMAIN || ".ittoday.web.id",
-        secure: process.env.NODE_ENV === "production" || false,
-        httpOnly: true,
-        signed: true,
+        secure: true,
         maxAge: 1000 * 60 * 60 * 24,
         sameSite: "None",
     },
