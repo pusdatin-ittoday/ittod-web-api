@@ -4,24 +4,12 @@ A robust RESTful backend service for the IT-TODAY 2025 platform, built with **No
 
 ---
 
-## 🚀 Features
-
-- User authentication and authorization
-- Team registration and management
-- Competition participation limits
-- Leader assignment and validation
-- Integration with Google OAuth2
-- Scalable database design with Prisma ORM
-
----
-
 ## 🛠️ Tech Stack
 
 - **Node.js**: Backend runtime
 - **Express.js**: Web framework
 - **MySQL**: Relational database
 - **Prisma ORM**: Database management
-- **Supabase**: Object storage
 - **Prettier**: Code formatting
 
 ---
@@ -29,6 +17,16 @@ A robust RESTful backend service for the IT-TODAY 2025 platform, built with **No
 ## 📦 Installation
 
 Follow these steps to set up the project locally:
+
+### 0. Setup your MySQL Database
+1. Download and Install XAMPP at https://www.apachefriends.org/download.html
+2. Launch XAMPP Control Panel
+3. Open the XAMPP Control Panel (it usually runs as xampp-control.exe).
+4. Start the following modules: Apache and MySQL
+5. Go to your browser and open http://localhost/phpmyadmin
+6. Click on "New" on the left sidebar.
+7. Enter a name (e.g. my_app_db) and click Create.
+8. You can now create tables with prisma.
 
 ### 1. Clone the repository
 
@@ -53,11 +51,30 @@ npm install
 Create a `.env` file in the project root and add the following variables:
 
 ```env
-DATABASE_URL=mysql://<username>:<password>@<host>:<port>/<database>
-SECRET_KEY_SESSION=<your_secret_key>
-GOOGLE_CLIENT_SECRET=<your_google_client_secret>
-GOOGLE_CLIENT_ID=<your_google_client_id>
-GOOGLE_REDIRECT=<your_google_redirect_url>
+DATABASE_URL=mysql://root:********@localhost:32768/ittod_dev
+SECRET_KEY_SESSION=******************************
+GOOGLE_CLIENT_SECRET=**************************************
+GOOGLE_CLIENT_ID=******************************.apps.googleusercontent.com
+GOOGLE_REDIRECT=http://localhost:3000/api/auth/google/redirect
+DB_HOST=localhost
+DB_PORT=32768
+DB_USER=root
+DB_PASSWORD=******************************
+DB_NAME=ittod_dev
+EMAIL_USER=******************************
+EMAIL_PASS=******************************
+EMAIL_HOST=smtp.ethereal.email #or other
+EMAIL_PORT=587 #or other
+APP_BASE_URL=http://localhost:5173
+EMAIL_SENDER="IT Today" <no-reply@ittoday.com>
+SUPPORT_EMAIL=support@ittoday.com
+R2_ACCESS_KEY_ID=******************************
+R2_SECRET_ACCESS_KEY=************************************************************
+R2_LINK=https://*****.r2.cloudflarestorage.com
+R2_PUBLIC=https://pub-*****.r2.dev
+R2_BUCKET_NAME=ittoday
+COOKIE_DOMAIN=localhost #if youre in production theres different method
+
 ```
 
 ### 5. Set up the database
@@ -88,35 +105,6 @@ npm run serve
 ```
 
 Access the API at: `http://localhost:3000`
-
----
-
-## 📄 API Endpoints
-
-### 🔐 Users
-
-| Method | Endpoint         | Description        |
-| ------ | ---------------- | ------------------ |
-| GET    | `/api/users`     | Retrieve all users |
-| POST   | `/api/users`     | Add a new user     |
-| GET    | `/api/users/:id` | Get user by ID     |
-| PUT    | `/api/users/:id` | Update user by ID  |
-
-### 🏆 Competitions
-
-| Method | Endpoint                | Description                   |
-| ------ | ----------------------- | ----------------------------- |
-| GET    | `/api/competitions`     | Retrieve all competitions     |
-| POST   | `/api/competitions`     | Add a new competition         |
-| GET    | `/api/competitions/:id` | Get competition details by ID |
-
-### 👥 Teams
-
-| Method | Endpoint          | Description                   |
-| ------ | ----------------- | ----------------------------- |
-| POST   | `/api/teams`      | Register a new team           |
-| POST   | `/api/teams/join` | Join a team using a team code |
-| GET    | `/api/teams/:id`  | Get team details by ID        |
 
 ---
 
