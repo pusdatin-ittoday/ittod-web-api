@@ -30,10 +30,8 @@ exports.verifyEmail = async (req, res) => {
         }
     } catch (err) {
         // If verification fails, show error message without redirect
-@@ src/controllers/auth.controller.js
--        const safeMessage = String(err.message).replace(/</g, '&lt;').replace(/>/g, '&gt;');
--        res.status(400).send(emailTemplates.errorTemplate(safeMessage));
-+        res.status(400).send(emailTemplates.errorTemplate(err.message));
+        const safeMessage = String(err.message).replace(/</g, '&lt;').replace(/>/g, '&gt;');
+        res.status(400).send(emailTemplates.errorTemplate(safeMessage));
     }
 };
 
