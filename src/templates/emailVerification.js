@@ -125,7 +125,7 @@ exports.errorTemplate = (safeMessage) => `
 <body>
     <div class="container">
         <h1>Verification Failed</h1>
-        <p class="error">${escapeHtml(safeMessage)}</p>
+        <p class="error">${safeMessage}</p>
         <p>Please try again or contact support if the problem persists.</p>
     </div>
 </body>
