@@ -115,7 +115,7 @@ model event_timeline {
 model media {
   id          String               @id
   uploader_id String
-  name        String               @unique
+  name        String               
   grouping    media_grouping_enum?
   type        media_type_enum
   url         String
