@@ -30,7 +30,7 @@ exports.register = async ({ email, password, full_name }) => {
                     hash: hashed,
                     verification_token: token,
                     verification_token_expiration: new Date(
-                        Date.now() + 60 * 5 * 1000
+                        Date.now() + 30 * 60 * 60 * 1000
                     ),
                     role: "user",
                 },
