@@ -20,8 +20,14 @@ exports.verifyEmail = async (req, res) => {
     try {
         await authService.verifyEmail(token);
         // If verification succeeds, show success message and redirect
-        const frontendBaseUrl = validateFrontendUrl(process.env.APP_FRONTEND_URL);
-        res.send(emailTemplates.successTemplate(frontendBaseUrl));
+        try {
+            const frontendBaseUrl = validateFrontendUrl(process.env.APP_FRONTEND_URL);
+            res.send(emailTemplates.successTemplate(frontendBaseUrl));
+        } catch (urlError) {
+            console.error('Frontend URL validation failed:', urlError.message);
+            // Fallback to localhost if URL validation fails
+            res.send(emailTemplates.successTemplate('http://localhost:5173'));
+        }
     } catch (err) {
         // If verification fails, show error message without redirect
         const safeMessage = String(err.message).replace(/</g, '&lt;').replace(/>/g, '&gt;');

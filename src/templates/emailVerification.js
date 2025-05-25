@@ -1,13 +1,28 @@
+/**
+ * Escapes HTML special characters to prevent XSS attacks
+ * @param {string} str - The string to escape
+ * @returns {string} The escaped string
+ */
+function escapeHtml(str) {
+    return String(str)
+        .replace(/&/g, '&amp;')
+        .replace(/</g, '&lt;')
+        .replace(/>/g, '&gt;')
+        .replace(/"/g, '&quot;')
+        .replace(/'/g, '&#x27;');
+}
+
 exports.successTemplate = (frontendBaseUrl) => {
-    const encodedUrl = encodeURI(frontendBaseUrl);
-    const loginUrl = `${encodedUrl}/login`;
+    const loginUrl = `${frontendBaseUrl}/login`;
+    const htmlEncodedUrl = escapeHtml(loginUrl);
+    const metaRefreshContent = escapeHtml(`3;url=${loginUrl}`);
     return `
 <!DOCTYPE html>
 <html>
 <head>
   <meta charset="UTF-8" />
   <title>Email Verified</title>
-  <meta http-equiv="refresh" content="3;url=${loginUrl}" />
+  <meta http-equiv="refresh" content="${metaRefreshContent}" />
   <style>
     body {
       font-family: sans-serif;
@@ -53,7 +68,7 @@ exports.successTemplate = (frontendBaseUrl) => {
   <div class="container">
     <h1>Email Verified Successfully!</h1>
     <p>You will be redirected to login shortly.</p>
-    <p>If not, <a href="${loginUrl}">click here</a>.</p>
+    <p>If not, <a href="${htmlEncodedUrl}">click here</a>.</p>
   </div>
 </body>
 </html>
@@ -110,7 +125,7 @@ exports.errorTemplate = (safeMessage) => `
 <body>
     <div class="container">
         <h1>Verification Failed</h1>
-        <p class="error">${safeMessage}</p>
+        <p class="error">${escapeHtml(safeMessage)}</p>
         <p>Please try again or contact support if the problem persists.</p>
     </div>
 </body>
