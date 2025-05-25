@@ -2,15 +2,6 @@ const prisma = require("../prisma.js");
 const crypto = require("crypto");
 
 const submitTeamFile = async ({ user_id, team_id, title, url_file }) => {
-    const existingFile = await prisma.competition_submission.findFirst({
-        where: { team_id },
-    });
-    if (existingFile) {
-        throw {
-            status: 409,
-            message: "Team already submitted file!",
-        };
-    }
     const file_id = crypto.randomUUID();
     const result = await prisma.team.findUnique({
         where: { id: team_id },
