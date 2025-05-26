@@ -6,6 +6,7 @@ if (!sessionSecret) {
 }
 
 module.exports = {
+    name: "session",
     secret: sessionSecret,
     resave: false,
     saveUninitialized: false,
@@ -14,7 +15,8 @@ module.exports = {
         httpOnly: true,
         path: "/",
         secure: true,
-        sameSite: "None",
+        sameSite: "none",
+        domain: "ittoday.web.id",
         maxAge: 3600000 * 24
     },
 };
