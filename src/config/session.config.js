@@ -15,5 +15,6 @@ module.exports = {
         path: "/",
         secure: true,
         sameSite: "None",
+        maxAge: 3600000 * 24
     },
 };
