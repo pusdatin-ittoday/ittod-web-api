@@ -1,7 +1,7 @@
 const prisma = require("../prisma");
 
 const events = [{}, {}, {}];
-const timelines = [{}, {}, {}];
+const timelines = [{}];
 const initiateDatabase = async (req, res) => {
     const eventResult = await prisma.event.createMany({
         data: events,
