@@ -19,6 +19,7 @@ const corsOptions = {
         "Authorization",
         "Access-Control-Allow-Origin",
     ],
+    exposedHeaders: ["Set-Cookie"],
     credentials: true,
     optionsSuccessStatus: 200,
 };
