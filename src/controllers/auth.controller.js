@@ -26,7 +26,7 @@ exports.verifyEmail = async (req, res) => {
         } catch (urlError) {
             console.error('Frontend URL validation failed:', urlError.message);
             // Fallback to localhost if URL validation fails
-            res.send(emailTemplates.successTemplate('http://localhost:5173'));
+            res.send(emailTemplates.successTemplate(process.env.APP_FRONTEND_URL));
         }
     } catch (err) {
         // If verification fails, show error message without redirect
