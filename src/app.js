@@ -13,14 +13,7 @@ const sessionConfig = require("./config/session.config.js");
 const app = express();
 const corsOptions = {
     origin: ["https://ittoday.web.id"],
-    methods: ["GET", "POST", "PUT", "DELETE"],
-    allowedHeaders: [
-        "Content-Type",
-        "Authorization",
-        "Access-Control-Allow-Origin",
-    ],
-    credentials: true, // Allow credentials
-    optionsSuccessStatus: 200,
+    credentials: true,
 };
 //middlewares
 app.use(cors(corsOptions));
