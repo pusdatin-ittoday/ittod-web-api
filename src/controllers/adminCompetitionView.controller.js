@@ -1,5 +1,4 @@
 const competitionService = require('../services/admin.services');
-const { message } = require('../validators/loginValidationSchema');
 
 const getCompetitionById = async (req, res) => {
     try {
@@ -10,9 +9,9 @@ const getCompetitionById = async (req, res) => {
         if(!competition) {
             return res.status(404).json({
                 success: false,
-                message: 'Competition not found'
+                message: `Competition with id : ${id} not found`
             });
-        }
+        };
 
         res.status(200).json({
             success: true,
@@ -25,9 +24,27 @@ const getCompetitionById = async (req, res) => {
         res.status(500).json({
             success: false,
             message: 'internal server error',
-            error: error.message
+            error: error.message || error
         });
-    }
+    };
 };
 
-module.exports = { getCompetitionById }
+const getCompetitionList = async(req, res) => {
+    try{
+        const competitionList = await competitionService.getCompetitionList();
+        res.status(200).json({
+            success: true,
+            data:competitionList
+        });
+
+    } catch (error) {
+        console.error("error retrieving competition list", error);
+        res.status(500).json({
+            success: false,
+            message: error.message || error
+        });
+
+    };
+};
+
+module.exports = { getCompetitionById, getCompetitionList };
