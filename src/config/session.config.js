@@ -13,6 +13,7 @@ module.exports = {
     cookie: {
         secure: true,
         sameSite: "None",
+        domain: process.env.COOKIE_DOMAIN,
         httpOnly: false,
         maxAge: 1000 * 60 * 60 * 24,
     },
