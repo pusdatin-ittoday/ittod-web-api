@@ -1,4 +1,5 @@
 const prisma = require("../prisma.js");
+const { message } = require('../validators/loginValidationSchema');
 
 const getCompetitionById = async(id) => {
     try{
