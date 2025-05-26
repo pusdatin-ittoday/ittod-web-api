@@ -13,12 +13,8 @@ const sessionConfig = require("./config/session.config.js");
 const app = express();
 const corsOptions = {
     origin: ["http://localhost:5173", "https://staging.ittoday.web.id", "https://ittoday.web.id"],
-    methods: ["GET", "POST", "PUT", "DELETE"],
-    allowedHeaders: [
-        "Content-Type",
-        "Authorization",
-        "Access-Control-Allow-Origin",
-    ],
+    methods: ["*"],
+    allowedHeaders: ["*"],
     exposedHeaders: ["Set-Cookie"],
     credentials: true,
     optionsSuccessStatus: 200,
