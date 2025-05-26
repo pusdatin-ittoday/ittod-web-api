@@ -131,3 +131,33 @@ exports.resetPassword = async (token, newPassword) => {
         }
     });
 };
+
+exports.resendVerificationEmail = async email => {
+    const user = await prisma.user.findUnique({
+        where: { email },
+        include: { identity: true }
+    });
+
+    if (!user || !user.identity || user.identity.is_verified) {
+        throw { status: 400, message: "Invalid request or email already verified" };
+    }
+
+    const token = crypto.randomBytes(32).toString("hex");
+    const tokenExpiration = new Date(Date.now() + 30 * 60 * 60 * 1000); // 30 hours
+
+    await prisma.user_identity.update({
+        where: { id: user.identity.id },
+        data: {
+            verification_token: token,
+            verification_token_expiration: tokenExpiration
+        }
+    });
+
+    try {
+        await sendVerificationEmail(email, token, user.full_name);
+    } catch (err) {
+        console.error("Failed to resend verification email: ", err);
+    }
+
+    return { message: "Verification email resent. Please check your inbox." };
+};

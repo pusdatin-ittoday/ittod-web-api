@@ -26,6 +26,9 @@ const {
     resetPassword,
 } = require("../controllers/auth.controller.js");
 const passportAuthMiddleware = require("../middleware/passportAuthMiddleware");
+const emailSchema = require("../validators/emailSchema")
+const {validateRequest} = require("../middleware/joiMiddleware")
+const { resendVerificationEmail } = require("../controllers/auth.controller");
 const authRouter = Router();
 
 authRouter.post(
@@ -90,6 +93,12 @@ authRouter.post(
     resetPasswordLimiter,
     validateResetPassword,
     resetPassword
+);
+
+authRouter.post(
+    "/api/auth/resend-verification-email",
+    validateRequest(emailSchema),
+    resendVerificationEmail
 );
 
 module.exports = authRouter;
