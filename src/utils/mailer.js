@@ -60,7 +60,8 @@ exports.sendPasswordResetEmail = async (email, token, name) => {
     
     const baseUrl = process.env.APP_BASE_URL || "http://localhost:3000";
     const supportEmail = process.env.SUPPORT_EMAIL || "support@ittoday.com";
-    const url = `${baseUrl}/reset-password?token=${token}`;
+    const frontendUrl = process.env.APP_FRONTEND_URL || "http://localhost:5173";
+    const url = `${frontendUrl}/new-password?token=${token}`;
     const sender = process.env.EMAIL_SENDER || '"IT Today" <no-reply@ittoday.com>';
 
     try {
