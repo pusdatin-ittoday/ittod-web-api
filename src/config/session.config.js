@@ -16,7 +16,6 @@ module.exports = {
         path: "/",
         secure: true,
         sameSite: "none",
-        domain: "ittoday.web.id",
         maxAge: 3600000 * 24
     },
 };
