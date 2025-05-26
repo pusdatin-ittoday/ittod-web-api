@@ -15,7 +15,6 @@ Table event {
   submissions competition_submission [not null]
   timelines event_timeline [not null]
   teams team [not null]
-  participants user [not null]
   event_participant event_participant [not null]
 }
 
@@ -57,7 +56,7 @@ Table event_timeline {
 Table media {
   id String [pk]
   uploader_id String [not null]
-  name String [unique, not null]
+  name String [not null]
   grouping media_grouping_enum
   type media_type_enum [not null]
   url String [not null]
@@ -131,7 +130,6 @@ Table user {
   identity user_identity
   announcements event_announcement [not null]
   member team_member [not null]
-  noncompetition_events event [not null]
   event_participant event_participant [not null]
 }
 
@@ -156,11 +154,6 @@ Table sessions {
   id String [pk]
   expires DateTime [not null]
   data Json [not null]
-}
-
-Table eventTouser {
-  participantsId String [ref: > user.id]
-  noncompetition_eventsId String [ref: > event.id]
 }
 
 Enum education_enum {
