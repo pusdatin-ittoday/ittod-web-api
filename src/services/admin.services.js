@@ -1,5 +1,4 @@
 const prisma = require("../prisma.js");
-const { message } = require('../validators/loginValidationSchema');
 
 //untuk tampilin data data competition berdasarkan dropdown
 const getCompetitionById = async(id) => {
