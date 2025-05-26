@@ -11,9 +11,9 @@ module.exports = {
     saveUninitialized: false,
     store: new PrismaSessionStore(),
     cookie: {
-        domain: process.env.COOKIE_DOMAIN || ".ittoday.web.id",
+        httpOnly: true,
+        path: "/",
         secure: true,
-        maxAge: 1000 * 60 * 60 * 24,
-        sameSite: "Lax",
+        sameSite: "None",
     },
 };
