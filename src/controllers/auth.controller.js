@@ -48,13 +48,22 @@ exports.resendVerificationEmail = async (req, res) => {
     }
 };
 
-exports.login = (req, res) => {
+exports.login = (req, res, next) => {
     const { id, email, name, role } = req.user;
-    res.json({
-        message: "Login successful",
-        user: { id, email, name, role },
+
+    req.session.save(err => {
+        if (err) {
+            console.error("Session save error:", err);
+            return next(err);
+        }
+
+        res.json({
+            message: "Login successful",
+            user: { id, email, name, role },
+        });
     });
 };
+
 
 exports.loginAdmin = (req, res) => {
     const { id, email, name, role } = req.user;
