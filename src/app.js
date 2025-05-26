@@ -19,7 +19,7 @@ const corsOptions = {
         "Authorization",
         "Access-Control-Allow-Origin",
     ],
-    credentials: true, // Allow credentials
+    credentials: true,
     optionsSuccessStatus: 200,
 };
 //middlewares

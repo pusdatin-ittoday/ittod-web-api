@@ -12,8 +12,7 @@ module.exports = {
     store: new PrismaSessionStore(),
     cookie: {
         secure: true,
-        sameSite: "Strict",
-        domain: process.env.COOKIE_DOMAIN,
+        sameSite: "None",
         httpOnly: true,
         maxAge: 1000 * 60 * 60 * 24,
     },
