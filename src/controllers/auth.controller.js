@@ -35,6 +35,19 @@ exports.verifyEmail = async (req, res) => {
     }
 };
 
+exports.resendVerificationEmail = async (req, res) => {
+    try {
+        const { email } = req.body;
+        if (!email || !email.trim()) {
+            return res.status(400).json({ error: "Email is required" });
+        }
+        const result = await authService.resendVerificationEmail(email);
+        res.json(result);
+    } catch (err) {
+        res.status(err.status || 500).json({ error: err.message });
+    }
+};
+
 exports.login = (req, res) => {
     const { id, email, name, role } = req.user;
     res.json({
