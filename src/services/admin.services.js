@@ -57,3 +57,5 @@ const getCompetitionById = async(id) => {
         };
     }
 }
+
+module.exports = { getCompetitionById };
