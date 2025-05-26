@@ -11,6 +11,7 @@ module.exports = {
     saveUninitialized: false,
     store: new PrismaSessionStore(),
     cookie: {
+        httpOnly: false,
         maxAge: 1000 * 60 * 60 * 24,
     },
 };
