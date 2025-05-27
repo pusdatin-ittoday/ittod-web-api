@@ -111,6 +111,7 @@ const viewUserDataService = async user_id => {
                 id_line: true,
                 id_discord: true,
                 id_instagram: true,
+                jenis_kelamin: true, // <-- Add this line
                 is_registration_complete: true,
                 ktm_key: true,
                 twibbon_key: true,
