@@ -13,7 +13,7 @@ const sessionConfig = require("./config/session.config.js");
 const app = express();
 const corsOptions = {
     origin: ["http://localhost:5173", "https://staging.ittoday.web.id"],
-    methods: ["GET", "POST", "PUT", "DELETE"],
+    methods: ["GET", "POST", "PUT", "DELETE", "PATCH"],
     allowedHeaders: [
         "Content-Type",
         "Authorization",

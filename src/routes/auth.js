@@ -50,8 +50,11 @@ authRouter.get(
     "/api/auth/google/redirect",
     passport.authenticate("google-user", { failureRedirect: "/login" }),
     (req, res) => {
-        const baseUrl = (process.env.APP_BASE_URL || "").replace(/\/+$/, "");
-        res.redirect(`${baseUrl}/dashboard/beranda`);
+        const frontendUrl = process.env.FRONTEND_URL;
+        if (!frontendUrl) {
+            return res.status(500).send("FRONTEND_URL is not set in the environment variables.");
+        }
+        res.redirect(`${frontendUrl}/dashboard/beranda`);
     }
 );
 
