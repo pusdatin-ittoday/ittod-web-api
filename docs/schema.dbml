@@ -33,12 +33,11 @@ Table event_announcement {
 Table competition_submission {
   team_id String [not null]
   competition_id String [not null]
-  media_id String [unique, not null]
+  submission_object Json
   created_at DateTime [default: `now()`, not null]
   updated_at DateTime
   team team [not null]
   competition event [not null]
-  media media [not null]
 
   indexes {
     (team_id, competition_id) [pk]
@@ -63,7 +62,6 @@ Table media {
   created_at DateTime [default: `now()`, not null]
   updated_at DateTime [default: `now()`, not null]
   uploader user [not null]
-  submission competition_submission
 }
 
 Table team {
@@ -208,8 +206,6 @@ Ref: event_announcement.author_id > user.id
 Ref: competition_submission.team_id > team.id
 
 Ref: competition_submission.competition_id > event.id
-
-Ref: competition_submission.media_id - media.id
 
 Ref: event_timeline.event_id > event.id
 

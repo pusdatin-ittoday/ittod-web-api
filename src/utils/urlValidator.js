@@ -18,11 +18,11 @@ function validateFrontendUrl(url, fallbackUrl = 'http://localhost:5173') {
         const allowedHostnames = [
             'localhost',
             '127.0.0.1',
-            'ittoday.web.id'
+            'ittoday.web.id',
         ];
         
         if (!allowedHostnames.includes(parsedUrl.hostname)) {
-            throw new Error('Invalid hostname. Only allowed domains are permitted.');
+            throw new Error(`Invalid hostname. Only allowed domains are permitted. ${parsedUrl.hostname} is not allowed`);
         }
 
         // Remove trailing slash and return sanitized URL

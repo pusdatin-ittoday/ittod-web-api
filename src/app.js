@@ -23,7 +23,13 @@ const corsOptions = {
     optionsSuccessStatus: 200,
 };
 //middlewares
-app.use(cors(corsOptions));
+app.use(
+    cors({
+        methods: ["GET", "POST", "PUT", "DELETE", "PATCH", "OPTIONS"],
+        origin: ["https://ittoday.web.id", "http://localhost:5173"],
+        credentials: true,
+    })
+);
 app.use(json());
 app.use(cookieParser(process.env.SECRET_KEY_SESSION));
 app.use(session(sessionConfig));

@@ -15,9 +15,8 @@ datasource db {
 
 enum education_enum {
   sma
-  s1
-  d3
-  d4
+  mahasiswa
+  lainnya
 }
 
 enum team_member_role_enum {
@@ -90,15 +89,14 @@ model event_announcement {
 }
 
 model competition_submission {
-  team_id        String
-  competition_id String
-  media_id       String    @unique
-  created_at     DateTime  @default(now())
-  updated_at     DateTime? @updatedAt
+  team_id           String
+  competition_id    String
+  submission_object Json?
+  created_at        DateTime  @default(now())
+  updated_at        DateTime? @updatedAt
 
   team        team  @relation(fields: [team_id], references: [id])
   competition event @relation(fields: [competition_id], references: [id])
-  media       media @relation(fields: [media_id], references: [id])
 
   @@id([team_id, competition_id])
 }
@@ -115,7 +113,7 @@ model event_timeline {
 model media {
   id          String               @id
   uploader_id String
-  name        String               
+  name        String               @unique
   grouping    media_grouping_enum?
   type        media_type_enum
   url         String
@@ -123,8 +121,6 @@ model media {
   updated_at  DateTime             @default(now())
 
   uploader user @relation(fields: [uploader_id], references: [id])
-
-  submission competition_submission?
 }
 
 model team {

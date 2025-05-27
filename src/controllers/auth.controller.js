@@ -26,7 +26,7 @@ exports.verifyEmail = async (req, res) => {
         } catch (urlError) {
             console.error('Frontend URL validation failed:', urlError.message);
             // Fallback to localhost if URL validation fails
-            res.send(emailTemplates.successTemplate('http://localhost:5173'));
+            res.send(emailTemplates.successTemplate(process.env.APP_FRONTEND_URL));
         }
     } catch (err) {
         // If verification fails, show error message without redirect
@@ -35,13 +35,35 @@ exports.verifyEmail = async (req, res) => {
     }
 };
 
-exports.login = (req, res) => {
+exports.resendVerificationEmail = async (req, res) => {
+    try {
+        const { email } = req.body;
+        if (!email || !email.trim()) {
+            return res.status(400).json({ error: "Email is required" });
+        }
+        const result = await authService.resendVerificationEmail(email);
+        res.status(200).json(result);
+    } catch (err) {
+        res.status(err.status || 500).json({ error: err.message });
+    }
+};
+
+exports.login = (req, res, next) => {
     const { id, email, name, role } = req.user;
-    res.json({
-        message: "Login successful",
-        user: { id, email, name, role },
+
+    req.session.save(err => {
+        if (err) {
+            console.error("Session save error:", err);
+            return next(err);
+        }
+
+        res.json({
+            message: "Login successful",
+            user: { id, email, name, role },
+        });
     });
 };
+
 
 exports.loginAdmin = (req, res) => {
     const { id, email, name, role } = req.user;

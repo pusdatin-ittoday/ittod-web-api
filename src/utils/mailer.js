@@ -4,7 +4,7 @@ const { mailerConfig } = require("../config/mailer.config.js");
 const transporter = nodemailer.createTransport(mailerConfig);
 
 exports.sendVerificationEmail = async (email, token, name) => {
-    const baseUrl = process.env.APP_BASE_URL || "http://localhost:3000";
+    const baseUrl = process.env.APP_FRONTEND_URL || "http://localhost:3000";
     const supportEmail = process.env.SUPPORT_EMAIL || "support@ittoday.com";
     const url = `${baseUrl}/api/auth/verify?token=${token}`;
     const sender =
