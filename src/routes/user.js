@@ -19,8 +19,8 @@ usersRouter.patch(
     "/api/user",
     isAuthenticated,
     images.fields([
-        { name: "image", maxCount: 1 },
-        { name: "twibbon", maxCount: 1 },
+        { name: "profileImage", maxCount: 1 },
+        { name: "userTwibbon", maxCount: 1 },
     ]),
     validateFile,
     validateUserProfile,
