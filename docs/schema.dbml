@@ -156,9 +156,8 @@ Table sessions {
 
 Enum education_enum {
   sma
-  s1
-  d3
-  d4
+  mahasiswa
+  lainnya
 }
 
 Enum team_member_role_enum {

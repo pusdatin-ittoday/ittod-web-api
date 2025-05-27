@@ -30,7 +30,7 @@ usersRouter.patch(
 usersRouter.put(
     "/api/user/twibbon",
     isAuthenticated,
-    images.single("image"),
+    images.single("userTwibbon"),
     validateFile,
     putTwibbonUser
 );
