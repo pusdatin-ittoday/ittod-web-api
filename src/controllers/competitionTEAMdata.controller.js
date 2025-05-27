@@ -21,6 +21,7 @@ const getCompetitionData = async (req, res) => {
                 },
                 members: {
                     select: {
+                        role: true, // Include the role column
                         user: {
                             select: {
                                 full_name: true,
@@ -39,10 +40,12 @@ const getCompetitionData = async (req, res) => {
             isVerified: team.is_verified,
             verificationError: team.verification_error,
             competitionName: team.competition?.title ?? 'N/A',
-            members: team.members.map(member => ({
-                fullName: member.user.full_name,
-                isRegistrationComplete: member.user.is_registration_complete
-            }))
+            members: team.members
+                .sort((a, b) => (a.role === "leader" ? -1 : 1)) // Sort leader to the top
+                .map(member => ({
+                    fullName: member.user.full_name,
+                    isRegistrationComplete: member.user.is_registration_complete
+                }))
         }));
 
         return res.status(200).json(formattedData);
@@ -76,6 +79,7 @@ const getUserCompetitionData = async (req, res) => {
                 },
                 members: {
                     select: {
+                        role: true, // Include the role column
                         user: {
                             select: {
                                 full_name: true,
@@ -94,10 +98,12 @@ const getUserCompetitionData = async (req, res) => {
             isVerified: team.is_verified,
             verificationError: team.verification_error,
             competitionName: team.competition?.title ?? 'N/A',
-            members: team.members.map(member => ({
-                fullName: member.user.full_name,
-                isRegistrationComplete: member.user.is_registration_complete
-            }))
+            members: team.members
+                .sort((a, b) => (a.role === "leader" ? -1 : 1)) // Sort leader to the top
+                .map(member => ({
+                    fullName: member.user.full_name,
+                    isRegistrationComplete: member.user.is_registration_complete
+                }))
         }));
 
         return res.status(200).json(formattedData);
