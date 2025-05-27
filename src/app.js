@@ -15,7 +15,7 @@ const app = express();
 app.use(
     cors({
         methods: ["GET", "POST", "PUT", "DELETE", "PATCH", "OPTIONS"],
-        origin: ["https://ittoday.web.id"],
+        origin: ["https://ittoday.web.id", "http://localhost:5173"],
         credentials: true,
     })
 );

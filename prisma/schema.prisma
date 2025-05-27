@@ -15,9 +15,8 @@ datasource db {
 
 enum education_enum {
   sma
-  s1
-  d3
-  d4
+  mahasiswa
+  lainnya
 }
 
 enum team_member_role_enum {
