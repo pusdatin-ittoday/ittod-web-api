@@ -18,7 +18,10 @@ const usersRouter = Router();
 usersRouter.patch(
     "/api/user",
     isAuthenticated,
-    images.single("image"),
+    images.fields([
+        { name: "image", maxCount: 1 },
+        { name: "twibbon", maxCount: 1 },
+    ]),
     validateFile,
     validateUserProfile,
     editUserProfileController

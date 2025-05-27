@@ -42,9 +42,9 @@ const editUserProfile = async ({
                 }
             }
 
-            const updateData = {
+            const dataToUpdate = {
                 full_name,
-                birth_date,
+                birth_date: birth_date ? new Date(birth_date) : undefined,
                 pendidikan,
                 nama_sekolah,
                 id_discord,
@@ -55,15 +55,21 @@ const editUserProfile = async ({
                 ...(ktm_key && { ktm_key: ktm_key }),
             };
 
-            // Remove undefined fields
-            Object.keys(updateData).forEach(
-                key => updateData[key] === undefined && delete updateData[key]
-            );
+            // Remove undefined, null, or empty string fields
+            Object.keys(dataToUpdate).forEach(key => {
+                if (
+                    dataToUpdate[key] === undefined ||
+                    dataToUpdate[key] === null ||
+                    dataToUpdate[key] === ""
+                ) {
+                    delete dataToUpdate[key];
+                }
+            });
 
             // Update user profile
             await tx.user.update({
                 where: { id: user_id },
-                data: updateData,
+                data: dataToUpdate,
             });
         });
 
@@ -108,6 +114,7 @@ const viewUserDataService = async user_id => {
                 is_registration_complete: true,
                 ktm_key: true,
                 twibbon_key: true,
+                jenis_kelamin: true,
             },
         });
         if (!user) {
