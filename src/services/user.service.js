@@ -12,6 +12,7 @@ const editUserProfile = async ({
     pendidikan,
     nama_sekolah,
     ktm,
+    twibbon,
     user_id,
 }) => {
     if (!user_id) {
@@ -26,7 +27,7 @@ const editUserProfile = async ({
     try {
         await prisma.$transaction(async tx => {
             let ktm_key = null;
-
+            let twibbon_key = null;
             if (ktm) {
                 try {
                     const { buffer, originalname, mimetype } = ktm;
@@ -41,7 +42,20 @@ const editUserProfile = async ({
                     };
                 }
             }
-
+            if (twibbon) {
+                try {
+                    const { buffer, originalname, mimetype } = twibbon;
+                    twibbon_key = (
+                        await uploadFileToR2(buffer, originalname, mimetype)
+                    ).key;
+                } catch (uploadError) {
+                    console.error("Twibbon upload failed:", uploadError);
+                    throw {
+                        status: 500,
+                        message: "Failed to upload Twibbon file.",
+                    };
+                }
+            }
             const dataToUpdate = {
                 full_name,
                 birth_date: birth_date ? new Date(birth_date) : undefined,
@@ -53,6 +67,7 @@ const editUserProfile = async ({
                 jenis_kelamin,
                 phone_number,
                 ...(ktm_key && { ktm_key: ktm_key }),
+                ...(twibbon_key && { twibbon_key: twibbon_key }),
             };
 
             // Remove undefined, null, or empty string fields
