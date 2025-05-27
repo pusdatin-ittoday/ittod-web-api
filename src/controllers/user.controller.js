@@ -12,14 +12,17 @@ const editUserProfileController = async (req, res) => {
             id_instagram,
             pendidikan,
             nama_sekolah,
+            ktm_key,        // tambahkan ini
+            twibbon_key     // tambahkan ini
         } = req.body;
 
-        const user_id = req.user?.id; // Ensure `req.user` exists
+        const user_id = req.user?.id;
         if (!user_id) {
             return res.status(400).json({ message: "User ID is missing" });
         }
 
-        const ktm = req.file; // Ensure file upload middleware is used
+        // Jika masih pakai upload file, bisa tetap ambil req.file
+        // const ktm = req.file;
 
         const result = await editUserProfile({
             full_name,
@@ -31,7 +34,8 @@ const editUserProfileController = async (req, res) => {
             id_instagram,
             pendidikan,
             nama_sekolah,
-            ktm,
+            ktm_key,        // tambahkan ini
+            twibbon_key,    // tambahkan ini
             user_id,
         });
 

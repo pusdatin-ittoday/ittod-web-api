@@ -43,6 +43,12 @@ const userProfileSchema = Joi.object({
     nama_sekolah: Joi.string().optional().messages({
         "string.base": "School name must be a string.",
     }),
+    ktm_key: Joi.string().optional().messages({
+        "string.base": "KTM key must be a string.",
+    }),
+    twibbon_key: Joi.string().optional().messages({
+        "string.base": "Twibbon key must be a string.",
+    }),
 });
 
 module.exports = { userProfileSchema };
