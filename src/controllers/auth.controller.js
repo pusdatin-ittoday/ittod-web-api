@@ -42,7 +42,7 @@ exports.resendVerificationEmail = async (req, res) => {
             return res.status(400).json({ error: "Email is required" });
         }
         const result = await authService.resendVerificationEmail(email);
-        res.json(result);
+        res.status(200).json(result);
     } catch (err) {
         res.status(err.status || 500).json({ error: err.message });
     }
