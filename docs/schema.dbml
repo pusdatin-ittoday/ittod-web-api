@@ -15,7 +15,6 @@ Table event {
   submissions competition_submission [not null]
   timelines event_timeline [not null]
   teams team [not null]
-  participants user [not null]
   event_participant event_participant [not null]
 }
 
@@ -34,12 +33,11 @@ Table event_announcement {
 Table competition_submission {
   team_id String [not null]
   competition_id String [not null]
-  media_id String [unique, not null]
+  submission_object Json
   created_at DateTime [default: `now()`, not null]
   updated_at DateTime
   team team [not null]
   competition event [not null]
-  media media [not null]
 
   indexes {
     (team_id, competition_id) [pk]
@@ -64,7 +62,6 @@ Table media {
   created_at DateTime [default: `now()`, not null]
   updated_at DateTime [default: `now()`, not null]
   uploader user [not null]
-  submission competition_submission
 }
 
 Table team {
@@ -131,7 +128,6 @@ Table user {
   identity user_identity
   announcements event_announcement [not null]
   member team_member [not null]
-  noncompetition_events event [not null]
   event_participant event_participant [not null]
 }
 
@@ -156,11 +152,6 @@ Table sessions {
   id String [pk]
   expires DateTime [not null]
   data Json [not null]
-}
-
-Table eventTouser {
-  participantsId String [ref: > user.id]
-  noncompetition_eventsId String [ref: > event.id]
 }
 
 Enum education_enum {
@@ -215,8 +206,6 @@ Ref: event_announcement.author_id > user.id
 Ref: competition_submission.team_id > team.id
 
 Ref: competition_submission.competition_id > event.id
-
-Ref: competition_submission.media_id - media.id
 
 Ref: event_timeline.event_id > event.id
 

@@ -11,19 +11,13 @@ const routes = require("./routes/index.js");
 const sessionConfig = require("./config/session.config.js");
 
 const app = express();
-const corsOptions = {
-    origin: ["http://localhost:5173", "https://staging.ittoday.web.id"],
-    methods: ["GET", "POST", "PUT", "DELETE", "PATCH"],
-    allowedHeaders: [
-        "Content-Type",
-        "Authorization",
-        "Access-Control-Allow-Origin",
-    ],
-    credentials: true, // Allow credentials
-    optionsSuccessStatus: 200,
-};
 //middlewares
-app.use(cors(corsOptions));
+app.use(
+    cors({
+        origin: ["https://ittoday.web.id"],
+        credentials: true,
+    })
+);
 app.use(json());
 app.use(cookieParser(process.env.SECRET_KEY_SESSION));
 app.use(session(sessionConfig));

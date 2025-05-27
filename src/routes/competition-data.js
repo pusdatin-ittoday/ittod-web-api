@@ -1,6 +1,9 @@
 const { Router } = require("express");
 const { isAuthenticated } = require("../middleware/authMiddleware.js");
-const { getCompetitionData, getUserCompetitionData } = require("../controllers/competition-data.controller.js");
+const {
+    getCompetitionData,
+    getUserCompetitionData,
+} = require("../controllers/competitionTEAMdata.controller");
 
 const competitionDataRouter = Router();
 
@@ -17,4 +20,4 @@ competitionDataRouter.get(
     getUserCompetitionData
 );
 
-module.exports = competitionDataRouter; 
+module.exports = competitionDataRouter;

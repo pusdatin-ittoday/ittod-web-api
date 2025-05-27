@@ -1,4 +1,6 @@
 const authService = require("../services/auth.service.js");
+const emailTemplates = require("../templates/emailVerification");
+const { validateFrontendUrl } = require("../utils/urlValidator");
 
 exports.register = async (req, res) => {
     try {
@@ -10,21 +12,58 @@ exports.register = async (req, res) => {
 };
 
 exports.verifyEmail = async (req, res) => {
+    const token = req.query.token;
+    if (!token) {
+        return res.status(400).json({ error: 'Token is required' });
+    }
+
     try {
-        const result = await authService.verifyEmail(req.query.token);
-        res.json({ message: result.message });
+        await authService.verifyEmail(token);
+        // If verification succeeds, show success message and redirect
+        try {
+            const frontendBaseUrl = validateFrontendUrl(process.env.APP_FRONTEND_URL);
+            res.send(emailTemplates.successTemplate(frontendBaseUrl));
+        } catch (urlError) {
+            console.error('Frontend URL validation failed:', urlError.message);
+            // Fallback to localhost if URL validation fails
+            res.send(emailTemplates.successTemplate(process.env.APP_FRONTEND_URL));
+        }
+    } catch (err) {
+        // If verification fails, show error message without redirect
+        const safeMessage = String(err.message).replace(/</g, '&lt;').replace(/>/g, '&gt;');
+        res.status(400).send(emailTemplates.errorTemplate(safeMessage));
+    }
+};
+
+exports.resendVerificationEmail = async (req, res) => {
+    try {
+        const { email } = req.body;
+        if (!email || !email.trim()) {
+            return res.status(400).json({ error: "Email is required" });
+        }
+        const result = await authService.resendVerificationEmail(email);
+        res.status(200).json(result);
     } catch (err) {
         res.status(err.status || 500).json({ error: err.message });
     }
 };
 
-exports.login = (req, res) => {
+exports.login = (req, res, next) => {
     const { id, email, name, role } = req.user;
-    res.json({
-        message: "Login successful",
-        user: { id, email, name, role },
+
+    req.session.save(err => {
+        if (err) {
+            console.error("Session save error:", err);
+            return next(err);
+        }
+
+        res.json({
+            message: "Login successful",
+            user: { id, email, name, role },
+        });
     });
 };
+
 
 exports.loginAdmin = (req, res) => {
     const { id, email, name, role } = req.user;
