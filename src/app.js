@@ -14,6 +14,7 @@ const app = express();
 //middlewares
 app.use(
     cors({
+        methods: ["GET", "POST", "PUT", "DELETE", "PATCH", "OPTIONS"],
         origin: ["https://ittoday.web.id"],
         credentials: true,
     })
