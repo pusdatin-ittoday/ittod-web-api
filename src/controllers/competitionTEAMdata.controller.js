@@ -13,6 +13,7 @@ const getCompetitionData = async (req, res) => {
                 team_name: true,
                 team_code: true,
                 is_verified: true,
+                payment_proof_id: true,
                 verification_error: true,
                 competition: {
                     select: {
@@ -38,6 +39,7 @@ const getCompetitionData = async (req, res) => {
             teamJoinCode: team.team_code,
             teamName: team.team_name,
             isVerified: team.is_verified,
+            paymentProofID: team.payment_proof_id,
             verificationError: team.verification_error,
             competitionName: team.competition?.title ?? 'N/A',
             members: team.members
