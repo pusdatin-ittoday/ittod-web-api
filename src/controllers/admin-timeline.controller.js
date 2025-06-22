@@ -35,21 +35,12 @@ const createTimeline = async (req, res) => {
             });
         }
 
-        // Validate date format and ensure it's not in the past
+        // Validate date format
         const parsedDate = new Date(date);
         if (isNaN(parsedDate.getTime())) {
             return res.status(400).json({
                 success: false,
                 message: "Invalid date format"
-            });
-        }
-
-        // Optional: Prevent creating timelines in the past
-        const now = new Date();
-        if (parsedDate < now) {
-            return res.status(400).json({
-                success: false,
-                message: "Cannot create timeline events in the past"
             });
         }
 
@@ -91,10 +82,17 @@ const createTimeline = async (req, res) => {
             });
         }
 
+        if (error.message === "Maximum number of timelines (20) reached for this event") {
+            return res.status(400).json({
+                success: false,
+                message: "Maximum number of timelines (20) reached for this event"
+            });
+        }
+
+        // Security: Don't expose internal error details to client
         res.status(500).json({
             success: false,
-            message: "Internal server error",
-            error: error.message
+            message: "Internal server error"
         });
     }
 };
