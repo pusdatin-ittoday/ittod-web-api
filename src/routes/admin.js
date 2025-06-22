@@ -9,6 +9,7 @@ const { loginAdmin } = require("../controllers/auth.controller");
 const preventLoginIfAuthenticated = require("../middleware/preventLoginIfAuthenticated");
 const { getCompetitionById, getCompetitionList } = require("../controllers/adminCompetitionView.controller");
 const { initiateDatabase } = require("../controllers/initate-db.controller");
+const { createTimeline } = require("../controllers/admin-timeline.controller");
 
 const adminRouter = Router();
 adminRouter.get("/api/admin/sync-ktm", isAuthenticated, checkAdmin, syncKtm);
@@ -34,6 +35,13 @@ adminRouter.get("/api/admin/competition-list",
     isAuthenticated,
     checkAdmin,
     getCompetitionList
+);
+
+// Create new timeline
+adminRouter.post("/api/admin/create-timeline",
+    isAuthenticated,
+    checkAdmin,
+    createTimeline
 );
 
 // ONLY RUN ONCE!
