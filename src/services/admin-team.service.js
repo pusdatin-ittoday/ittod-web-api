@@ -11,71 +11,74 @@ const getTeamsByCompetition = async (competitionName, page = 1, limit = 10) => {
     const skip = (page - 1) * limit;
     const take = limit;
 
-    const teams = await prisma.team.findMany({
-        where: {
-            competition: {
-                title: {
-                    contains: competitionName
-                    // Removed mode: 'insensitive' as it's PostgreSQL-specific
-                    // MySQL uses case-insensitive collation by default
-                }
-            }
-        },
-        select: {
-            id: true,
-            team_name: true,
-            team_code: true,
-            is_verified: true,
-            payment_proof_id: true,
-            verification_error: true,
-            created_at: true,
-            competition: {
-                select: {
-                    title: true
-                }
-            },
-            // Only fetch leader member data for performance
-            members: {
-                where: {
-                    role: 'leader'
-                },
-                select: {
-                    role: true,
-                    user: {
-                        select: {
-                            id: true,
-                            full_name: true,
-                            email: true,
-                            phone_number: true,
-                            is_registration_complete: true
-                        }
+    // Use transaction to ensure consistency between count and data queries
+    const [teams, totalTeams] = await prisma.$transaction([
+        // Query 1: Get paginated teams with leader data
+        prisma.team.findMany({
+            where: {
+                competition: {
+                    title: {
+                        contains: competitionName
+                        // Removed mode: 'insensitive' as it's PostgreSQL-specific
+                        // MySQL uses case-insensitive collation by default
                     }
                 }
             },
-            // Get total member count separately for performance
-            _count: {
-                select: {
-                    members: true
+            select: {
+                id: true,
+                team_name: true,
+                team_code: true,
+                is_verified: true,
+                payment_proof_id: true,
+                verification_error: true,
+                created_at: true,
+                competition: {
+                    select: {
+                        title: true
+                    }
+                },
+                // Only fetch leader member data for performance
+                members: {
+                    where: {
+                        role: 'leader'
+                    },
+                    select: {
+                        role: true,
+                        user: {
+                            select: {
+                                id: true,
+                                full_name: true,
+                                email: true,
+                                phone_number: true,
+                                is_registration_complete: true
+                            }
+                        }
+                    }
+                },
+                // Get total member count separately for performance
+                _count: {
+                    select: {
+                        members: true
+                    }
+                }
+            },
+            orderBy: {
+                created_at: 'desc'
+            },
+            skip: skip,
+            take: take
+        }),
+        // Query 2: Get total count for pagination metadata
+        prisma.team.count({
+            where: {
+                competition: {
+                    title: {
+                        contains: competitionName
+                    }
                 }
             }
-        },
-        orderBy: {
-            created_at: 'desc'
-        },
-        skip: skip,
-        take: take
-    });
-
-    // Get total count for pagination metadata
-    const totalTeams = await prisma.team.count({
-        where: {
-            competition: {
-                title: {
-                    contains: competitionName
-                }
-            }
-        }
-    });
+        })
+    ]);
 
     const totalPages = Math.ceil(totalTeams / limit);
 
