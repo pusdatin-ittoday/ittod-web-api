@@ -1,12 +1,23 @@
 const prisma = require("../prisma.js");
 
 // Get List Tim Berdasarkan Kompetisi
-const getTeamsByCompetition = async (competitionName) => {
+const getTeamsByCompetition = async (competitionName, page = 1, limit = 10) => {
+    // Validate pagination parameters
+    if (page < 1) page = 1;
+    if (limit < 1) limit = 10;
+    if (limit > 100) limit = 100;
+
+    // Calculate pagination values
+    const skip = (page - 1) * limit;
+    const take = limit;
+
     const teams = await prisma.team.findMany({
         where: {
             competition: {
                 title: {
                     contains: competitionName
+                    // Removed mode: 'insensitive' as it's PostgreSQL-specific
+                    // MySQL uses case-insensitive collation by default
                 }
             }
         },
@@ -23,7 +34,11 @@ const getTeamsByCompetition = async (competitionName) => {
                     title: true
                 }
             },
+            // Only fetch leader member data for performance
             members: {
+                where: {
+                    role: 'leader'
+                },
                 select: {
                     role: true,
                     user: {
@@ -36,25 +51,56 @@ const getTeamsByCompetition = async (competitionName) => {
                         }
                     }
                 }
+            },
+            // Get total member count separately for performance
+            _count: {
+                select: {
+                    members: true
+                }
             }
         },
         orderBy: {
             created_at: 'desc'
+        },
+        skip: skip,
+        take: take
+    });
+
+    // Get total count for pagination metadata
+    const totalTeams = await prisma.team.count({
+        where: {
+            competition: {
+                title: {
+                    contains: competitionName
+                }
+            }
         }
     });
 
-    return teams.map(team => ({
-        id: team.id,
-        team_name: team.team_name,
-        team_code: team.team_code,
-        is_verified: team.is_verified,
-        payment_proof_id: team.payment_proof_id,
-        verification_error: team.verification_error,
-        competition_name: team.competition.title,
-        member_count: team.members.length,
-        contact_info: team.members.find(m => m.role === 'leader')?.user || null,
-        created_at: team.created_at
-    }));
+    const totalPages = Math.ceil(totalTeams / limit);
+
+    return {
+        teams: teams.map(team => ({
+            id: team.id,
+            team_name: team.team_name,
+            team_code: team.team_code,
+            is_verified: team.is_verified,
+            payment_proof_id: team.payment_proof_id,
+            verification_error: team.verification_error,
+            competition_name: team.competition.title,
+            member_count: team._count.members,
+            contact_info: team.members.length > 0 ? team.members[0].user : null, // Safe array access
+            created_at: team.created_at
+        })),
+        pagination: {
+            current_page: page,
+            total_pages: totalPages,
+            total_items: totalTeams,
+            items_per_page: limit,
+            has_next: page < totalPages,
+            has_previous: page > 1
+        }
+    };
 };
 
 // Get Detail Tim dan Anggota

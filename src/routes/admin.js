@@ -17,6 +17,7 @@ const {
     rejectTeam, 
     updateMemberStatus 
 } = require("../controllers/admin-team.controller");
+const { validateRequest } = require("../middleware/validationMiddleware");
 const {
     verifyTeamSchema,
     rejectTeamSchema,
@@ -62,16 +63,7 @@ adminRouter.post("/api/admin/create-timeline",
 adminRouter.get("/api/admin/teams",
     isAuthenticated,
     checkAdmin,
-    (req, res, next) => {
-        const { error } = teamsByCompetitionSchema.validate(req.query);
-        if (error) {
-            return res.status(400).json({
-                success: false,
-                message: error.details[0].message
-            });
-        }
-        next();
-    },
+    validateRequest(teamsByCompetitionSchema, 'query'),
     getTeamsByCompetition
 );
 
@@ -79,16 +71,7 @@ adminRouter.get("/api/admin/teams",
 adminRouter.get("/api/admin/teams/:teamId",
     isAuthenticated,
     checkAdmin,
-    (req, res, next) => {
-        const { error } = teamDetailSchema.validate(req.params);
-        if (error) {
-            return res.status(400).json({
-                success: false,
-                message: error.details[0].message
-            });
-        }
-        next();
-    },
+    validateRequest(teamDetailSchema, 'params'),
     getTeamDetail
 );
 
@@ -96,16 +79,7 @@ adminRouter.get("/api/admin/teams/:teamId",
 adminRouter.post("/api/admin/teams/:teamId/verify",
     isAuthenticated,
     checkAdmin,
-    (req, res, next) => {
-        const { error } = verifyTeamSchema.validate(req.params);
-        if (error) {
-            return res.status(400).json({
-                success: false,
-                message: error.details[0].message
-            });
-        }
-        next();
-    },
+    validateRequest(verifyTeamSchema, 'params'),
     verifyTeam
 );
 
@@ -113,16 +87,7 @@ adminRouter.post("/api/admin/teams/:teamId/verify",
 adminRouter.post("/api/admin/teams/:teamId/reject",
     isAuthenticated,
     checkAdmin,
-    (req, res, next) => {
-        const { error } = rejectTeamSchema.validate({ ...req.params, ...req.body });
-        if (error) {
-            return res.status(400).json({
-                success: false,
-                message: error.details[0].message
-            });
-        }
-        next();
-    },
+    validateRequest(rejectTeamSchema, 'combined'),
     rejectTeam
 );
 
@@ -130,16 +95,7 @@ adminRouter.post("/api/admin/teams/:teamId/reject",
 adminRouter.patch("/api/admin/members/:memberId/status",
     isAuthenticated,
     checkAdmin,
-    (req, res, next) => {
-        const { error } = updateMemberStatusSchema.validate({ ...req.params, ...req.body });
-        if (error) {
-            return res.status(400).json({
-                success: false,
-                message: error.details[0].message
-            });
-        }
-        next();
-    },
+    validateRequest(updateMemberStatusSchema, 'combined'),
     updateMemberStatus
 );
 

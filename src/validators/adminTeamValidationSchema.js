@@ -45,7 +45,27 @@ const teamsByCompetitionSchema = Joi.object({
         "string.min": "Competition name cannot be empty.",
         "string.max": "Competition name cannot exceed 255 characters.",
         "any.required": "Competition parameter is required.",
+    }),
+    page: Joi.number().integer().min(1).optional().default(1).messages({
+        "number.base": "Page must be a valid number.",
+        "number.integer": "Page must be an integer.",
+        "number.min": "Page must be at least 1.",
+    }),
+    limit: Joi.number().integer().min(1).max(100).optional().default(10).messages({
+        "number.base": "Limit must be a valid number.",
+        "number.integer": "Limit must be an integer.",
+        "number.min": "Limit must be at least 1.",
+        "number.max": "Limit cannot exceed 100.",
     })
+}).custom((value, helpers) => {
+    // Additional validation for edge cases
+    if (value.page && (isNaN(value.page) || value.page < 1)) {
+        return helpers.error('any.invalid', { message: 'Page must be a valid positive number' });
+    }
+    if (value.limit && (isNaN(value.limit) || value.limit < 1 || value.limit > 100)) {
+        return helpers.error('any.invalid', { message: 'Limit must be between 1 and 100' });
+    }
+    return value;
 });
 
 module.exports = {

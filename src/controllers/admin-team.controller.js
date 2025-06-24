@@ -5,21 +5,36 @@ const getTeamsByCompetition = async (req, res) => {
     try {
         const { competition } = req.query;
         
+        // Parse and validate pagination parameters
+        let page = parseInt(req.query.page) || 1;
+        let limit = parseInt(req.query.limit) || 10;
+        
+        // Additional validation for edge cases
+        if (isNaN(page) || page < 1) page = 1;
+        if (isNaN(limit) || limit < 1) limit = 10;
+        if (limit > 100) limit = 100;
+        
         // Validation is now handled by Joi middleware
-        const teams = await adminTeamService.getTeamsByCompetition(competition);
+        const result = await adminTeamService.getTeamsByCompetition(competition, page, limit);
 
         res.status(200).json({
             success: true,
             message: 'Teams fetched successfully',
-            data: teams
+            data: result.teams,
+            pagination: result.pagination
         });
 
     } catch (error) {
-        console.error('Error fetching teams by competition:', error);
+        // Log sanitized error for debugging
+        console.error('Error fetching teams by competition:', {
+            message: error.message,
+            stack: error.stack,
+            timestamp: new Date().toISOString()
+        });
+        
         res.status(500).json({
             success: false,
-            message: 'Internal server error',
-            error: error.message || error
+            message: 'Internal server error'
         });
     }
 };
@@ -46,11 +61,16 @@ const getTeamDetail = async (req, res) => {
         });
 
     } catch (error) {
-        console.error('Error fetching team detail:', error);
+        // Log sanitized error for debugging
+        console.error('Error fetching team detail:', {
+            message: error.message,
+            stack: error.stack,
+            timestamp: new Date().toISOString()
+        });
+        
         res.status(500).json({
             success: false,
-            message: 'Internal server error',
-            error: error.message || error
+            message: 'Internal server error'
         });
     }
 };
@@ -70,7 +90,13 @@ const verifyTeam = async (req, res) => {
         });
 
     } catch (error) {
-        console.error('Error verifying team:', error);
+        // Log sanitized error for debugging
+        console.error('Error verifying team:', {
+            message: error.message,
+            stack: error.stack,
+            timestamp: new Date().toISOString()
+        });
+        
         if (error.status === 404) {
             return res.status(404).json({
                 success: false,
@@ -85,8 +111,7 @@ const verifyTeam = async (req, res) => {
         }
         res.status(500).json({
             success: false,
-            message: 'Internal server error',
-            error: error.message || error
+            message: 'Internal server error'
         });
     }
 };
@@ -107,17 +132,28 @@ const rejectTeam = async (req, res) => {
         });
 
     } catch (error) {
-        console.error('Error rejecting team:', error);
+        // Log sanitized error for debugging
+        console.error('Error rejecting team:', {
+            message: error.message,
+            stack: error.stack,
+            timestamp: new Date().toISOString()
+        });
+        
         if (error.status === 404) {
             return res.status(404).json({
                 success: false,
                 message: error.message
             });
         }
+        if (error.status === 400) {
+            return res.status(400).json({
+                success: false,
+                message: error.message
+            });
+        }
         res.status(500).json({
             success: false,
-            message: 'Internal server error',
-            error: error.message || error
+            message: 'Internal server error'
         });
     }
 };
@@ -138,7 +174,13 @@ const updateMemberStatus = async (req, res) => {
         });
 
     } catch (error) {
-        console.error('Error updating member status:', error);
+        // Log sanitized error for debugging
+        console.error('Error updating member status:', {
+            message: error.message,
+            stack: error.stack,
+            timestamp: new Date().toISOString()
+        });
+        
         if (error.status === 404) {
             return res.status(404).json({
                 success: false,
@@ -147,8 +189,7 @@ const updateMemberStatus = async (req, res) => {
         }
         res.status(500).json({
             success: false,
-            message: 'Internal server error',
-            error: error.message || error
+            message: 'Internal server error'
         });
     }
 };
