@@ -57,15 +57,6 @@ const teamsByCompetitionSchema = Joi.object({
         "number.min": "Limit must be at least 1.",
         "number.max": "Limit cannot exceed 100.",
     })
-}).custom((value, helpers) => {
-    // Additional validation for edge cases
-    if (value.page && (isNaN(value.page) || value.page < 1)) {
-        return helpers.error('any.invalid', { message: 'Page must be a valid positive number' });
-    }
-    if (value.limit && (isNaN(value.limit) || value.limit < 1 || value.limit > 100)) {
-        return helpers.error('any.invalid', { message: 'Limit must be between 1 and 100' });
-    }
-    return value;
 });
 
 module.exports = {

@@ -3,19 +3,9 @@ const adminTeamService = require('../services/admin-team.service');
 // Get List Tim Berdasarkan Kompetisi
 const getTeamsByCompetition = async (req, res) => {
     try {
-        const { competition } = req.query;
-        
-        // Parse and validate pagination parameters
-        let page = parseInt(req.query.page) || 1;
-        let limit = parseInt(req.query.limit) || 10;
-        
-        // Additional validation for edge cases
-        if (isNaN(page) || page < 1) page = 1;
-        if (isNaN(limit) || limit < 1) limit = 10;
-        if (limit > 100) limit = 100;
-        
-        // Validation is now handled by Joi middleware
-        const result = await adminTeamService.getTeamsByCompetition(competition, page, limit);
+        const { competition, page, limit } = req.query;
+        // Validation is now handled by Joi middleware and the service layer
+        const result = await adminTeamService.getTeamsByCompetition(competition, parseInt(page), parseInt(limit));
 
         res.status(200).json({
             success: true,
