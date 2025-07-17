@@ -102,11 +102,13 @@ model team {
 }
 
 model event_participant {
-  user_id    String
-  event_id   String
-  date_added DateTime @default(now())
-  event      event    @relation(fields: [event_id], references: [id])
-  user       user     @relation(fields: [user_id], references: [id])
+  user_id              String
+  event_id             String
+  date_added           DateTime           @default(now())
+  payment_proof        String?
+  payment_verification payment_proof_enum @default(pending)
+  event                event              @relation(fields: [event_id], references: [id])
+  user                 user               @relation(fields: [user_id], references: [id])
 
   @@id([user_id, event_id])
   @@index([event_id], map: "event_participant_event_id_fkey")
@@ -178,6 +180,12 @@ model Session {
 enum team_member_role_enum {
   leader
   member
+}
+
+enum payment_proof_enum {
+  pending
+  accepted
+  rejected
 }
 
 enum user_identity_provider_enum {
