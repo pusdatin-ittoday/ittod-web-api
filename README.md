@@ -131,11 +131,11 @@ Access the API at: `http://localhost:3000`
 - **Walid Nadirul Ahnaf**
 - **Aldi Pramudya**
 - **Ilham Edgar Maulana Goesasi**
-- **Qois Firosi**
 - **Jeremy Tjahjana**
+- **Daffa Aulia M S**
 
 ---
 
 ## 📄 License
 
-This project is licensed under the [MIT License](LICENSE).
+This project is licensed under the [Apache License 2.0](LICENSE).

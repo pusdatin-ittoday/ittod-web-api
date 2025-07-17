@@ -18,7 +18,10 @@ const usersRouter = Router();
 usersRouter.patch(
     "/api/user",
     isAuthenticated,
-    images.single("image"),
+    images.fields([
+        { name: "profileImage", maxCount: 1 },
+        { name: "userTwibbon", maxCount: 1 },
+    ]),
     validateFile,
     validateUserProfile,
     editUserProfileController
@@ -27,7 +30,7 @@ usersRouter.patch(
 usersRouter.put(
     "/api/user/twibbon",
     isAuthenticated,
-    images.single("image"),
+    images.single("userTwibbon"),
     validateFile,
     putTwibbonUser
 );

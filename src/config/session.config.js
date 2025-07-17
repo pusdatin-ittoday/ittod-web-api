@@ -6,14 +6,14 @@ if (!sessionSecret) {
 }
 
 module.exports = {
+    name: "session",
     secret: sessionSecret,
     resave: false,
     saveUninitialized: false,
     store: new PrismaSessionStore(),
     cookie: {
-        secure: process.env.NODE_ENV === "production",
         httpOnly: true,
-        maxAge: 1000 * 60 * 60 * 24,
-        sameSite: "lax",
+        sameSite: "Strict",
+        maxAge: 3600000 * 24 * 24 * 24
     },
 };

@@ -9,6 +9,12 @@ const {
 const {
     validateRegister,
 } = require("../middleware/registerValidationMiddleware.js");
+const {
+    forgotPasswordLimiter,
+    resetPasswordLimiter,
+    validateForgotPassword,
+    validateResetPassword
+} = require("../middleware/passwordResetMiddleware.js");
 const preventLoginIfAuthenticated = require("../middleware/preventLoginIfAuthenticated.js");
 const googleStrategy = require("../strategies/google-strategy.js");
 const LocalStrategy = require("../strategies/local-strategy.js");
@@ -16,8 +22,13 @@ const {
     login,
     register,
     verifyEmail,
+    forgotPassword,
+    resetPassword,
 } = require("../controllers/auth.controller.js");
 const passportAuthMiddleware = require("../middleware/passportAuthMiddleware");
+const emailSchema = require("../validators/emailSchema")
+const {validateRequest} = require("../middleware/joiMiddleware")
+const { resendVerificationEmail } = require("../controllers/auth.controller");
 const authRouter = Router();
 
 authRouter.post(
@@ -42,8 +53,11 @@ authRouter.get(
     "/api/auth/google/redirect",
     passport.authenticate("google-user", { failureRedirect: "/login" }),
     (req, res) => {
-        const baseUrl = (process.env.APP_BASE_URL || "").replace(/\/+$/, "");
-        res.redirect(`${baseUrl}/dashboard/beranda`);
+        const frontendUrl = process.env.FRONTEND_URL;
+        if (!frontendUrl) {
+            return res.status(500).send("FRONTEND_URL is not set in the environment variables.");
+        }
+        res.redirect(`${frontendUrl}/dashboard/beranda`);
     }
 );
 
@@ -69,5 +83,25 @@ authRouter.get("/api/auth/status", (req, res) => {
         res.status(200).json({ authenticated: false });
     }
 });
+
+authRouter.post(
+    "/api/auth/forgot-password", 
+    forgotPasswordLimiter,
+    validateForgotPassword,
+    forgotPassword
+);
+
+authRouter.post(
+    "/api/auth/reset-password",
+    resetPasswordLimiter,
+    validateResetPassword,
+    resetPassword
+);
+
+authRouter.post(
+    "/api/auth/resend-verification-email",
+    validateRequest(emailSchema),
+    resendVerificationEmail
+);
 
 module.exports = authRouter;

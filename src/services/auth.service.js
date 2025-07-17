@@ -1,7 +1,7 @@
 const prisma = require("../prisma.js");
 const argon2 = require("argon2");
 const crypto = require("crypto");
-const { sendVerificationEmail } = require("../utils/mailer.js");
+const { sendVerificationEmail, sendPasswordResetEmail } = require("../utils/mailer.js");
 
 exports.register = async ({ email, password, full_name }) => {
     if (password.length < 8)
@@ -30,7 +30,7 @@ exports.register = async ({ email, password, full_name }) => {
                     hash: hashed,
                     verification_token: token,
                     verification_token_expiration: new Date(
-                        Date.now() + 60 * 5 * 1000
+                        Date.now() + 30 * 60 * 60 * 1000
                     ),
                     role: "user",
                 },
@@ -72,4 +72,92 @@ exports.verifyEmail = async token => {
     });
 
     return { message: "Email verified. You can now login." };
+};
+
+exports.sendPasswordResetEmail = async (email) => {
+    const user = await prisma.user.findUnique({
+        where: { email },
+        include: { identity: true }
+    });
+
+    if (!user) {
+        throw { status: 404, message: "User not found" };
+    }
+
+    const resetToken = crypto.randomBytes(32).toString("hex");
+    const resetTokenExpiration = new Date(Date.now() + 60 * 60 * 1000); // 1 hour
+
+    await prisma.user_identity.update({
+        where: { id: user.identity.id },
+        data: {
+            password_recovery_token: resetToken,
+            password_recovery_token_expiration: resetTokenExpiration
+        }
+    });
+
+    // Send reset email with error handling
+    try {
+        await sendPasswordResetEmail(email, resetToken, user.full_name);
+    } catch (err) {
+        console.error("Failed to send password reset email: ", err);
+        // Continue execution, as the token was still successfully generated
+    }
+};
+
+exports.resetPassword = async (token, newPassword) => {
+    if (newPassword.length < 8) {
+        throw { status: 400, message: "Password must be at least 8 characters" };
+    }
+
+    const user = await prisma.user_identity.findFirst({
+        where: {
+            password_recovery_token: token,
+            password_recovery_token_expiration: { gt: new Date() }
+        }
+    });
+
+    if (!user) {
+        throw { status: 400, message: "Invalid or expired reset token" };
+    }
+
+    const hashedPassword = await argon2.hash(newPassword);
+
+    await prisma.user_identity.update({
+        where: { id: user.id },
+        data: {
+            hash: hashedPassword,
+            password_recovery_token: null,
+            password_recovery_token_expiration: null
+        }
+    });
+};
+
+exports.resendVerificationEmail = async email => {
+    const user = await prisma.user.findUnique({
+        where: { email },
+        include: { identity: true }
+    });
+
+    if (!user || !user.identity || user.identity.is_verified) {
+        throw { status: 400, message: "Invalid request or email already verified" };
+    }
+
+    const token = crypto.randomBytes(32).toString("hex");
+    const tokenExpiration = new Date(Date.now() + 30 * 60 * 60 * 1000); // 30 hours
+
+    await prisma.user_identity.update({
+        where: { id: user.identity.id },
+        data: {
+            verification_token: token,
+            verification_token_expiration: tokenExpiration
+        }
+    });
+
+    try {
+        await sendVerificationEmail(email, token, user.full_name);
+    } catch (err) {
+        console.error("Failed to resend verification email: ", err);
+    }
+
+    return { message: "Verification email resent. Please check your inbox." };
 };
