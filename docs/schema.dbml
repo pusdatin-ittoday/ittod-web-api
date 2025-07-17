@@ -11,11 +11,11 @@ Table event {
   contact_person1 String [not null]
   contact_person2 String
   max_noncompetition_participant Int
-  announcements event_announcement [not null]
   submissions competition_submission [not null]
+  announcements event_announcement [not null]
+  event_participant event_participant [not null]
   timelines event_timeline [not null]
   teams team [not null]
-  event_participant event_participant [not null]
 }
 
 Table event_announcement {
@@ -26,18 +26,19 @@ Table event_announcement {
   description String [not null]
   created_at DateTime [default: `now()`, not null]
   updated_at DateTime [not null]
-  competition event [not null]
   author user [not null]
+  competition event [not null]
 }
 
 Table competition_submission {
   team_id String [not null]
   competition_id String [not null]
-  submission_object Json
+  media_id String [unique, not null]
   created_at DateTime [default: `now()`, not null]
   updated_at DateTime
-  team team [not null]
   competition event [not null]
+  media media [not null]
+  team team [not null]
 
   indexes {
     (team_id, competition_id) [pk]
@@ -55,12 +56,13 @@ Table event_timeline {
 Table media {
   id String [pk]
   uploader_id String [not null]
-  name String [unique, not null]
+  name String [not null]
   grouping media_grouping_enum
   type media_type_enum [not null]
   url String [not null]
   created_at DateTime [default: `now()`, not null]
   updated_at DateTime [default: `now()`, not null]
+  competition_submission competition_submission
   uploader user [not null]
 }
 
@@ -75,17 +77,19 @@ Table team {
   verification_error String
   created_at DateTime [default: `now()`, not null]
   updated_at DateTime
+  submission competition_submission [not null]
   competition event [not null]
   members team_member [not null]
-  submission competition_submission [not null]
 }
 
 Table event_participant {
   user_id String [not null]
   event_id String [not null]
   date_added DateTime [default: `now()`, not null]
-  user user [not null]
+  payment_proof String
+  payment_verification payment_proof_enum [not null, default: 'pending']
   event event [not null]
+  user user [not null]
 
   indexes {
     (user_id, event_id) [pk]
@@ -98,8 +102,8 @@ Table team_member {
   role team_member_role_enum [not null]
   kartu_id String
   verification_error String
-  user user [not null]
   team team [not null]
+  user user [not null]
 
   indexes {
     (user_id, team_id) [pk]
@@ -111,7 +115,7 @@ Table user {
   email String [unique, not null]
   full_name String [not null]
   birth_date DateTime
-  pendidikan education_enum
+  pendidikan user_pendidikan
   nama_sekolah String
   entry_source String
   phone_number String
@@ -124,11 +128,11 @@ Table user {
   is_registration_complete Boolean [not null, default: false]
   created_at DateTime [default: `now()`, not null]
   updated_at DateTime
-  uploaded media [not null]
-  identity user_identity
   announcements event_announcement [not null]
-  member team_member [not null]
   event_participant event_participant [not null]
+  uploaded media [not null]
+  member team_member [not null]
+  identity user_identity
 }
 
 Table user_identity {
@@ -154,15 +158,15 @@ Table sessions {
   data Json [not null]
 }
 
-Enum education_enum {
-  sma
-  mahasiswa
-  lainnya
-}
-
 Enum team_member_role_enum {
   leader
   member
+}
+
+Enum payment_proof_enum {
+  pending
+  accepted
+  rejected
 }
 
 Enum user_identity_provider_enum {
@@ -198,13 +202,22 @@ Enum jenis_kelamin_enum {
   perempuan
 }
 
-Ref: event_announcement.event_id > event.id
+Enum user_pendidikan {
+  sma
+  s1
+  d3
+  d4
+}
 
 Ref: event_announcement.author_id > user.id
 
-Ref: competition_submission.team_id > team.id
+Ref: event_announcement.event_id > event.id
 
 Ref: competition_submission.competition_id > event.id
+
+Ref: competition_submission.media_id - media.id
+
+Ref: competition_submission.team_id > team.id
 
 Ref: event_timeline.event_id > event.id
 
@@ -212,12 +225,12 @@ Ref: media.uploader_id > user.id
 
 Ref: team.competition_id > event.id
 
-Ref: event_participant.user_id > user.id
-
 Ref: event_participant.event_id > event.id
 
-Ref: team_member.user_id > user.id
+Ref: event_participant.user_id > user.id
 
 Ref: team_member.team_id > team.id
+
+Ref: team_member.user_id > user.id
 
 Ref: user_identity.id - user.id
