@@ -19,6 +19,12 @@ enum education_enum {
   lainnya
 }
 
+enum payment_proof_enum {
+  accepted
+  pending
+  rejected
+}
+
 enum team_member_role_enum {
   leader
   member
@@ -142,9 +148,11 @@ model team {
 }
 
 model event_participant {
-  user_id    String
-  event_id   String
-  date_added DateTime @default(now())
+  user_id          String
+  event_id         String
+  date_added       DateTime            @default(now())
+  payment_proof    String?
+  payment_verified payment_proof_enum?
 
   user  user  @relation(fields: [user_id], references: [id])
   event event @relation(fields: [event_id], references: [id])
