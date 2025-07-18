@@ -8,6 +8,18 @@ const {
 const eventRegisterSchema = require("../validators/eventRegisterValidationSchema");
 const { validateRequest } = require("../middleware/joiMiddleware");
 const bootcampRegisterSchema = require("../validators/bootcampRegistrationSchema");
+const multer = require("multer");
+const { validateFile } = require("../middleware/imageValidator");
+const {
+    uploadPaymentController,
+} = require("../controllers/pay-competition.controller");
+const images = multer({
+    storage: multer.memoryStorage(),
+    limits: {
+        fileSize: 2 * 1024 * 1024, // 2MB limit
+    },
+});
+
 const eventRouter = Router();
 
 eventRouter.post(
@@ -25,4 +37,12 @@ eventRouter.post(
 );
 
 eventRouter.get("/api/event/", isAuthenticated, eventShowController);
+
+eventRouter.post(
+    "/api/event/bootcamp/payment",
+    isAuthenticated,
+    images.single("image"),
+    validateFile,
+    uploadPaymentController
+);
 module.exports = eventRouter;
