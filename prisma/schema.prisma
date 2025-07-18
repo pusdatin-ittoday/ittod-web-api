@@ -153,6 +153,8 @@ model event_participant {
   date_added           DateTime           @default(now())
   payment_proof        String?
   payment_verification payment_proof_enum @default(pending)
+  bundling             bundling_enum?
+  paid_for_user        Boolean?
 
   user  user  @relation(fields: [user_id], references: [id])
   event event @relation(fields: [event_id], references: [id])
@@ -216,6 +218,12 @@ model user_identity {
   updated_at                         DateTime?                   @updatedAt
 
   user user @relation(fields: [id], references: [id])
+}
+
+enum bundling_enum {
+  day1
+  day2
+  day1_day2
 }
 
 model Session {
