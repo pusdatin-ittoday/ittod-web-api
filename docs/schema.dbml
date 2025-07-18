@@ -84,6 +84,10 @@ Table event_participant {
   user_id String [not null]
   event_id String [not null]
   date_added DateTime [default: `now()`, not null]
+  payment_proof String
+  payment_verification payment_proof_enum [not null, default: 'pending']
+  bundling bundling_enum
+  paid_for_user Boolean
   user user [not null]
   event event [not null]
 
@@ -171,6 +175,12 @@ Enum user_identity_provider_enum {
   github
 }
 
+Enum payment_proof_enum {
+  pending
+  accepted
+  rejected
+}
+
 Enum user_identity_role_enum {
   admin
   user
@@ -196,6 +206,12 @@ Enum event_type_enum {
 Enum jenis_kelamin_enum {
   laki2
   perempuan
+}
+
+Enum bundling_enum {
+  day1
+  day2
+  day1_day2
 }
 
 Ref: event_announcement.event_id > event.id
