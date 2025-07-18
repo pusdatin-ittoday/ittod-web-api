@@ -10,9 +10,6 @@ const { validateRequest } = require("../middleware/joiMiddleware");
 const bootcampRegisterSchema = require("../validators/bootcampRegistrationSchema");
 const multer = require("multer");
 const { validateFile } = require("../middleware/imageValidator");
-const {
-    uploadPaymentController,
-} = require("../controllers/pay-competition.controller");
 const { uploadBootcampPaymentController } = require("../controllers/bootcamp-payment.controller");
 const images = multer({
     storage: multer.memoryStorage(),
