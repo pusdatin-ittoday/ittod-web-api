@@ -1,19 +1,19 @@
-const { uploadPaymentCompetition } = require("../services/bootcamp-payment.service");
+const { uploadBootcampPaymentService } = require("../services/bootcamp-payment.service");
 
-const uploadPaymentController = async (req, res) => {
+const uploadBootcampPaymentController = async (req, res) => {
     try {
-        const { team_id } = req.body;
+        const user_id = req.user.id;
         const payment_proof = req.file;
 
-        if (!team_id) {
-            return res.status(400).json({ message: "Team ID is required" });
+        if (!user_id) {
+            return res.status(400).json({ message: "User ID is required" });
         }
         if (!payment_proof) {
             return res.status(400).json({ message: "Payment proof file is required" });
         }
 
-        const result = await uploadPaymentCompetition({
-            team_id,
+        const result = await uploadBootcampPaymentService({
+            user_id,
             payment_proof,
         });
         res.status(200).json(result);
@@ -23,4 +23,4 @@ const uploadPaymentController = async (req, res) => {
     }
 };
 
-module.exports = { uploadPaymentController };
+module.exports = { uploadBootcampPaymentController };

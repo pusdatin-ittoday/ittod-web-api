@@ -13,6 +13,7 @@ const { validateFile } = require("../middleware/imageValidator");
 const {
     uploadPaymentController,
 } = require("../controllers/pay-competition.controller");
+const { uploadBootcampPaymentController } = require("../controllers/bootcamp-payment.controller");
 const images = multer({
     storage: multer.memoryStorage(),
     limits: {
@@ -43,6 +44,6 @@ eventRouter.post(
     isAuthenticated,
     images.single("image"),
     validateFile,
-    uploadPaymentController
+    uploadBootcampPaymentController
 );
 module.exports = eventRouter;
