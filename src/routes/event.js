@@ -3,6 +3,7 @@ const { isAuthenticated } = require("../middleware/authMiddleware.js");
 const {
     eventJoinController,
     eventShowController,
+    checkIPBOrMinetodayController,
 } = require("../controllers/event-user.controller");
 const eventRegisterSchema = require("../validators/eventRegisterValidationSchema");
 const { validateRequest } = require("../middleware/joiMiddleware");
@@ -16,4 +17,5 @@ eventRouter.post(
 );
 
 eventRouter.get("/api/event/", isAuthenticated, eventShowController);
+eventRouter.get("/api/event/check-ipb-or-minetoday", isAuthenticated, checkIPBOrMinetodayController);
 module.exports = eventRouter;
