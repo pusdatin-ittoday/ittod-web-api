@@ -74,19 +74,16 @@ const checkIPBOrMinetodayController = async (req, res) => {
         // 1. Check if user's institution is 'IPB'
         const user = await prisma.user.findUnique({
             where: { id: user_id },
-            select: { nama_sekolah: true }
+            select: { nama_sekolah: true },
         });
         const namaSekolah = user?.nama_sekolah?.toLowerCase() || "";
-        const isIPB =
-            namaSekolah === "ipb" ||
-            namaSekolah === "ipb university" ||
-            namaSekolah === "institut pertanian bogor";
+        const isIPB = /(ipb|institut pertanian bogor)/i.test(namaSekolah);
 
         // 2. Check if user is registered to 'minetoday' event (by title)
         // Find the event ID for 'minetoday' (case-insensitive)
         const minetodayEvent = await prisma.event.findFirst({
-            where: { title: { equals: 'minetoday', mode: 'insensitive' } },
-            select: { id: true }
+            where: { title: { equals: "MineToday" } },
+            select: { id: true },
         });
         let isRegisteredToMinetoday = false;
         let paymentVerification = null;
@@ -94,25 +91,35 @@ const checkIPBOrMinetodayController = async (req, res) => {
         if (minetodayEvent) {
             const participant = await prisma.event_participant.findFirst({
                 where: { user_id, event_id: minetodayEvent.id },
-                select: { payment_verification: true }
+                select: { payment_verification: true },
             });
             isRegisteredToMinetoday = !!participant;
-            paymentVerification = participant ? participant.payment_verification : null;
-            paymentStatus = participant ? participant.payment_verification === 'accepted' : false;
+            paymentVerification = participant
+                ? participant.payment_verification
+                : null;
+            paymentStatus = participant
+                ? participant.payment_verification === "accepted"
+                : false;
         }
 
         res.status(200).json({
             isIPB,
             isRegisteredToMinetoday,
             paymentVerification,
-            paymentStatus
+            paymentStatus,
         });
     } catch (err) {
         console.error("Error checking IPB or minetoday registration", err);
         res.status(500).json({
-            error: err.message || "Failed to check IPB or minetoday registration"
+            error:
+                err.message || "Failed to check IPB or minetoday registration",
         });
     }
 };
 
-module.exports = { eventJoinController, eventShowController, checkIPBOrMinetodayController, bootcampRegistrationController };
+module.exports = {
+    eventJoinController,
+    eventShowController,
+    checkIPBOrMinetodayController,
+    bootcampRegistrationController,
+};
