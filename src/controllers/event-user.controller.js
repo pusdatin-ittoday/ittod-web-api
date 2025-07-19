@@ -30,8 +30,9 @@ const eventShowController = async (req, res) => {
             where: { user_id },
             select: {
                 event_id: true,
+                payment_verification: true,
                 event: {
-                    select: { title: true },
+                    select: { title: true, },
                 },
             },
         });
