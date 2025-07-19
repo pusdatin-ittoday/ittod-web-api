@@ -38,6 +38,20 @@ const uploadBootcampPaymentService = async ({ user_id, payment_proof }) => {
                     "Invalid payment_proof object. Must include buffer, originalname, and mimetype.",
             };
         }
+
+        const allowedMimeTypes = [
+            "image/jpeg",
+            "image/png",
+            "image/jpg",
+            "image/webp",
+        ];
+        if (!allowedMimeTypes.includes(mimetype)) {
+            throw {
+                status: 400,
+                message:
+                    "Invalid file type. Only JPEG, PNG, and WebP images are allowed.",
+            };
+        }
         try {
             payment_proof_key = (
                 await uploadFileToR2(buffer, originalname, mimetype)
