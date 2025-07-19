@@ -46,7 +46,8 @@ exports.registerUserIntoBootcamp = async ({
 
             const isEventFull =
                 lockedEvent.max_noncompetition_participant !== null &&
-                eventParticipantCount >= lockedEvent.max_noncompetition_participant;
+                eventParticipantCount >=
+                    lockedEvent.max_noncompetition_participant;
 
             if (isEventFull) {
                 throw {
@@ -85,7 +86,9 @@ exports.registerUserIntoBootcamp = async ({
             const canBeFree =
                 isMinetod ||
                 ((namaSekolah.toLowerCase().includes("ipb") ||
-                    namaSekolah.toLowerCase().includes("institut pertanian bogor")) &&
+                    namaSekolah
+                        .toLowerCase()
+                        .includes("institut pertanian bogor")) &&
                     userData.is_registration_complete === true);
 
             await tx.event_participant.create({
@@ -100,10 +103,12 @@ exports.registerUserIntoBootcamp = async ({
         });
     } catch (e) {
         console.error("Registration error:", e);
+        if (e.status) {
+            throw e; // Re-throw if it's already a formatted error
+        }
         throw {
             status: 500,
             message: "Failed to register user into bootcamp.",
-            error: e.message,
         };
     }
 };
