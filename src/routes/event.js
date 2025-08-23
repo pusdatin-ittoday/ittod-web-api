@@ -27,16 +27,16 @@ eventRouter.post(
     validateRequest(eventRegisterSchema),
     eventJoinController
 );
-
+/*
 eventRouter.post(
     "/api/event/bootcamp/join",
     isAuthenticated,
     validateRequest(bootcampRegisterSchema),
     bootcampRegistrationController
 );
-
+*/
 eventRouter.get("/api/event/", isAuthenticated, eventShowController);
-
+/*
 eventRouter.post(
     "/api/event/bootcamp/payment",
     isAuthenticated,
@@ -44,7 +44,7 @@ eventRouter.post(
     validateFile,
     uploadBootcampPaymentController
 );
-
+*/
 eventRouter.get("/api/event/check-ipb-or-minetoday", isAuthenticated, checkIPBOrMinetodayController);
 
 module.exports = eventRouter;
