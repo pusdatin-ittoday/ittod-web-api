@@ -4,11 +4,19 @@ const registerUserIntoEvent = async (
     user_id,
     event_id,
     institution_name,
-    phone_number
+    phone_number,
+    date_of_birth,
 ) => {
     const eventExists = await prisma.event.findFirst({
         where: { id: event_id },
     });
+
+    if (date_of_birth) {
+        await prisma.user.update({
+            where: { id: user_id },
+            data: { date_of_birth },
+        });
+    }
 
     if (!eventExists) {
         throw {

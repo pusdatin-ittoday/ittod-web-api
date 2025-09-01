@@ -5,13 +5,14 @@ const { registerUserIntoBootcamp } = require("../services/bootcamp.service");
 const eventJoinController = async (req, res) => {
     try {
         const user_id = req.user.id;
-        const { event_id, institution_name, phone_number } = req.body;
+        const { event_id, institution_name, phone_number, date_of_birth } = req.body;
 
         const result = await registerUserIntoEvent(
             user_id,
             event_id,
             institution_name,
-            phone_number
+            phone_number,
+            date_of_birth
         );
 
         res.status(201).json(result);
