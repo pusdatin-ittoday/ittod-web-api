@@ -17,8 +17,8 @@ const eventRegisterSchema = Joi.object({
             "string.pattern.base":
                 "Phone number must be a valid international format.",
         }),
-    // 'date_of_born' is optional; provide if available, unlike other required fields
-    date_of_born: Joi.date()
+    // 'date_of_birth' is optional; provide if available, unlike other required fields
+    date_of_birth: Joi.date()
         .optional()
 });
 

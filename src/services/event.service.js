@@ -14,7 +14,7 @@ const registerUserIntoEvent = async (
     if (date_of_birth) {
         await prisma.user.update({
             where: { id: user_id },
-            data: { date_of_birth },
+            data: { birth_date: new Date(date_of_birth) },
         });
     }
 
