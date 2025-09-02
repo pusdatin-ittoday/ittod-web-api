@@ -32,8 +32,8 @@ const editUserProfileController = async (req, res) => {
             id_instagram,
             pendidikan,
             nama_sekolah,
-            ktm: profileImage,          // tambahkan ini
-            twibbon: userTwibbon,       // tambahkan ini
+            ktm: profileImage, // tambahkan ini
+            twibbon: userTwibbon, // tambahkan ini
             user_id,
         });
 

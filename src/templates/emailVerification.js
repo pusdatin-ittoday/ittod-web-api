@@ -5,14 +5,14 @@
  */
 function escapeHtml(str) {
     return String(str)
-        .replace(/&/g, '&amp;')
-        .replace(/</g, '&lt;')
-        .replace(/>/g, '&gt;')
-        .replace(/"/g, '&quot;')
-        .replace(/'/g, '&#x27;');
+        .replace(/&/g, "&amp;")
+        .replace(/</g, "&lt;")
+        .replace(/>/g, "&gt;")
+        .replace(/"/g, "&quot;")
+        .replace(/'/g, "&#x27;");
 }
 
-exports.successTemplate = (frontendBaseUrl) => {
+exports.successTemplate = frontendBaseUrl => {
     const loginUrl = `${frontendBaseUrl}/login`;
     const htmlEncodedUrl = escapeHtml(loginUrl);
     const metaRefreshContent = escapeHtml(`3;url=${loginUrl}`);
@@ -75,7 +75,7 @@ exports.successTemplate = (frontendBaseUrl) => {
 `;
 };
 
-exports.errorTemplate = (safeMessage) => `
+exports.errorTemplate = safeMessage => `
 <!DOCTYPE html>
 <html>
 <head>
@@ -130,4 +130,4 @@ exports.errorTemplate = (safeMessage) => `
     </div>
 </body>
 </html>
-`; 
+`;

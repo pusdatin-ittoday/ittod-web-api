@@ -11,7 +11,9 @@ const { validateRequest } = require("../middleware/joiMiddleware");
 const bootcampRegisterSchema = require("../validators/bootcampRegistrationSchema");
 const multer = require("multer");
 const { validateFile } = require("../middleware/imageValidator");
-const { uploadBootcampPaymentController } = require("../controllers/bootcamp-payment.controller");
+const {
+    uploadBootcampPaymentController,
+} = require("../controllers/bootcamp-payment.controller");
 const images = multer({
     storage: multer.memoryStorage(),
     limits: {
@@ -45,6 +47,10 @@ eventRouter.post(
     uploadBootcampPaymentController
 );
 */
-eventRouter.get("/api/event/check-ipb-or-minetoday", isAuthenticated, checkIPBOrMinetodayController);
+eventRouter.get(
+    "/api/event/check-ipb-or-minetoday",
+    isAuthenticated,
+    checkIPBOrMinetodayController
+);
 
 module.exports = eventRouter;

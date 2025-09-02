@@ -1,6 +1,8 @@
 const { Router } = require("express");
 const { isAuthenticated } = require("../middleware/authMiddleware.js");
-const { fetchHalamanKompetisiEvent } = require("../controllers/fetch-halaman-kompetisi-event.controller.js");
+const {
+    fetchHalamanKompetisiEvent,
+} = require("../controllers/fetch-halaman-kompetisi-event.controller.js");
 
 const fetchHalamanKompetisiEventRouter = Router();
 
@@ -11,4 +13,4 @@ fetchHalamanKompetisiEventRouter.get(
     fetchHalamanKompetisiEvent
 );
 
-module.exports = fetchHalamanKompetisiEventRouter; 
+module.exports = fetchHalamanKompetisiEventRouter;

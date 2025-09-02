@@ -12,31 +12,31 @@ exports.getAllAnnouncements = async (req, res) => {
                 competition: {
                     select: {
                         id: true,
-                        title: true
-                    }
+                        title: true,
+                    },
                 },
                 author: {
                     select: {
                         id: true,
-                        full_name: true
-                    }
-                }
+                        full_name: true,
+                    },
+                },
             },
             orderBy: {
-                created_at: 'desc'
-            }
+                created_at: "desc",
+            },
         });
 
         res.json({
             success: true,
-            data: announcements
+            data: announcements,
         });
     } catch (error) {
         console.error("Error fetching announcements:", error);
         res.status(500).json({
             success: false,
             message: "Failed to fetch announcements",
-            error: error.message
+            error: error.message,
         });
     }
-}; 
+};

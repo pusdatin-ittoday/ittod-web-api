@@ -1,6 +1,8 @@
 const { Router } = require("express");
 const { isAuthenticated } = require("../middleware/authMiddleware.js");
-const { getAllAnnouncements } = require("../controllers/announcement.controller.js");
+const {
+    getAllAnnouncements,
+} = require("../controllers/announcement.controller.js");
 
 const announcementRouter = Router();
 
@@ -11,4 +13,4 @@ announcementRouter.get(
     getAllAnnouncements
 );
 
-module.exports = announcementRouter; 
+module.exports = announcementRouter;

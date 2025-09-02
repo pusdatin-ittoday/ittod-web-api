@@ -2,8 +2,8 @@ const prisma = require("../prisma.js");
 
 /**
  * Controller to get competition data including teams and members
- * @param {import('express').Request} req 
- * @param {import('express').Response} res 
+ * @param {import('express').Request} req
+ * @param {import('express').Response} res
  */
 const getCompetitionData = async (req, res) => {
     try {
@@ -17,8 +17,8 @@ const getCompetitionData = async (req, res) => {
                 verification_error: true,
                 competition: {
                     select: {
-                        title: true
-                    }
+                        title: true,
+                    },
                 },
                 members: {
                     select: {
@@ -26,12 +26,12 @@ const getCompetitionData = async (req, res) => {
                         user: {
                             select: {
                                 full_name: true,
-                                is_registration_complete: true
-                            }
-                        }
-                    }
-                }
-            }
+                                is_registration_complete: true,
+                            },
+                        },
+                    },
+                },
+            },
         });
 
         const formattedData = competitionData.map(team => ({
@@ -41,19 +41,20 @@ const getCompetitionData = async (req, res) => {
             isVerified: team.is_verified,
             paymentProofID: team.payment_proof_id,
             verificationError: team.verification_error,
-            competitionName: team.competition?.title ?? 'N/A',
+            competitionName: team.competition?.title ?? "N/A",
             members: team.members
                 .sort((a, b) => (a.role === "leader" ? -1 : 1)) // Sort leader to the top
                 .map(member => ({
                     fullName: member.user.full_name,
-                    isRegistrationComplete: member.user.is_registration_complete
-                }))
+                    isRegistrationComplete:
+                        member.user.is_registration_complete,
+                })),
         }));
 
         return res.status(200).json(formattedData);
     } catch (error) {
-        console.error('Error fetching competition data:', error);
-        return res.status(500).json({ error: 'Internal server error' });
+        console.error("Error fetching competition data:", error);
+        return res.status(500).json({ error: "Internal server error" });
     }
 };
 
@@ -64,9 +65,9 @@ const getUserCompetitionData = async (req, res) => {
             where: {
                 members: {
                     some: {
-                        user_id: user_id
-                    }
-                }
+                        user_id: user_id,
+                    },
+                },
             },
             select: {
                 id: true,
@@ -77,8 +78,8 @@ const getUserCompetitionData = async (req, res) => {
                 payment_proof_id: true,
                 competition: {
                     select: {
-                        title: true
-                    }
+                        title: true,
+                    },
                 },
                 members: {
                     select: {
@@ -86,12 +87,12 @@ const getUserCompetitionData = async (req, res) => {
                         user: {
                             select: {
                                 full_name: true,
-                                is_registration_complete: true
-                            }
-                        }
-                    }
-                }
-            }
+                                is_registration_complete: true,
+                            },
+                        },
+                    },
+                },
+            },
         });
 
         const formattedData = userCompetitionData.map(team => ({
@@ -101,22 +102,24 @@ const getUserCompetitionData = async (req, res) => {
             isVerified: team.is_verified,
             paymentProofID: team.payment_proof_id,
             verificationError: team.verification_error,
-            competitionName: team.competition?.title ?? 'N/A',
+            competitionName: team.competition?.title ?? "N/A",
             members: team.members
                 .sort((a, b) => (a.role === "leader" ? -1 : 1)) // Sort leader to the top
                 .map(member => ({
                     fullName: member.user.full_name,
-                    isRegistrationComplete: member.user.is_registration_complete
-                }))
+                    isRegistrationComplete:
+                        member.user.is_registration_complete,
+                })),
         }));
 
         return res.status(200).json(formattedData);
     } catch (error) {
-        console.error('Error fetching user competition data:', error);
-        return res.status(500).json({ error: 'Internal server error' });
+        console.error("Error fetching user competition data:", error);
+        return res.status(500).json({ error: "Internal server error" });
     }
 };
 
 module.exports = {
-    getCompetitionData, getUserCompetitionData
+    getCompetitionData,
+    getUserCompetitionData,
 };

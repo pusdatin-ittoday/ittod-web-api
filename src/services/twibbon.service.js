@@ -60,4 +60,4 @@ const twibbonUploadService = async ({ user_id, twibbon }) => {
     }
 };
 
-module.exports = {twibbonUploadService}
+module.exports = { twibbonUploadService };

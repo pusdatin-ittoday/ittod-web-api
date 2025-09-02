@@ -8,22 +8,22 @@ const createTimeline = async (req, res) => {
         if (!event_id || !title || !date) {
             return res.status(400).json({
                 success: false,
-                message: "event_id, title, and date are required"
+                message: "event_id, title, and date are required",
             });
         }
 
         // Validate string fields are not empty or whitespace-only
-        if (typeof event_id !== 'string' || event_id.trim() === '') {
+        if (typeof event_id !== "string" || event_id.trim() === "") {
             return res.status(400).json({
                 success: false,
-                message: "event_id must be a non-empty string"
+                message: "event_id must be a non-empty string",
             });
         }
 
-        if (typeof title !== 'string' || title.trim() === '') {
+        if (typeof title !== "string" || title.trim() === "") {
             return res.status(400).json({
                 success: false,
-                message: "title must be a non-empty string"
+                message: "title must be a non-empty string",
             });
         }
 
@@ -31,7 +31,7 @@ const createTimeline = async (req, res) => {
         if (title.trim().length > 500) {
             return res.status(400).json({
                 success: false,
-                message: "title must be less than 500 characters"
+                message: "title must be less than 500 characters",
             });
         }
 
@@ -40,30 +40,29 @@ const createTimeline = async (req, res) => {
         if (isNaN(parsedDate.getTime())) {
             return res.status(400).json({
                 success: false,
-                message: "Invalid date format"
+                message: "Invalid date format",
             });
         }
 
         const result = await createTimelineService({
             event_id: event_id.trim(),
             title: title.trim(),
-            date: parsedDate
+            date: parsedDate,
         });
 
         res.status(201).json({
             success: true,
             message: "Timeline created successfully",
-            data: result
+            data: result,
         });
-
     } catch (error) {
         console.error("Error creating timeline:", error);
-        
+
         // Handle Prisma foreign key constraint violation
         if (error.code === "P2003") {
             return res.status(400).json({
                 success: false,
-                message: "Event not found"
+                message: "Event not found",
             });
         }
 
@@ -71,30 +70,35 @@ const createTimeline = async (req, res) => {
         if (error.message === "Event not found") {
             return res.status(400).json({
                 success: false,
-                message: "Event not found"
+                message: "Event not found",
             });
         }
 
         if (error.message === "Duplicate timeline title for this event") {
             return res.status(409).json({
                 success: false,
-                message: "A timeline with this title already exists for this event"
+                message:
+                    "A timeline with this title already exists for this event",
             });
         }
 
-        if (error.message === "Maximum number of timelines (20) reached for this event") {
+        if (
+            error.message ===
+            "Maximum number of timelines (20) reached for this event"
+        ) {
             return res.status(400).json({
                 success: false,
-                message: "Maximum number of timelines (20) reached for this event"
+                message:
+                    "Maximum number of timelines (20) reached for this event",
             });
         }
 
         // Security: Don't expose internal error details to client
         res.status(500).json({
             success: false,
-            message: "Internal server error"
+            message: "Internal server error",
         });
     }
 };
 
-module.exports = { createTimeline }; 
+module.exports = { createTimeline };

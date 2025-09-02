@@ -1,7 +1,10 @@
 const prisma = require("../prisma.js");
 const argon2 = require("argon2");
 const crypto = require("crypto");
-const { sendVerificationEmail, sendPasswordResetEmail } = require("../utils/mailer.js");
+const {
+    sendVerificationEmail,
+    sendPasswordResetEmail,
+} = require("../utils/mailer.js");
 
 exports.register = async ({ email, password, full_name }) => {
     if (password.length < 8)
@@ -74,10 +77,10 @@ exports.verifyEmail = async token => {
     return { message: "Email verified. You can now login." };
 };
 
-exports.sendPasswordResetEmail = async (email) => {
+exports.sendPasswordResetEmail = async email => {
     const user = await prisma.user.findUnique({
         where: { email },
-        include: { identity: true }
+        include: { identity: true },
     });
 
     if (!user) {
@@ -91,8 +94,8 @@ exports.sendPasswordResetEmail = async (email) => {
         where: { id: user.identity.id },
         data: {
             password_recovery_token: resetToken,
-            password_recovery_token_expiration: resetTokenExpiration
-        }
+            password_recovery_token_expiration: resetTokenExpiration,
+        },
     });
 
     // Send reset email with error handling
@@ -106,14 +109,17 @@ exports.sendPasswordResetEmail = async (email) => {
 
 exports.resetPassword = async (token, newPassword) => {
     if (newPassword.length < 8) {
-        throw { status: 400, message: "Password must be at least 8 characters" };
+        throw {
+            status: 400,
+            message: "Password must be at least 8 characters",
+        };
     }
 
     const user = await prisma.user_identity.findFirst({
         where: {
             password_recovery_token: token,
-            password_recovery_token_expiration: { gt: new Date() }
-        }
+            password_recovery_token_expiration: { gt: new Date() },
+        },
     });
 
     if (!user) {
@@ -127,19 +133,22 @@ exports.resetPassword = async (token, newPassword) => {
         data: {
             hash: hashedPassword,
             password_recovery_token: null,
-            password_recovery_token_expiration: null
-        }
+            password_recovery_token_expiration: null,
+        },
     });
 };
 
 exports.resendVerificationEmail = async email => {
     const user = await prisma.user.findUnique({
         where: { email },
-        include: { identity: true }
+        include: { identity: true },
     });
 
     if (!user || !user.identity || user.identity.is_verified) {
-        throw { status: 400, message: "Invalid request or email already verified" };
+        throw {
+            status: 400,
+            message: "Invalid request or email already verified",
+        };
     }
 
     const token = crypto.randomBytes(32).toString("hex");
@@ -149,8 +158,8 @@ exports.resendVerificationEmail = async email => {
         where: { id: user.identity.id },
         data: {
             verification_token: token,
-            verification_token_expiration: tokenExpiration
-        }
+            verification_token_expiration: tokenExpiration,
+        },
     });
 
     try {

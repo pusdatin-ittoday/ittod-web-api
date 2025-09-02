@@ -1,30 +1,33 @@
-const adminTeamService = require('../services/admin-team.service');
+const adminTeamService = require("../services/admin-team.service");
 
 // Get List Tim Berdasarkan Kompetisi
 const getTeamsByCompetition = async (req, res) => {
     try {
         const { competition, page, limit } = req.query;
         // Validation is now handled by Joi middleware and the service layer
-        const result = await adminTeamService.getTeamsByCompetition(competition, parseInt(page), parseInt(limit));
+        const result = await adminTeamService.getTeamsByCompetition(
+            competition,
+            parseInt(page),
+            parseInt(limit)
+        );
 
         res.status(200).json({
             success: true,
-            message: 'Teams fetched successfully',
+            message: "Teams fetched successfully",
             data: result.teams,
-            pagination: result.pagination
+            pagination: result.pagination,
         });
-
     } catch (error) {
         // Log sanitized error for debugging
-        console.error('Error fetching teams by competition:', {
+        console.error("Error fetching teams by competition:", {
             message: error.message,
             stack: error.stack,
-            timestamp: new Date().toISOString()
+            timestamp: new Date().toISOString(),
         });
-        
+
         res.status(500).json({
             success: false,
-            message: 'Internal server error'
+            message: "Internal server error",
         });
     }
 };
@@ -40,27 +43,26 @@ const getTeamDetail = async (req, res) => {
         if (!teamDetail) {
             return res.status(404).json({
                 success: false,
-                message: `Team with id: ${teamId} not found`
+                message: `Team with id: ${teamId} not found`,
             });
         }
 
         res.status(200).json({
             success: true,
-            message: 'Team detail fetched successfully',
-            data: teamDetail
+            message: "Team detail fetched successfully",
+            data: teamDetail,
         });
-
     } catch (error) {
         // Log sanitized error for debugging
-        console.error('Error fetching team detail:', {
+        console.error("Error fetching team detail:", {
             message: error.message,
             stack: error.stack,
-            timestamp: new Date().toISOString()
+            timestamp: new Date().toISOString(),
         });
-        
+
         res.status(500).json({
             success: false,
-            message: 'Internal server error'
+            message: "Internal server error",
         });
     }
 };
@@ -75,33 +77,32 @@ const verifyTeam = async (req, res) => {
 
         res.status(200).json({
             success: true,
-            message: 'Team verified successfully',
-            data: result
+            message: "Team verified successfully",
+            data: result,
         });
-
     } catch (error) {
         // Log sanitized error for debugging
-        console.error('Error verifying team:', {
+        console.error("Error verifying team:", {
             message: error.message,
             stack: error.stack,
-            timestamp: new Date().toISOString()
+            timestamp: new Date().toISOString(),
         });
-        
+
         if (error.status === 404) {
             return res.status(404).json({
                 success: false,
-                message: error.message
+                message: error.message,
             });
         }
         if (error.status === 400) {
             return res.status(400).json({
                 success: false,
-                message: error.message
+                message: error.message,
             });
         }
         res.status(500).json({
             success: false,
-            message: 'Internal server error'
+            message: "Internal server error",
         });
     }
 };
@@ -117,33 +118,32 @@ const rejectTeam = async (req, res) => {
 
         res.status(200).json({
             success: true,
-            message: 'Team rejected successfully',
-            data: result
+            message: "Team rejected successfully",
+            data: result,
         });
-
     } catch (error) {
         // Log sanitized error for debugging
-        console.error('Error rejecting team:', {
+        console.error("Error rejecting team:", {
             message: error.message,
             stack: error.stack,
-            timestamp: new Date().toISOString()
+            timestamp: new Date().toISOString(),
         });
-        
+
         if (error.status === 404) {
             return res.status(404).json({
                 success: false,
-                message: error.message
+                message: error.message,
             });
         }
         if (error.status === 400) {
             return res.status(400).json({
                 success: false,
-                message: error.message
+                message: error.message,
             });
         }
         res.status(500).json({
             success: false,
-            message: 'Internal server error'
+            message: "Internal server error",
         });
     }
 };
@@ -155,31 +155,33 @@ const updateMemberStatus = async (req, res) => {
         const { is_complete } = req.body;
 
         // Validation is now handled by Joi middleware
-        const result = await adminTeamService.updateMemberStatus(memberId, is_complete);
+        const result = await adminTeamService.updateMemberStatus(
+            memberId,
+            is_complete
+        );
 
         res.status(200).json({
             success: true,
-            message: 'Member status updated successfully',
-            data: result
+            message: "Member status updated successfully",
+            data: result,
         });
-
     } catch (error) {
         // Log sanitized error for debugging
-        console.error('Error updating member status:', {
+        console.error("Error updating member status:", {
             message: error.message,
             stack: error.stack,
-            timestamp: new Date().toISOString()
+            timestamp: new Date().toISOString(),
         });
-        
+
         if (error.status === 404) {
             return res.status(404).json({
                 success: false,
-                message: error.message
+                message: error.message,
             });
         }
         res.status(500).json({
             success: false,
-            message: 'Internal server error'
+            message: "Internal server error",
         });
     }
 };
@@ -189,5 +191,5 @@ module.exports = {
     getTeamDetail,
     verifyTeam,
     rejectTeam,
-    updateMemberStatus
-}; 
+    updateMemberStatus,
+};

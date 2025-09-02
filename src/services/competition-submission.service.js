@@ -1,6 +1,6 @@
 const prisma = require("../prisma.js");
 
-const upsertTeamSubmission = async (team_id,submission_object) => {
+const upsertTeamSubmission = async (team_id, submission_object) => {
     try {
         await prisma.$transaction(async tx => {
             const team = await tx.team.findUnique({
@@ -9,7 +9,12 @@ const upsertTeamSubmission = async (team_id,submission_object) => {
             });
 
             await tx.competition_submission.upsert({
-                where: { team_id_competition_id: { team_id, competition_id: team.competition_id } },
+                where: {
+                    team_id_competition_id: {
+                        team_id,
+                        competition_id: team.competition_id,
+                    },
+                },
                 update: { submission_object },
                 create: {
                     team_id,
@@ -25,6 +30,5 @@ const upsertTeamSubmission = async (team_id,submission_object) => {
         throw { status: 500, message: "Submission Failed" };
     }
 };
-
 
 module.exports = { upsertTeamSubmission };

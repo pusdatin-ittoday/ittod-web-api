@@ -9,22 +9,22 @@ const validateRequest = (schema, source) => {
         let dataToValidate;
 
         switch (source) {
-            case 'params':
+            case "params":
                 dataToValidate = req.params;
                 break;
-            case 'query':
+            case "query":
                 dataToValidate = req.query;
                 break;
-            case 'body':
+            case "body":
                 dataToValidate = req.body;
                 break;
-            case 'combined':
+            case "combined":
                 dataToValidate = { ...req.params, ...req.body };
                 break;
             default:
                 return res.status(500).json({
                     success: false,
-                    message: 'Invalid validation source specified'
+                    message: "Invalid validation source specified",
                 });
         }
 
@@ -32,11 +32,11 @@ const validateRequest = (schema, source) => {
         if (error) {
             return res.status(400).json({
                 success: false,
-                message: error.details[0].message
+                message: error.details[0].message,
             });
         }
         next();
     };
 };
 
-module.exports = { validateRequest }; 
+module.exports = { validateRequest };

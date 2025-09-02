@@ -5,7 +5,7 @@ const registerUserIntoEvent = async (
     event_id,
     institution_name,
     phone_number,
-    date_of_birth,
+    date_of_birth
 ) => {
     const eventExists = await prisma.event.findFirst({
         where: { id: event_id },

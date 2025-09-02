@@ -1,4 +1,6 @@
-const { uploadBootcampPaymentService } = require("../services/bootcamp-payment.service");
+const {
+    uploadBootcampPaymentService,
+} = require("../services/bootcamp-payment.service");
 
 const uploadBootcampPaymentController = async (req, res) => {
     try {
@@ -9,7 +11,9 @@ const uploadBootcampPaymentController = async (req, res) => {
             return res.status(400).json({ message: "User ID is required" });
         }
         if (!payment_proof) {
-            return res.status(400).json({ message: "Payment proof file is required" });
+            return res
+                .status(400)
+                .json({ message: "Payment proof file is required" });
         }
 
         const result = await uploadBootcampPaymentService({

@@ -14,23 +14,29 @@ exports.register = async (req, res) => {
 exports.verifyEmail = async (req, res) => {
     const token = req.query.token;
     if (!token) {
-        return res.status(400).json({ error: 'Token is required' });
+        return res.status(400).json({ error: "Token is required" });
     }
 
     try {
         await authService.verifyEmail(token);
         // If verification succeeds, show success message and redirect
         try {
-            const frontendBaseUrl = validateFrontendUrl(process.env.APP_FRONTEND_URL);
+            const frontendBaseUrl = validateFrontendUrl(
+                process.env.APP_FRONTEND_URL
+            );
             res.send(emailTemplates.successTemplate(frontendBaseUrl));
         } catch (urlError) {
-            console.error('Frontend URL validation failed:', urlError.message);
+            console.error("Frontend URL validation failed:", urlError.message);
             // Fallback to localhost if URL validation fails
-            res.send(emailTemplates.successTemplate(process.env.APP_FRONTEND_URL));
+            res.send(
+                emailTemplates.successTemplate(process.env.APP_FRONTEND_URL)
+            );
         }
     } catch (err) {
         // If verification fails, show error message without redirect
-        const safeMessage = String(err.message).replace(/</g, '&lt;').replace(/>/g, '&gt;');
+        const safeMessage = String(err.message)
+            .replace(/</g, "&lt;")
+            .replace(/>/g, "&gt;");
         res.status(400).send(emailTemplates.errorTemplate(safeMessage));
     }
 };
@@ -64,7 +70,6 @@ exports.login = (req, res, next) => {
     });
 };
 
-
 exports.loginAdmin = (req, res) => {
     const { id, email, name, role } = req.user;
     res.json({
@@ -80,7 +85,9 @@ exports.forgotPassword = async (req, res) => {
             return res.status(400).json({ error: "Email is required" });
         }
         await authService.sendPasswordResetEmail(email);
-        res.json({ message: "Password reset instructions have been sent to your email" });
+        res.json({
+            message: "Password reset instructions have been sent to your email",
+        });
     } catch (err) {
         res.status(err.status || 500).json({ error: err.message });
     }

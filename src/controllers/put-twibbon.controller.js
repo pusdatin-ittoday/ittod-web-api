@@ -6,12 +6,12 @@ const putTwibbonUser = async (req, res) => {
         const user_id = req.user.id;
 
         if (!twibbon) {
-            return res.status(400).json({ message: "twibbon image is required!" });
-        }
-        if (!user_id) {
             return res
                 .status(400)
-                .json({ message: "user_id is required!" });
+                .json({ message: "twibbon image is required!" });
+        }
+        if (!user_id) {
+            return res.status(400).json({ message: "user_id is required!" });
         }
 
         const result = await twibbonUploadService({ twibbon, user_id });
@@ -23,4 +23,4 @@ const putTwibbonUser = async (req, res) => {
     }
 };
 
-module.exports = {putTwibbonUser}
+module.exports = { putTwibbonUser };

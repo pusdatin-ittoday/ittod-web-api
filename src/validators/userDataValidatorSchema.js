@@ -1,19 +1,15 @@
-const Joi = require("joi").extend(require('@joi/date'));
+const Joi = require("joi").extend(require("@joi/date"));
 
 const userProfileSchema = Joi.object({
     full_name: Joi.string().required().messages({
         "string.base": "Full name must be a string.",
         "any.required": "Full name is required.",
     }),
-    birth_date: Joi
-        .date()
-        .iso()
-        .optional()
-        .messages({
-            "string.base": "Birth date must be a string.",
-            "string.isoDate":
-                "Birth date must be a valid ISO-8601 date-time (with time).",
-        }),
+    birth_date: Joi.date().iso().optional().messages({
+        "string.base": "Birth date must be a string.",
+        "string.isoDate":
+            "Birth date must be a valid ISO-8601 date-time (with time).",
+    }),
     phone_number: Joi.string()
         .pattern(/^[0-9+\-\s]+$/)
         .optional()

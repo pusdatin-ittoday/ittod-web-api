@@ -3,8 +3,8 @@ const { editUserProfileController } = require("../controllers/user.controller");
 const { isAuthenticated } = require("../middleware/authMiddleware.js");
 const { validateUserProfile } = require("../middleware/userDataMiddleware");
 const { validateFile } = require("../middleware/imageValidator");
-const { putTwibbonUser } = require("../controllers/put-twibbon.controller")
-const {viewUserData} = require("../controllers/user-view.controller")
+const { putTwibbonUser } = require("../controllers/put-twibbon.controller");
+const { viewUserData } = require("../controllers/user-view.controller");
 const multer = require("multer");
 
 const images = multer({
@@ -35,10 +35,6 @@ usersRouter.put(
     putTwibbonUser
 );
 
-usersRouter.get(
-    "/api/user",
-    isAuthenticated,
-    viewUserData,
-)
+usersRouter.get("/api/user", isAuthenticated, viewUserData);
 
 module.exports = usersRouter;

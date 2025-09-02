@@ -8,7 +8,7 @@ const createTimelineService = async ({ event_id, title, date }) => {
 
         // Check if event exists
         const event = await prisma.event.findUnique({
-            where: { id: event_id }
+            where: { id: event_id },
         });
 
         if (!event) {
@@ -19,14 +19,13 @@ const createTimelineService = async ({ event_id, title, date }) => {
         const existingTimeline = await prisma.event_timeline.findFirst({
             where: {
                 event_id: event_id,
-                title: title
-            }
+                title: title,
+            },
         });
 
         if (existingTimeline) {
             throw new Error("Duplicate timeline title for this event");
         }
-
 
         // Create the timeline
         const timeline = await prisma.event_timeline.create({
@@ -34,24 +33,23 @@ const createTimelineService = async ({ event_id, title, date }) => {
                 id,
                 event_id,
                 title,
-                date
+                date,
             },
             include: {
                 event: {
                     select: {
                         id: true,
-                        title: true
-                    }
-                }
-            }
+                        title: true,
+                    },
+                },
+            },
         });
 
         return timeline;
-
     } catch (error) {
         console.error("Error in createTimelineService:", error);
         throw error;
     }
 };
 
-module.exports = { createTimelineService }; 
+module.exports = { createTimelineService };

@@ -14,6 +14,6 @@ module.exports = {
     cookie: {
         httpOnly: true,
         sameSite: "Strict",
-        maxAge: 3600000 * 24 * 24 * 24
+        maxAge: 3600000 * 24 * 24 * 24,
     },
 };

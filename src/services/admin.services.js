@@ -1,11 +1,11 @@
 const prisma = require("../prisma.js");
 
 //untuk tampilin data data competition berdasarkan dropdown
-const getCompetitionById = async(id) => {
+const getCompetitionById = async id => {
     const competition = await prisma.event.findFirst({
         where: {
             id: parseInt(id),
-            type: 'competition'
+            type: "competition",
         },
         select: {
             id: true,
@@ -18,27 +18,27 @@ const getCompetitionById = async(id) => {
                 select: {
                     id: true,
                     title: true,
-                    date: true
+                    date: true,
                 },
-                orderBy: { date: 'asc' }
-            }
-        }
+                orderBy: { date: "asc" },
+            },
+        },
     });
 
     if (!competition) {
         return null;
-    } 
+    }
 
     return competition;
-}
+};
 
 //fetch data yang diperlukan untuk ditaro di dropdown
-const getCompetitionList = async() => {
+const getCompetitionList = async () => {
     return await prisma.event.findMany({
-        where: { type: 'competition' },
-        select: { id:true, title: true},
-        orderBy: { title: 'asc'},
+        where: { type: "competition" },
+        select: { id: true, title: true },
+        orderBy: { title: "asc" },
     });
 };
 
-module.exports = { getCompetitionById, getCompetitionList };    
+module.exports = { getCompetitionById, getCompetitionList };

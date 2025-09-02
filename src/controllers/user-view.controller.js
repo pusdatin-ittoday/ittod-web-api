@@ -1,4 +1,4 @@
-const {viewUserDataService} = require("../services/user.service")
+const { viewUserDataService } = require("../services/user.service");
 
 const viewUserData = async (req, res) => {
     try {
@@ -15,6 +15,6 @@ const viewUserData = async (req, res) => {
         console.error("View User Data Error:", error);
         res.status(error.status || 500).json({ message: error.message });
     }
-}
+};
 
-module.exports = { viewUserData }
+module.exports = { viewUserData };
