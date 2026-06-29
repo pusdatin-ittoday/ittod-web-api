@@ -9,7 +9,7 @@ exports.getAllAnnouncements = async (req, res) => {
                 description: true,
                 created_at: true,
                 updated_at: true,
-                competition: {
+                event: {
                     select: {
                         id: true,
                         title: true,

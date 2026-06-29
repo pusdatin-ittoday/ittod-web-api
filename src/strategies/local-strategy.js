@@ -11,10 +11,24 @@ passport.serializeUser((user, done) => {
 
 passport.deserializeUser(async (id, done) => {
     try {
-        const user = await prisma.user.findUnique({ where: { id } });
-        if (!user) {
+        // Get user_identity (contains auth info)
+        const identity = await prisma.user_identity.findUnique({ 
+            where: { id },
+            include: { user: true }
+        });
+        if (!identity) {
             return done(null, false);
         }
+        // Combine identity + user data
+        const user = {
+            id: identity.id,
+            email: identity.email,
+            role: identity.role,
+            is_verified: identity.is_verified,
+            full_name: identity.user?.full_name,
+            name: identity.user?.full_name, // For auth.controller
+            phone_number: identity.user?.phone_number,
+        };
         done(null, user);
     } catch (err) {
         console.error("Deserialization error:", err);
