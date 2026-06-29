@@ -71,6 +71,7 @@ Table event {
   contact_person1 String [not null]
   contact_person2 String
   max_noncompetition_participant Int
+  requires_submission Boolean [not null, default: false]
   submissions competition_submission [not null]
   announcements event_announcement [not null]
   participants event_participant [not null]
