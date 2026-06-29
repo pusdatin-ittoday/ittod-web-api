@@ -93,6 +93,7 @@ model event {
   contact_person2                String?
   max_noncompetition_participant Int?
   is_active                      Unsupported("tinyint(1)") @default(dbgenerated("'1'"))
+  requires_submission            Boolean                  @default(false)
   submissions                    competition_submission[]
   announcements                  event_announcement[]
   participants                   event_participant[]
