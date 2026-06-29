@@ -2,54 +2,81 @@
 //// THIS FILE WAS AUTOMATICALLY GENERATED (DO NOT MODIFY)
 //// ------------------------------------------------------
 
+Table user {
+  id String [pk]
+  email String [unique, not null]
+  full_name String [not null]
+  birth_date DateTime
+  pendidikan pendidikan_enum
+  nama_sekolah String
+  entry_source String
+  phone_number String
+  id_line String
+  id_discord String
+  id_instagram String
+  is_registration_complete Int [not null, default: 0]
+  jenis_kelamin jenis_kelamin_enum
+  ktm_key String
+  twibbon_key String
+  created_at DateTime [default: `now()`, not null]
+  updated_at DateTime
+  announcements event_announcement [not null]
+  event_participants event_participant [not null]
+  media media [not null]
+  team_members team_member [not null]
+  identity user_identity
+}
+
+Table user_identity {
+  id String [pk]
+  email String [unique, not null]
+  provider user_identity_provider_enum [not null, default: 'basic']
+  hash String
+  is_verified Int [not null, default: 0]
+  verification_token String
+  verification_token_expiration DateTime
+  password_recovery_token String
+  password_recovery_token_expiration DateTime
+  refresh_token String
+  role user_identity_role_enum [not null, default: 'user']
+  remember_token String
+  created_at DateTime [default: `now()`, not null]
+  updated_at DateTime
+  event_staff event_staff [not null]
+  user user [not null]
+}
+
+Table password_reset_tokens {
+  email String [pk]
+  token String [not null]
+  created_at DateTime
+}
+
+Table sessions {
+  id String [pk]
+  user_id String
+  ip_address String
+  user_agent String
+  payload String [not null]
+  last_activity Int [not null]
+}
+
 Table event {
   id String [pk]
   title String [not null]
   description String [not null]
   guide_book_url String [not null]
   type event_type_enum [not null]
+  price Int [not null, default: 0]
   contact_person1 String [not null]
   contact_person2 String
   max_noncompetition_participant Int
-  announcements event_announcement [not null]
   submissions competition_submission [not null]
+  announcements event_announcement [not null]
+  participants event_participant [not null]
+  staff event_staff [not null]
   timelines event_timeline [not null]
   teams team [not null]
-  event_participant event_participant [not null]
-}
-
-Table event_announcement {
-  id String [pk]
-  event_id String [not null]
-  author_id String [not null]
-  title String [not null]
-  description String [not null]
-  created_at DateTime [default: `now()`, not null]
-  updated_at DateTime [not null]
-  competition event [not null]
-  author user [not null]
-}
-
-Table competition_submission {
-  team_id String [not null]
-  competition_id String [not null]
-  submission_object Json
-  created_at DateTime [default: `now()`, not null]
-  updated_at DateTime
-  team team [not null]
-  competition event [not null]
-
-  indexes {
-    (team_id, competition_id) [pk]
-  }
-}
-
-Table event_timeline {
-  id String [pk]
-  event_id String [not null]
-  title String [not null]
-  date DateTime [not null]
-  event event [not null]
 }
 
 Table media {
@@ -62,6 +89,8 @@ Table media {
   created_at DateTime [default: `now()`, not null]
   updated_at DateTime [default: `now()`, not null]
   uploader user [not null]
+  team_payment team [not null]
+  team_member_kartu team_member [not null]
 }
 
 Table team {
@@ -70,14 +99,65 @@ Table team {
   team_name String [not null]
   team_code String [unique, not null]
   max_member Int [not null, default: 3]
-  payment_proof_id String [unique]
-  is_verified Boolean [not null, default: false]
+  is_document_verified Int [not null, default: 0]
+  is_verified Int [not null, default: 0]
   verification_error String
   created_at DateTime [default: `now()`, not null]
   updated_at DateTime
+  payment_proof_id String
+  submissions competition_submission [not null]
+  payment_proof media
   competition event [not null]
   members team_member [not null]
-  submission competition_submission [not null]
+}
+
+Table team_member {
+  user_id String [not null]
+  team_id String [not null]
+  role team_member_role_enum [not null]
+  verification_error String
+  kartu_id String
+  kartu media
+  team team [not null]
+  user user [not null]
+
+  indexes {
+    (user_id, team_id) [pk]
+  }
+}
+
+Table event_timeline {
+  id String [pk]
+  event_id String [not null]
+  title String [not null]
+  date DateTime [not null]
+  event event [not null]
+}
+
+Table event_announcement {
+  id String [pk]
+  event_id String [not null]
+  author_id String [not null]
+  title String [not null]
+  description String [not null]
+  created_at DateTime [default: `now()`, not null]
+  updated_at DateTime [not null]
+  author user [not null]
+  event event [not null]
+}
+
+Table competition_submission {
+  team_id String [not null]
+  competition_id String [not null]
+  created_at DateTime [default: `now()`, not null]
+  updated_at DateTime
+  submission_object String
+  competition event [not null]
+  team team [not null]
+
+  indexes {
+    (team_id, competition_id) [pk]
+  }
 }
 
 Table event_participant {
@@ -85,83 +165,84 @@ Table event_participant {
   event_id String [not null]
   date_added DateTime [default: `now()`, not null]
   payment_proof String
-  payment_verification payment_proof_enum [not null, default: 'pending']
-  bundling bundling_enum
-  paid_for_user Boolean
-  user user [not null]
+  payment_verification payment_verification_enum [not null, default: 'pending']
   event event [not null]
+  user user [not null]
 
   indexes {
     (user_id, event_id) [pk]
   }
 }
 
-Table team_member {
+Table event_staff {
+  event_id String [not null]
   user_id String [not null]
-  team_id String [not null]
-  role team_member_role_enum [not null]
-  kartu_id String
-  verification_error String
-  user user [not null]
-  team team [not null]
+  created_at DateTime
+  updated_at DateTime
+  user user_identity [not null]
+  event event [not null]
 
   indexes {
-    (user_id, team_id) [pk]
+    (event_id, user_id) [pk]
   }
 }
 
-Table user {
-  id String [pk]
-  email String [unique, not null]
-  full_name String [not null]
-  birth_date DateTime
-  pendidikan education_enum
-  nama_sekolah String
-  entry_source String
-  phone_number String
-  id_line String
-  id_discord String
-  id_instagram String
-  ktm_key String
-  twibbon_key String
-  jenis_kelamin jenis_kelamin_enum
-  is_registration_complete Boolean [not null, default: false]
-  created_at DateTime [default: `now()`, not null]
-  updated_at DateTime
-  uploaded media [not null]
-  identity user_identity
-  announcements event_announcement [not null]
-  member team_member [not null]
-  event_participant event_participant [not null]
+Table cache {
+  key String [pk]
+  value String [not null]
+  expiration Int [not null]
 }
 
-Table user_identity {
-  id String [pk]
-  email String [unique, not null]
-  provider user_identity_provider_enum [not null]
-  hash String
-  is_verified Boolean [not null, default: false]
-  verification_token String [not null]
-  verification_token_expiration DateTime [not null]
-  password_recovery_token String
-  password_recovery_token_expiration DateTime
-  refresh_token String
-  role user_identity_role_enum
-  created_at DateTime [default: `now()`, not null]
-  updated_at DateTime
-  user user [not null]
+Table cache_locks {
+  key String [pk]
+  owner String [not null]
+  expiration Int [not null]
 }
 
-Table sessions {
-  id String [pk]
-  expires DateTime [not null]
-  data Json [not null]
+Table failed_jobs {
+  id Int [pk, increment]
+  uuid String [unique, not null]
+  connection String [not null]
+  queue String [not null]
+  payload String [not null]
+  exception String [not null]
+  failed_at DateTime [default: `now()`, not null]
 }
 
-Enum education_enum {
+Table job_batches {
+  id String [pk]
+  name String [not null]
+  total_jobs Int [not null]
+  pending_jobs Int [not null]
+  failed_jobs Int [not null]
+  failed_job_ids String [not null]
+  options String
+  cancelled_at Int
+  created_at Int [not null]
+  finished_at Int
+}
+
+Table jobs {
+  id Int [pk, increment]
+  queue String [not null]
+  payload String [not null]
+  attempts Int [not null]
+  reserved_at Int
+  available_at Int [not null]
+  created_at Int [not null]
+}
+
+Table migrations {
+  id Int [pk, increment]
+  migration String [not null]
+  batch Int [not null]
+}
+
+Enum pendidikan_enum {
   sma
-  mahasiswa
-  lainnya
+  s1
+  d3
+  d4
 }
 
 Enum team_member_role_enum {
@@ -175,14 +256,16 @@ Enum user_identity_provider_enum {
   github
 }
 
-Enum payment_proof_enum {
+Enum payment_verification_enum {
   pending
   accepted
   rejected
 }
 
 Enum user_identity_role_enum {
-  admin
+  superadmin
+  admin_keuangan
+  panitia
   user
 }
 
@@ -214,26 +297,34 @@ Enum bundling_enum {
   day1_day2
 }
 
-Ref: event_announcement.event_id > event.id
-
-Ref: event_announcement.author_id > user.id
-
-Ref: competition_submission.team_id > team.id
-
-Ref: competition_submission.competition_id > event.id
-
-Ref: event_timeline.event_id > event.id
+Ref: user_identity.id - user.id
 
 Ref: media.uploader_id > user.id
 
+Ref: team.payment_proof_id > media.id
+
 Ref: team.competition_id > event.id
 
-Ref: event_participant.user_id > user.id
-
-Ref: event_participant.event_id > event.id
-
-Ref: team_member.user_id > user.id
+Ref: team_member.kartu_id > media.id
 
 Ref: team_member.team_id > team.id
 
-Ref: user_identity.id - user.id
+Ref: team_member.user_id > user.id
+
+Ref: event_timeline.event_id > event.id
+
+Ref: event_announcement.author_id > user.id
+
+Ref: event_announcement.event_id > event.id
+
+Ref: competition_submission.competition_id > event.id
+
+Ref: competition_submission.team_id > team.id
+
+Ref: event_participant.event_id > event.id
+
+Ref: event_participant.user_id > user.id
+
+Ref: event_staff.user_id > user_identity.id [delete: Cascade]
+
+Ref: event_staff.event_id > event.id [delete: Cascade]

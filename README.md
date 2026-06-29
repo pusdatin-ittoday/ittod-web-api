@@ -1,93 +1,174 @@
 # IT-TODAY Backend API
 
-A robust RESTful backend service for the IT-TODAY 2025 platform, built with **Node.js**, **Express.js**, **MySQL**, and **Prisma ORM**. This API manages user data, team registrations, competitions, and other functionalities for the IT-TODAY event.
+Backend REST API untuk platform IT-TODAY 2025. Aplikasi ini menangani autentikasi, data peserta, pendaftaran event dan kompetisi, pembayaran, serta penyimpanan berkas.
 
----
+## Teknologi
 
-## 🚀 Features
+- Node.js dan Express
+- MySQL dan Prisma ORM
+- Passport
+- Cloudflare R2
+- Nodemailer
 
-- User authentication and authorization
-- Team registration and management
-- Competition participation limits
-- Leader assignment and validation
-- Integration with Google OAuth2
-- Scalable database design with Prisma ORM
+## Prasyarat
 
----
+- Node.js 20 LTS atau versi yang lebih baru
+- npm
+- MySQL 8/MariaDB, atau XAMPP
+- Git
 
-## 🛠️ Tech Stack
+Frontend berjalan di `http://localhost:5173`, sedangkan backend menggunakan `http://localhost:3000`.
 
-- **Node.js**: Backend runtime
-- **Express.js**: Web framework
-- **MySQL**: Relational database
-- **Prisma ORM**: Database management
-- **Supabase**: Object storage
-- **Prettier**: Code formatting
-
----
-
-## 📦 Installation
-
-Follow these steps to set up the project locally:
-
-### 1. Clone the repository
+## Instalasi
 
 ```bash
 git clone https://github.com/pusdatin-ittoday/ittod-web-api.git
-```
-
-### 2. Navigate to the project directory
-
-```bash
 cd ittod-web-api
-```
-
-### 3. Install dependencies
-
-```bash
 npm install
 ```
 
-### 4. Configure environment variables
+## Konfigurasi environment
 
-Create a `.env` file in the project root and add the following variables:
+Salin template environment:
 
-```env
-DATABASE_URL=mysql://<username>:<password>@<host>:<port>/<database>
-SECRET_KEY_SESSION=<your_secret_key>
-GOOGLE_CLIENT_SECRET=<your_google_client_secret>
-GOOGLE_CLIENT_ID=<your_google_client_id>
-GOOGLE_REDIRECT=<your_google_redirect_url>
+PowerShell:
+
+```powershell
+Copy-Item .env.example .env
 ```
 
-### 5. Set up the database
-
-Run the following Prisma commands to configure the database:
+Bash:
 
 ```bash
-npx prisma generate       # Generate the Prisma client
-npx prisma migrate dev    # Apply migrations and create the database
-# Or, if not using migrations:
-npx prisma db push        # Push the schema to the database
+cp .env.example .env
 ```
 
----
+Isi `.env`:
 
-## 🧪 Usage
+```env
+NODE_ENV=development
+PORT=3000
 
-### Start the development server
+DATABASE_URL=mysql://root:@localhost:3306/ittoday
+SECRET_KEY_SESSION=ganti-dengan-random-string-yang-panjang
+
+APP_BASE_URL=http://localhost:3000
+APP_FRONTEND_URL=http://localhost:5173
+FRONTEND_URL=http://localhost:5173
+
+GOOGLE_CLIENT_ID=ganti-dengan-google-client-id
+GOOGLE_CLIENT_SECRET=ganti-dengan-google-client-secret
+GOOGLE_REDIRECT=http://localhost:3000/api/auth/google/redirect
+
+EMAIL_HOST=smtp.example.com
+EMAIL_PORT=587
+EMAIL_USER=ganti-dengan-email-user
+EMAIL_PASS=ganti-dengan-email-password
+EMAIL_SENDER="IT Today <no-reply@example.com>"
+SUPPORT_EMAIL=support@example.com
+
+R2_LINK=https://account-id.r2.cloudflarestorage.com
+R2_ACCESS_KEY_ID=ganti-dengan-r2-access-key-id
+R2_SECRET_ACCESS_KEY=ganti-dengan-r2-secret-access-key
+R2_BUCKET_NAME=ittoday
+R2_PUBLIC=https://public-r2-domain.example.com
+```
+
+| Variabel | Kegunaan |
+| --- | --- |
+| `NODE_ENV` | Mode aplikasi: `development` atau `production`. |
+| `PORT` | Port HTTP backend. |
+| `DATABASE_URL` | Connection string MySQL untuk Prisma. |
+| `SECRET_KEY_SESSION` | Secret session/cookie. Gunakan nilai acak yang panjang. |
+| `APP_BASE_URL` | URL publik backend. |
+| `APP_FRONTEND_URL` | URL frontend untuk verifikasi email dan reset password. |
+| `FRONTEND_URL` | URL redirect setelah Google OAuth. |
+| `GOOGLE_*` | Credential dan callback Google OAuth. |
+| `EMAIL_*` | Konfigurasi SMTP. |
+| `SUPPORT_EMAIL` | Alamat support pada email otomatis. |
+| `R2_*` | Konfigurasi bucket Cloudflare R2. |
+
+Jangan commit file `.env`. Hanya `.env.example` tanpa secret asli yang boleh masuk repository.
+
+Google OAuth, email, dan upload R2 memerlukan credential development milik tim. Jangan menggunakan credential production di environment lokal.
+
+## Setup database lokal
+
+### Menggunakan XAMPP
+
+1. Buka XAMPP Control Panel.
+2. Jalankan MySQL. Apache hanya diperlukan jika ingin memakai phpMyAdmin.
+3. Buka `http://localhost/phpmyadmin`.
+4. Buat database bernama `ittoday`.
+5. Pastikan `DATABASE_URL` sesuai dengan user, password, dan port MySQL.
+
+XAMPP default memakai user `root` tanpa password:
+
+```env
+DATABASE_URL=mysql://root:@localhost:3306/ittoday
+```
+
+Jika user `root` memiliki password:
+
+```env
+DATABASE_URL=mysql://root:PASSWORD_KAMU@localhost:3306/ittoday
+```
+
+Lakukan URL encoding jika password mengandung karakter khusus seperti `@`, `:`, `/`, atau `#`.
+
+### Menjalankan migrasi
+
+Untuk development:
+
+```bash
+npx prisma generate
+npx prisma migrate dev
+```
+
+Untuk deployment/CI:
+
+```bash
+npx prisma migrate deploy
+```
+
+## Menjalankan aplikasi
+
+Development dengan auto-reload:
 
 ```bash
 npm run dev
 ```
 
-### Start the production server
+Menjalankan tanpa auto-reload:
 
 ```bash
 npm run serve
 ```
 
-Access the API at: `http://localhost:3000`
+Cek `http://localhost:3000`. Endpoint root akan menampilkan `OK` jika backend berhasil berjalan.
+
+## Menjalankan bersama frontend
+
+Biarkan terminal backend tetap berjalan. Buka terminal lain:
+
+```bash
+cd ../ittod-web-frontend
+npm install
+npm run dev
+```
+
+Buka `http://localhost:5173`.
+
+## Perintah npm
+
+| Perintah | Kegunaan |
+| --- | --- |
+| `npm run dev` | Menjalankan server dengan Nodemon. |
+| `npm run serve` | Menjalankan server menggunakan Node.js. |
+| `npm run format` | Memformat project dengan Prettier. |
+| `npm audit` | Memeriksa vulnerability dependency. |
+
+Project belum memiliki automated test suite.
 
 ---
 
@@ -133,6 +214,42 @@ Access the API at: `http://localhost:3000`
 - **Ilham Edgar Maulana Goesasi**
 - **Jeremy Tjahjana**
 - **Daffa Aulia M S**
+
+---
+
+## Troubleshooting
+
+### Prisma `P1001`
+
+Backend tidak dapat menjangkau MySQL. Pastikan MySQL aktif dan port pada `DATABASE_URL` benar:
+
+```powershell
+Test-NetConnection localhost -Port 3306
+```
+
+### Prisma `P1000`
+
+Username atau password MySQL salah. Sesuaikan credential pada `DATABASE_URL`.
+
+### Akun testing belum terverifikasi
+
+Jika SMTP development belum tersedia, akun khusus testing lokal dapat diverifikasi melalui database:
+
+```sql
+UPDATE user_identity
+SET is_verified = 1
+WHERE email = 'test@localhost.com';
+```
+
+Jangan melakukan langkah ini pada database production.
+
+### Frontend gagal memanggil API
+
+Pastikan backend berjalan di `http://localhost:3000`, frontend berjalan di `http://localhost:5173`, dan frontend memakai:
+
+```env
+VITE_API_BASE_URL=http://localhost:3000
+```
 
 ---
 
