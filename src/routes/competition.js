@@ -12,6 +12,10 @@ const { validateFile } = require("../middleware/imageValidator");
 const {
     upsertSubmissionController,
 } = require("../controllers/submission.controller");
+const { validateRequest } = require("../middleware/joiMiddleware");
+const competitionSubmissionSchema = require(
+    "../validators/competitionSubmissionValidationSchema"
+);
 
 const images = multer({
     storage: multer.memoryStorage(),
@@ -46,6 +50,7 @@ compeRouter.post(
 compeRouter.put(
     "/api/competition/submission",
     isAuthenticated,
+    validateRequest(competitionSubmissionSchema),
     upsertSubmissionController
 );
 

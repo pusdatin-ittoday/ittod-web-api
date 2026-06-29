@@ -8,6 +8,13 @@ const upsertTeamSubmission = async (team_id, submission_object) => {
                 select: { competition_id: true },
             });
 
+            if (!team) {
+                throw {
+                    status: 404,
+                    message: "Team not found",
+                };
+            }
+
             await tx.competition_submission.upsert({
                 where: {
                     team_id_competition_id: {
@@ -24,9 +31,12 @@ const upsertTeamSubmission = async (team_id, submission_object) => {
             });
         });
 
-        return { message: "Submitted Successfuly" };
+        return { message: "Submitted Successfully" };
     } catch (error) {
         console.error("Submission error:", error);
+        if (error.status) {
+            throw error;
+        }
         throw { status: 500, message: "Submission Failed" };
     }
 };
