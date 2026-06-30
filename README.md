@@ -5,7 +5,9 @@ Backend REST API untuk platform IT-TODAY 2025. Aplikasi ini menangani autentikas
 ## Teknologi
 
 - Node.js dan Express
-- MySQL dan Prisma ORM
+- SQLite (shared dengan Laravel Admin Dashboard)
+- Prisma ORM
+- bcryptjs (compatible dengan Laravel)
 - Passport
 - Cloudflare R2
 - Nodemailer
@@ -49,12 +51,17 @@ Isi `.env`:
 NODE_ENV=development
 PORT=3000
 
-DATABASE_URL=mysql://root:@localhost:3306/ittoday
+# Shared SQLite database dengan Laravel Admin Dashboard
+# Path harus sesuai dengan lokasi database Laravel
+DATABASE_URL="file:d:/ittod-web/dashboard-ittod-admin/database/database.sqlite"
 SECRET_KEY_SESSION=ganti-dengan-random-string-yang-panjang
 
 APP_BASE_URL=http://localhost:3000
 APP_FRONTEND_URL=http://localhost:5173
 FRONTEND_URL=http://localhost:5173
+
+# CORS origins (development)
+CORS_ORIGINS=http://localhost:5173
 
 GOOGLE_CLIENT_ID=ganti-dengan-google-client-id
 GOOGLE_CLIENT_SECRET=ganti-dengan-google-client-secret
