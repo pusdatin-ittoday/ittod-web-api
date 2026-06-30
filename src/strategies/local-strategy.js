@@ -3,7 +3,7 @@
 const prisma = require("../prisma.js");
 const passport = require("passport");
 const { Strategy: LocalStrategy } = require("passport-local");
-const bcrypt = require("bcrypt");
+const bcrypt = require("bcryptjs");
 
 passport.serializeUser((user, done) => {
     done(null, user.id);
