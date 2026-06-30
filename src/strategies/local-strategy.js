@@ -3,7 +3,7 @@
 const prisma = require("../prisma.js");
 const passport = require("passport");
 const { Strategy: LocalStrategy } = require("passport-local");
-const argon2 = require("argon2");
+const bcrypt = require("bcrypt");
 
 passport.serializeUser((user, done) => {
     done(null, user.id);
@@ -61,7 +61,7 @@ passport.use(
                 }
 
                 // Verify password
-                const valid = await argon2.verify(user.hash, password);
+                const valid = await bcrypt.compare(password, user.hash);
                 if (!valid) {
                     return done(null, false, {
                         message: "Invalid email or password",
