@@ -44,6 +44,19 @@ Table user_identity {
   updated_at DateTime
   event_staff event_staff [not null]
   user user [not null]
+  notifications notification [not null]
+}
+
+Table notification {
+  id String [pk]
+  user_id String [not null]
+  title String [not null]
+  message String [not null]
+  type notification_type_enum [not null, default: 'info']
+  is_read Int [not null, default: 0]
+  related_id String
+  created_at DateTime [default: `now()`, not null]
+  user user_identity [not null]
 }
 
 Table password_reset_tokens {
@@ -239,6 +252,13 @@ Table migrations {
   batch Int [not null]
 }
 
+Enum notification_type_enum {
+  info
+  success
+  warning
+  error
+}
+
 Enum pendidikan_enum {
   sma
   s1
@@ -299,6 +319,8 @@ Enum bundling_enum {
 }
 
 Ref: user_identity.id - user.id
+
+Ref: notification.user_id > user_identity.id [delete: Cascade]
 
 Ref: media.uploader_id > user.id
 

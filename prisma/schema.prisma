@@ -57,8 +57,30 @@ model user_identity {
   updated_at                         DateTime?
   event_staff                        event_staff[]
   user                               user                        @relation(fields: [id], references: [id])
+  notifications                      notification[]
 
   @@map("user_identity")
+}
+
+model notification {
+  id          String   @id
+  user_id     String
+  title       String
+  message     String
+  type        notification_type_enum @default(info)
+  is_read     Int      @default(0)
+  related_id  String?
+  created_at  DateTime @default(now())
+  user        user_identity @relation(fields: [user_id], references: [id], onDelete: Cascade)
+
+  @@map("notification")
+}
+
+enum notification_type_enum {
+  info
+  success
+  warning
+  error
 }
 
 model password_reset_tokens {
