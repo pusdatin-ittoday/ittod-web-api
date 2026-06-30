@@ -22,7 +22,8 @@ const getCompetitionData = async (req, res) => {
                 },
                 members: {
                     select: {
-                        role: true, // Include the role column
+                        role: true,
+                        verification_error: true, // Include verification error for members
                         user: {
                             select: {
                                 full_name: true,
@@ -48,6 +49,7 @@ const getCompetitionData = async (req, res) => {
                     fullName: member.user.full_name,
                     isRegistrationComplete:
                         member.user.is_registration_complete,
+                    verificationError: member.verification_error, // Include member's verification error
                 })),
         }));
 
@@ -83,7 +85,8 @@ const getUserCompetitionData = async (req, res) => {
                 },
                 members: {
                     select: {
-                        role: true, // Include the role column
+                        role: true,
+                        verification_error: true, // Include verification error for members
                         user: {
                             select: {
                                 full_name: true,
@@ -109,6 +112,7 @@ const getUserCompetitionData = async (req, res) => {
                     fullName: member.user.full_name,
                     isRegistrationComplete:
                         member.user.is_registration_complete,
+                    verificationError: member.verification_error, // Include member's verification error
                 })),
         }));
 
