@@ -221,34 +221,13 @@ Project belum memiliki automated test suite.
 - **Ilham Edgar Maulana Goesasi**
 - **Jeremy Tjahjana**
 - **Daffa Aulia M S**
+- **Azka Julian P.W**
+- **Julius Calvin kurniadi**
+- **Adityo Cahyo**
 
 ---
 
 ## Troubleshooting
-
-### Prisma `P1001`
-
-Backend tidak dapat menjangkau MySQL. Pastikan MySQL aktif dan port pada `DATABASE_URL` benar:
-
-```powershell
-Test-NetConnection localhost -Port 3306
-```
-
-### Prisma `P1000`
-
-Username atau password MySQL salah. Sesuaikan credential pada `DATABASE_URL`.
-
-### Akun testing belum terverifikasi
-
-Jika SMTP development belum tersedia, akun khusus testing lokal dapat diverifikasi melalui database:
-
-```sql
-UPDATE user_identity
-SET is_verified = 1
-WHERE email = 'test@localhost.com';
-```
-
-Jangan melakukan langkah ini pada database production.
 
 ### Frontend gagal memanggil API
 
