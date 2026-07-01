@@ -95,6 +95,22 @@ R2_PUBLIC=https://public-r2-domain.example.com
 | `SUPPORT_EMAIL` | Alamat support pada email otomatis. |
 | `R2_*` | Konfigurasi bucket Cloudflare R2. |
 
+### Panduan Mendapatkan Credential
+
+**`SECRET_KEY_SESSION`**:
+Secret key untuk enkripsi session. Gunakan string acak yang panjang. Anda bisa men-generate-nya di terminal dengan perintah:
+```bash
+node -e "console.log(require('crypto').randomBytes(32).toString('hex'))"
+```
+
+**Cloudflare R2 (`R2_*`)**:
+Credential ini digunakan untuk penyimpanan file.
+1. Buka Cloudflare Dashboard > **R2**.
+2. **`R2_LINK`**: Pada halaman utama R2, lihat bagian **Account Details** di kanan. Salin **S3 API URL** (format: `https://<ACCOUNT_ID>.r2.cloudflarestorage.com`).
+3. **`R2_ACCESS_KEY_ID` & `R2_SECRET_ACCESS_KEY`**: Klik **Manage R2 API Tokens** di sebelah kanan atas > **Create API token** (berikan izin Object Read & Write). Salin nilainya.
+4. **`R2_BUCKET_NAME`**: Nama bucket yang Anda buat (misalnya `ittoday`).
+5. **`R2_PUBLIC`**: Klik nama bucket Anda > tab **Settings** > **Public Access**. Anda bisa mengaktifkan **R2.dev subdomain** (contoh: `https://pub-<random>.r2.dev`) atau menghubungkan **Custom Domain**. Gunakan URL publik tersebut.
+
 Jangan commit file `.env`. Hanya `.env.example` tanpa secret asli yang boleh masuk repository.
 
 Google OAuth, email, dan upload R2 memerlukan credential development milik tim. Jangan menggunakan credential production di environment lokal.
