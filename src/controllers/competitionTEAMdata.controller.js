@@ -81,9 +81,12 @@ const getUserCompetitionData = async (req, res) => {
                 payment_proof_id: true,
                 competition: {
                     select: {
+                        id: true,
                         title: true,
+                        requires_submission: true,
                     },
                 },
+                submissions: true,
                 members: {
                     select: {
                         role: true,
@@ -107,7 +110,10 @@ const getUserCompetitionData = async (req, res) => {
             isDocumentVerified: team.is_document_verified,
             paymentProofID: team.payment_proof_id,
             verificationError: team.verification_error,
+            competitionId: team.competition?.id,
             competitionName: team.competition?.title ?? "N/A",
+            requiresSubmission: team.competition?.requires_submission ?? false,
+            submissionData: team.submissions?.length > 0 ? team.submissions[0] : null,
             members: team.members
                 .sort((a, b) => (a.role === "leader" ? -1 : 1)) // Sort leader to the top
                 .map(member => ({

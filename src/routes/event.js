@@ -21,7 +21,15 @@ const images = multer({
     },
 });
 
+const {
+    getEventsController,
+    getEventByIdController,
+} = require("../controllers/event-public.controller");
+
 const eventRouter = Router();
+
+eventRouter.get("/api/events", getEventsController);
+eventRouter.get("/api/events/:id", getEventByIdController);
 
 eventRouter.post(
     "/api/event/join",

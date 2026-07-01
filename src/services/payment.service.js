@@ -1,7 +1,7 @@
 const prisma = require("../prisma.js");
 const { uploadFileToR2 } = require("./r2.service");
 
-const uploadPaymentCompetition = async ({ team_id, payment_proof }) => {
+const uploadPaymentCompetition = async ({ team_id, payment_proof, user_id }) => {
     const team = await prisma.team.findUnique({
         where: { id: team_id },
     });
@@ -20,9 +20,19 @@ const uploadPaymentCompetition = async ({ team_id, payment_proof }) => {
             if (payment_proof) {
                 try {
                     const { buffer, originalname, mimetype } = payment_proof;
-                    payment_proof_key = (
-                        await uploadFileToR2(buffer, originalname, mimetype)
-                    ).key;
+                    const r2Result = await uploadFileToR2(buffer, originalname, mimetype);
+                    payment_proof_key = r2Result.key;
+
+                    await tx.media.create({
+                        data: {
+                            id: payment_proof_key,
+                            uploader_id: user_id,
+                            name: payment_proof_key,
+                            grouping: "payments",
+                            type: mimetype.includes("pdf") ? "pdf" : "image",
+                            url: r2Result.url
+                        }
+                    });
                 } catch (uploadError) {
                     console.error("Payment_Proof upload failed:", uploadError);
                     throw {

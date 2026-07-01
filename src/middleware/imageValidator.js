@@ -1,6 +1,4 @@
 const path = require("path");
-const { fromBuffer } = require("file-type");
-
 const validateOptionalFile = async (req, res, next) => {
     if (!req.file) return next();
     const file = req.file;
@@ -12,7 +10,8 @@ const validateOptionalFile = async (req, res, next) => {
         return res.status(400).json({ message: "Invalid file extension" });
     }
     // 2. Verify magic number
-    const detected = await fromBuffer(file.buffer);
+    const { fileTypeFromBuffer } = await import("file-type");
+    const detected = await fileTypeFromBuffer(file.buffer);
     if (!detected || !["image/png", "image/jpeg"].includes(detected.mime)) {
         return res.status(400).json({ message: "Invalid file content" });
     }
