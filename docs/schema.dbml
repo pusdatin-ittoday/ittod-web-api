@@ -84,6 +84,7 @@ Table event {
   contact_person1 String [not null]
   contact_person2 String
   max_noncompetition_participant Int
+  is_active Boolean [not null, default: true]
   requires_submission Boolean [not null, default: false]
   submissions competition_submission [not null]
   announcements event_announcement [not null]
@@ -113,8 +114,8 @@ Table team {
   team_name String [not null]
   team_code String [unique, not null]
   max_member Int [not null, default: 3]
-  is_document_verified Int [not null, default: 0]
-  is_verified Int [not null, default: 0]
+  is_document_verified document_verification_enum [not null, default: 'pending']
+  is_verified document_verification_enum [not null, default: 'pending']
   verification_error String
   created_at DateTime [default: `now()`, not null]
   updated_at DateTime
@@ -280,6 +281,12 @@ Enum user_identity_provider_enum {
 Enum payment_verification_enum {
   pending
   accepted
+  rejected
+}
+
+Enum document_verification_enum {
+  pending
+  approved
   rejected
 }
 

@@ -78,7 +78,7 @@ exports.registerUserIntoBootcamp = async ({
                          JOIN team t ON tm.team_id = t.id
                 WHERE tm.user_id = ${user_id}
                   AND t.competition_id = 'minetoday'
-                  AND t.is_verified = 1
+                  AND t.is_verified = 'approved'
             `;
             const isMinetod = isMinetodArr.length > 0;
 

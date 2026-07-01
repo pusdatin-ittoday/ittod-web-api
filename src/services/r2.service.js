@@ -14,7 +14,7 @@ async function uploadFileToR2(fileBuffer, originalName, mimeType) {
 
     const command = new PutObjectCommand({
         Bucket: process.env.R2_BUCKET_NAME || "ittoday",
-        Key: uniqueName,
+        Key: fileKey,
         Body: fileBuffer,
         ContentType: mimeType,
     });
@@ -22,7 +22,7 @@ async function uploadFileToR2(fileBuffer, originalName, mimeType) {
     try {
         await r2.send(command);
         const fileUrl = `${process.env.R2_PUBLIC}/${fileKey}`;
-        return { key: uniqueName, url: fileUrl };
+        return { key: fileKey, url: fileUrl };
     } catch (err) {
         console.error("R2 Upload Failed:", err);
         throw err;

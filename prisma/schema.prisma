@@ -9,7 +9,7 @@ generator dbml {
 }
 
 datasource db {
-  provider = "sqlite"
+  provider = "mysql"
   url      = env("DATABASE_URL")
 }
 
@@ -114,7 +114,7 @@ model event {
   contact_person1                String
   contact_person2                String?
   max_noncompetition_participant Int?
-  is_active                      Unsupported("tinyint(1)") @default(dbgenerated("'1'"))
+  is_active                      Boolean                  @default(true)
   requires_submission            Boolean                  @default(false)
   submissions                    competition_submission[]
   announcements                  event_announcement[]
@@ -148,8 +148,8 @@ model team {
   team_name            String
   team_code            String                   @unique(map: "team_team_code_unique")
   max_member           Int                      @default(3)
-  is_document_verified Int                      @default(0)
-  is_verified          Int                      @default(0)
+  is_document_verified document_verification_enum @default(pending)
+  is_verified          document_verification_enum @default(pending)
   verification_error   String?
   created_at           DateTime                 @default(now())
   updated_at           DateTime?
@@ -316,6 +316,12 @@ enum user_identity_provider_enum {
 enum payment_verification_enum {
   pending
   accepted
+  rejected
+}
+
+enum document_verification_enum {
+  pending
+  approved
   rejected
 }
 

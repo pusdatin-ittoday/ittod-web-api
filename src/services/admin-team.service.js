@@ -207,14 +207,14 @@ const verifyTeam = async teamId => {
             throw { status: 404, message: "Team not found" };
         }
 
-        if (team.is_verified) {
+        if (team.is_verified === 'approved') {
             throw { status: 400, message: "Team is already verified" };
         }
 
         const updatedTeam = await prisma.team.update({
             where: { id: teamId },
             data: {
-                is_verified: true,
+                is_verified: 'approved',
                 verification_error: null,
             },
             select: {
@@ -250,7 +250,7 @@ const rejectTeam = async (teamId, reason) => {
         const updatedTeam = await prisma.team.update({
             where: { id: teamId },
             data: {
-                is_verified: false,
+                is_verified: 'rejected',
                 verification_error:
                     reason && reason.trim() !== ""
                         ? reason.trim()

@@ -25,13 +25,11 @@ const images = multer({
 }); // Use memory storage for Buffer
 const compeRouter = Router();
 
-/*
 compeRouter.post(
     "/api/competition/register",
     isAuthenticated,
     registerCompetition
 );
-*/
 
 compeRouter.post(
     "/api/competition/join",

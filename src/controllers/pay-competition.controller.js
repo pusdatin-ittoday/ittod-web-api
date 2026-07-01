@@ -17,6 +17,7 @@ const uploadPaymentController = async (req, res) => {
         const result = await uploadPaymentCompetition({
             team_id,
             payment_proof,
+            user_id: req.user.id,
         });
         res.status(200).json(result);
     } catch (error) {
