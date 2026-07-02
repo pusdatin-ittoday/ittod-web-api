@@ -139,20 +139,35 @@ DATABASE_URL=mysql://root:PASSWORD_KAMU@localhost:3306/ittoday
 
 Lakukan URL encoding jika password mengandung karakter khusus seperti `@`, `:`, `/`, atau `#`.
 
-### Menjalankan migrasi
+### Sinkronisasi schema database
 
-Untuk development:
+Repo Laravel Admin Dashboard menjadi sumber utama perubahan schema database.
+Jangan membuat migration atau mengubah schema database dari repo web-api.
+
+#### Repo Laravel
+
+Developer hanya membuat dan menjalankan migration dari repo Laravel:
 
 ```bash
+php artisan make:migration nama_migration
+php artisan migrate
+git push
+```
+
+#### Repo Express
+
+Ketika schema database berubah, jalankan perintah berikut di repo web-api:
+
+```bash
+# Ambil struktur database terbaru ke prisma/schema.prisma
+npx prisma db pull
+
+# Generate ulang Prisma Client
 npx prisma generate
-npx prisma migrate dev
 ```
 
-Untuk deployment/CI:
-
-```bash
-npx prisma migrate deploy
-```
+Commit perubahan `prisma/schema.prisma` jika file tersebut berubah dan memang
+dilacak oleh Git.
 
 ## Menjalankan aplikasi
 

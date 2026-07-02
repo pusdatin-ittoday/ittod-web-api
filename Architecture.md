@@ -35,3 +35,12 @@ The backend serves as the core API for the user-facing web platform. It handles 
 3. **Dynamic Configuration**:
    - The backend connects directly to the shared central MySQL database (managed by the Admin Dashboard) to read from tables like `event`, `event_timeline`, and `event_announcement`.
    - Instead of static configurations, the backend provides dynamic event status (such as `is_active` and `requires_submission` flags) so the frontend can accurately display available registrations based on the database state.
+4. **Competition Participation Types**:
+   - Each competition exposes `participation_type` with either `individual` or `team`.
+   - User competition dashboard responses include `participationType` so the frontend can distinguish internal one-member records from real teams.
+   - Team competitions require a participant-provided team name and retain the one-team-leadership rule.
+   - Individual competitions do not require a team name. The API creates an internal one-member team record (`max_member = 1`) so existing competition, payment, and submission relations remain compatible.
+   - Duplicate registration for the same user and competition is rejected.
+5. **Database Schema Ownership**:
+   - Laravel Admin is the source of truth for database migrations.
+   - After a Laravel migration changes the shared schema, the API synchronizes Prisma with `npx prisma db pull` followed by `npx prisma generate`.

@@ -2,16 +2,12 @@ const compService = require("../services/competition.service.js");
 
 exports.registerCompetition = async (req, res) => {
     try {
-        // Validate required fields
         const { competition_id, team_name } = req.body;
-        if (!competition_id || !team_name) {
+        if (!competition_id) {
             return res.status(400).json({
                 error: "Missing required fields",
                 details: {
-                    competition_id: competition_id
-                        ? undefined
-                        : "Competition ID is required",
-                    team_name: team_name ? undefined : "Team name is required",
+                    competition_id: "Competition ID is required",
                 },
             });
         }

@@ -85,6 +85,7 @@ const getUserCompetitionData = async (req, res) => {
                     select: {
                         id: true,
                         title: true,
+                        participation_type: true,
                         requires_submission: true,
                         participation_type: true,
                     },
@@ -115,6 +116,8 @@ const getUserCompetitionData = async (req, res) => {
             verificationError: team.verification_error,
             competitionId: team.competition?.id,
             competitionName: team.competition?.title ?? "N/A",
+            participationType:
+                team.competition?.participation_type ?? "team",
             requiresSubmission: team.competition?.requires_submission ?? false,
             participationType: team.competition?.participation_type ?? "team",
             submissionData: team.submissions?.length > 0 ? team.submissions[0] : null,
