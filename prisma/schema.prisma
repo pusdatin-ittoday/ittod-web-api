@@ -169,6 +169,7 @@ model team_member {
   user_id            String
   team_id            String
   role               team_member_role_enum
+  is_verified        Boolean               @default(false)
   verification_error String?
   kartu_id           String?
   kartu              media?                @relation(fields: [kartu_id], references: [id])

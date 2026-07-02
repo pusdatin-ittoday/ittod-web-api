@@ -41,6 +41,7 @@ The backend serves as the core API for the user-facing web platform. It handles 
    - Team competitions require a participant-provided team name and retain the one-team-leadership rule.
    - Individual competitions do not require a team name. The API creates an internal one-member team record (`max_member = 1`) so existing competition, payment, and submission relations remain compatible.
    - Duplicate registration for the same user and competition is rejected.
+   - `team_member.is_verified` stores each member's document-verification result from the Laravel-managed database.
 5. **Database Schema Ownership**:
    - Laravel Admin is the source of truth for database migrations.
    - After a Laravel migration changes the shared schema, the API synchronizes Prisma with `npx prisma db pull` followed by `npx prisma generate`.

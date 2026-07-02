@@ -133,6 +133,7 @@ Table team_member {
   user_id String [not null]
   team_id String [not null]
   role team_member_role_enum [not null]
+  is_verified Boolean [not null, default: false]
   verification_error String
   kartu_id String
   kartu media
