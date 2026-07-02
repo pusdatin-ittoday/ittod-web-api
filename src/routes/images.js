@@ -13,8 +13,11 @@ const {
 } = require("../middleware/getImageFromR2Validator");
 
 uploadRouter.get(
-    "/api/images/:key",
-    isAuthenticated,
+    /^\/api\/images\/(.*)$/,
+    (req, res, next) => {
+        req.params.key = req.params[0];
+        next();
+    },
     getImageFromR2Validator,
     getFileFromBucket
 );

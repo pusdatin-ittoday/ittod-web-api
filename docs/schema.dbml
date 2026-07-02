@@ -77,15 +77,18 @@ Table sessions {
 Table event {
   id String [pk]
   title String [not null]
-  description String [not null]
-  guide_book_url String [not null]
+  description String
+  guide_book_url String
   type event_type_enum [not null]
+  participation_type String [not null, default: 'team']
   price Int [not null, default: 0]
-  contact_person1 String [not null]
+  contact_person1 String
   contact_person2 String
   max_noncompetition_participant Int
   is_active Boolean [not null, default: true]
   requires_submission Boolean [not null, default: false]
+  whatsapp_group_link String
+  logo_url String
   submissions competition_submission [not null]
   announcements event_announcement [not null]
   participants event_participant [not null]

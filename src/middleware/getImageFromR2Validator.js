@@ -1,9 +1,8 @@
 const getImageFromR2Validator = (req, res, next) => {
     const key = req.params.key;
-    const validKeyPattern = /^[a-zA-Z0-9_-]+(\.[a-zA-Z0-9_-]+)+$/;
+    const validKeyPattern = /^[a-zA-Z0-9_\-\/]+(\.[a-zA-Z0-9_-]+)+$/;
     if (
         !key ||
-        key.includes("/") ||
         key.includes("..") ||
         !validKeyPattern.test(key)
     ) {
