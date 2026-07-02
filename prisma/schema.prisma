@@ -107,16 +107,18 @@ model sessions {
 model event {
   id                             String                    @id
   title                          String
-  description                    String
-  guide_book_url                 String
+  description                    String?
+  guide_book_url                 String?
   type                           event_type_enum
   participation_type             participation_type_enum   @default(team)
   price                          Int                       @default(0)
-  contact_person1                String
+  contact_person1                String?    
   contact_person2                String?
   max_noncompetition_participant Int?
   is_active                      Boolean                  @default(true)
   requires_submission            Boolean                  @default(false)
+  whatsapp_group_link            String?
+  logo_url                       String?
   submissions                    competition_submission[]
   announcements                  event_announcement[]
   participants                   event_participant[]
