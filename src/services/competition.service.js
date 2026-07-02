@@ -9,14 +9,57 @@ exports.registerTeamThenInsertLeader = async ({
     team_name,
     leader_id,
 }) => {
-    const existingLeader = await prisma.team_member.findFirst({
+    const competitionExists = await prisma.event.findFirst({
+        where: { id: competition_id, type: "competition" },
+    });
+    if (!competitionExists)
+        throw { status: 404, message: "competition_id not found" };
+
+    const leaderExists = await prisma.user.findUnique({
+        where: { id: leader_id },
+    });
+    if (!leaderExists) throw { status: 404, message: "Leader ID not found" };
+
+    const isIndividual =
+        competitionExists.participation_type === "individual";
+    const submittedTeamName =
+        typeof team_name === "string" ? team_name.trim() : "";
+
+    if (!isIndividual && !submittedTeamName) {
+        throw { status: 400, message: "Team name is required" };
+    }
+
+    const existingRegistration = await prisma.team_member.findFirst({
         where: {
             user_id: leader_id,
-            role: "leader",
+            team: {
+                competition_id,
+            },
         },
     });
 
-    if (existingLeader) {
+    if (existingRegistration) {
+        throw {
+            status: 409,
+            message: "You are already registered for this competition",
+        };
+    }
+
+    const existingTeamLeadership = !isIndividual
+        ? await prisma.team_member.findFirst({
+              where: {
+                  user_id: leader_id,
+                  role: "leader",
+                  team: {
+                      competition: {
+                          participation_type: "team",
+                      },
+                  },
+              },
+          })
+        : null;
+
+    if (existingTeamLeadership) {
         throw {
             status: 403,
             message: "You can only register one team as a leader",
@@ -24,6 +67,9 @@ exports.registerTeamThenInsertLeader = async ({
     }
     await checkUserCompetitionLimit(prisma, leader_id);
     const random_id = crypto.randomUUID();
+    const resolvedTeamName = isIndividual
+        ? `${leaderExists.full_name} - ${competitionExists.title} - ${random_id.slice(0, 8)}`
+        : submittedTeamName;
     const MAX_RETRIES = 10;
     let retryCount = 0;
     let team_code;
@@ -43,19 +89,10 @@ exports.registerTeamThenInsertLeader = async ({
         }
     } while (existingTeamWithCode);
 
-    const competitionExists = await prisma.event.findFirst({
-        where: { id: competition_id, type: "competition" },
+    const teamExists = await prisma.team.findFirst({
+        where: { team_name: resolvedTeamName },
     });
-    if (!competitionExists)
-        throw { status: 404, message: "competition_id not found" };
-
-    const teamExists = await prisma.team.findFirst({ where: { team_name } });
     if (teamExists) throw { status: 409, message: "Team name already exists" };
-
-    const leaderExists = await prisma.user.findUnique({
-        where: { id: leader_id },
-    });
-    if (!leaderExists) throw { status: 404, message: "Leader ID not found" };
 
     try {
         await prisma.$transaction(async tx => {
@@ -64,8 +101,9 @@ exports.registerTeamThenInsertLeader = async ({
                 data: {
                     id: random_id,
                     competition_id,
-                    team_name,
+                    team_name: resolvedTeamName,
                     team_code,
+                    ...(isIndividual ? { max_member: 1 } : {}),
                 },
             });
             // Add the leader to the team
@@ -78,7 +116,12 @@ exports.registerTeamThenInsertLeader = async ({
             });
         });
 
-        return { message: "Team successfully registered and leader assigned" };
+        return {
+            message: isIndividual
+                ? "Individual participant successfully registered"
+                : "Team successfully registered and leader assigned",
+            participation_type: competitionExists.participation_type,
+        };
     } catch (error) {
         console.error("Registration error:", error);
         throw { status: 500, message: "Failed to register team" };

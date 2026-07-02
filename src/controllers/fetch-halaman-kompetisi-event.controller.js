@@ -14,6 +14,7 @@ const fetchHalamanKompetisiEvent = async (req, res) => {
                 description: true,
                 guide_book_url: true,
                 type: true,
+                participation_type: true,
                 contact_person1: true,
                 contact_person2: true,
                 max_noncompetition_participant: true,

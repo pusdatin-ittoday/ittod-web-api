@@ -80,6 +80,7 @@ Table event {
   description String [not null]
   guide_book_url String [not null]
   type event_type_enum [not null]
+  participation_type participation_type_enum [not null, default: 'team']
   price Int [not null, default: 0]
   contact_person1 String [not null]
   contact_person2 String
@@ -312,6 +313,11 @@ Enum media_type_enum {
 Enum event_type_enum {
   competition
   non_competition
+}
+
+Enum participation_type_enum {
+  individual
+  team
 }
 
 Enum jenis_kelamin_enum {
