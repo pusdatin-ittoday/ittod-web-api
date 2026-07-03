@@ -7,7 +7,7 @@ exports.registerUserIntoBootcamp = async ({
     phone_number,
     bundling,
 }) => {
-    if (event_id !== "bootcamp") {
+    if (event_id.toLowerCase() !== "bootcamp") {
         throw {
             status: 400,
             message: "Bootcamp only!",
@@ -41,7 +41,10 @@ exports.registerUserIntoBootcamp = async ({
             const lockedEvent = lockedEventArr[0] || {};
 
             const eventParticipantCount = await tx.event_participant.count({
-                where: { event_id },
+                where: { 
+                    event_id,
+                    payment_verification: { in: ['pending', 'accepted'] }
+                },
             });
 
             const isEventFull =

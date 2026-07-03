@@ -85,7 +85,7 @@ const checkIPBOrMinetodayController = async (req, res) => {
         // 2. Check if user is registered to 'minetoday' event (by title)
         // Find the event ID for 'minetoday' (case-insensitive)
         const minetodayEvent = await prisma.event.findFirst({
-            where: { title: { equals: "MineToday" } },
+            where: { title: { equals: "Mine Today" } },
             select: { id: true },
         });
         let isRegisteredToMinetoday = false;

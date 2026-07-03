@@ -16,7 +16,11 @@ const getCompetitionById = async (req, res) => {
         res.status(200).json({
             success: true,
             message: "competition fetched successfully",
-            data: competition,
+            data: {
+                ...competition,
+                contact_person1: competition.contact_person1,
+                contact_person2: competition.contact_person2,
+            },
         });
     } catch (error) {
         console.error("Error fetching competition", error);

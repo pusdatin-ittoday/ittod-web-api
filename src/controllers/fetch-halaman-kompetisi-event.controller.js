@@ -17,11 +17,20 @@ const fetchHalamanKompetisiEvent = async (req, res) => {
                 participation_type: true,
                 contact_person1: true,
                 contact_person2: true,
+                method: true,
                 max_noncompetition_participant: true,
+                logo_url: true,
                 // Exclude: teams, participants, announcements, submissions, timelines
             },
         });
-        return res.status(200).json(events);
+
+        const formattedEvents = events.map(event => ({
+            ...event,
+            contact_person1: event.contact_person1,
+            contact_person2: event.contact_person2,
+        }));
+
+        return res.status(200).json(formattedEvents);
     } catch (error) {
         console.error("Error fetching events:", error);
         return res.status(500).json({ error: "Internal server error" });

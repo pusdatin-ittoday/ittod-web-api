@@ -45,14 +45,18 @@ const registerUserIntoEvent = async (
                     FOR UPDATE
             `;
 
+            const maxParticipants = lockedEvent[0]?.max_noncompetition_participant;
+
             const eventParticipantCount = await tx.event_participant.count({
-                where: { event_id },
+                where: { 
+                    event_id,
+                    payment_verification: { in: ['pending', 'accepted'] }
+                },
             });
 
             const isEventFull =
-                lockedEvent.max_noncompetition_participant !== null &&
-                eventParticipantCount >=
-                    lockedEvent.max_noncompetition_participant;
+                maxParticipants !== null &&
+                eventParticipantCount >= maxParticipants;
 
             if (isEventFull) {
                 throw {

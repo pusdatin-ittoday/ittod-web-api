@@ -25,7 +25,7 @@ model user {
   id_line                  String?
   id_discord               String?
   id_instagram             String?
-  is_registration_complete Int                  @default(0)
+  is_registration_complete Int                  @default(0) @db.TinyInt
   jenis_kelamin            jenis_kelamin_enum?
   ktm_key                  String?
   twibbon_key              String?
@@ -45,48 +45,26 @@ model user_identity {
   email                              String                      @unique(map: "user_identity_email_unique")
   provider                           user_identity_provider_enum @default(basic)
   hash                               String?
-  is_verified                        Int                         @default(0)
+  is_verified                        Int                         @default(0) @db.TinyInt
   verification_token                 String?
   verification_token_expiration      DateTime?
   password_recovery_token            String?
   password_recovery_token_expiration DateTime?
   refresh_token                      String?
   role                               user_identity_role_enum     @default(user)
-  remember_token                     String?
+  remember_token                     String?                     @db.VarChar(100)
   created_at                         DateTime                    @default(now())
   updated_at                         DateTime?
   event_staff                        event_staff[]
-  user                               user                        @relation(fields: [id], references: [id])
-  notifications                      notification[]
+  user                               user                        @relation(fields: [id], references: [id], map: "user_identity_id_foreign")
 
   @@map("user_identity")
-}
-
-model notification {
-  id          String   @id
-  user_id     String
-  title       String
-  message     String
-  type        notification_type_enum @default(info)
-  is_read     Int      @default(0)
-  related_id  String?
-  created_at  DateTime @default(now())
-  user        user_identity @relation(fields: [user_id], references: [id], onDelete: Cascade)
-
-  @@map("notification")
-}
-
-enum notification_type_enum {
-  info
-  success
-  warning
-  error
 }
 
 model password_reset_tokens {
   email      String    @id
   token      String
-  created_at DateTime?
+  created_at DateTime? @db.Timestamp(0)
 
   @@map("password_reset_tokens")
 }
@@ -94,9 +72,9 @@ model password_reset_tokens {
 model sessions {
   id            String  @id
   user_id       String?
-  ip_address    String?
-  user_agent    String?
-  payload       String
+  ip_address    String? @db.VarChar(45)
+  user_agent    String? @db.Text
+  payload       String  @db.LongText
   last_activity Int
 
   @@index([last_activity], map: "sessions_last_activity_index")
@@ -105,20 +83,21 @@ model sessions {
 }
 
 model event {
-  id                             String                    @id
-  title                          String
-  description                    String?
-  guide_book_url                 String?
+  id                             String                   @id
+  title                          String                   @db.Text
+  description                    String?                  @db.Text
+  guide_book_url                 String?                  @db.Text
   type                           event_type_enum
-  participation_type             participation_type_enum   @default(team)
-  price                          Int                       @default(0)
-  contact_person1                String?    
-  contact_person2                String?
-  max_noncompetition_participant Int?
+  participation_type             String                   @default("team") @db.VarChar(255)
   is_active                      Boolean                  @default(true)
   requires_submission            Boolean                  @default(false)
-  whatsapp_group_link            String?
-  logo_url                       String?
+  price                          Int                      @default(0)
+  contact_person1                String?
+  contact_person2                String?
+  max_noncompetition_participant Int?
+  whatsapp_group_link            String?                  @db.VarChar(255)
+  logo_url                       String?                  @db.VarChar(255)
+  method                         String                   @default("offline") @db.VarChar(255)
   submissions                    competition_submission[]
   announcements                  event_announcement[]
   participants                   event_participant[]
@@ -138,30 +117,33 @@ model media {
   url               String
   created_at        DateTime             @default(now())
   updated_at        DateTime             @default(now())
-  uploader          user                 @relation(fields: [uploader_id], references: [id])
+  uploader          user                 @relation(fields: [uploader_id], references: [id], map: "media_uploader_id_foreign")
   team_payment      team[]               @relation("PaymentProof")
   team_member_kartu team_member[]
 
+  @@index([uploader_id], map: "media_uploader_id_foreign")
   @@map("media")
 }
 
 model team {
-  id                   String                   @id
+  id                   String                     @id
   competition_id       String
-  team_name            String
-  team_code            String                   @unique(map: "team_team_code_unique")
-  max_member           Int                      @default(3)
+  team_name            String                     @db.Text
+  team_code            String                     @unique(map: "team_team_code_unique")
+  max_member           Int                        @default(3)
   is_document_verified document_verification_enum @default(pending)
   is_verified          document_verification_enum @default(pending)
-  verification_error   String?
-  created_at           DateTime                 @default(now())
+  verification_error   String?                    @db.Text
+  created_at           DateTime                   @default(now())
   updated_at           DateTime?
   payment_proof_id     String?
   submissions          competition_submission[]
-  payment_proof        media?                   @relation("PaymentProof", fields: [payment_proof_id], references: [id])
-  competition          event                    @relation(fields: [competition_id], references: [id])
+  competition          event                      @relation(fields: [competition_id], references: [id], map: "team_competition_id_foreign")
+  payment_proof        media?                     @relation("PaymentProof", fields: [payment_proof_id], references: [id], map: "team_payment_proof_id_foreign")
   members              team_member[]
 
+  @@index([competition_id], map: "team_competition_id_foreign")
+  @@index([payment_proof_id], map: "team_payment_proof_id_foreign")
   @@map("team")
 }
 
@@ -170,37 +152,42 @@ model team_member {
   team_id            String
   role               team_member_role_enum
   is_verified        Boolean               @default(false)
-  verification_error String?
+  verification_error String?               @db.Text
   kartu_id           String?
-  kartu              media?                @relation(fields: [kartu_id], references: [id])
-  team               team                  @relation(fields: [team_id], references: [id])
-  user               user                  @relation(fields: [user_id], references: [id])
+  kartu              media?                @relation(fields: [kartu_id], references: [id], map: "team_member_kartu_id_foreign")
+  team               team                  @relation(fields: [team_id], references: [id], map: "team_member_team_id_foreign")
+  user               user                  @relation(fields: [user_id], references: [id], map: "team_member_user_id_foreign")
 
   @@id([user_id, team_id])
+  @@index([kartu_id], map: "team_member_kartu_id_foreign")
+  @@index([team_id], map: "team_member_team_id_foreign")
   @@map("team_member")
 }
 
 model event_timeline {
   id       String   @id
   event_id String
-  title    String
+  title    String   @db.Text
   date     DateTime
-  event    event    @relation(fields: [event_id], references: [id])
+  event    event    @relation(fields: [event_id], references: [id], map: "event_timeline_event_id_foreign")
 
+  @@index([event_id], map: "event_timeline_event_id_foreign")
   @@map("event_timeline")
 }
 
 model event_announcement {
   id          String   @id
-  event_id    String
+  event_id    String?
   author_id   String
-  title       String
-  description String
+  title       String   @db.Text
+  description String   @db.Text
   created_at  DateTime @default(now())
   updated_at  DateTime @updatedAt
-  author      user     @relation(fields: [author_id], references: [id])
-  event       event    @relation(fields: [event_id], references: [id])
+  author      user     @relation(fields: [author_id], references: [id], map: "event_announcement_author_id_foreign")
+  event       event?   @relation(fields: [event_id], references: [id], onDelete: Restrict, map: "event_announcement_event_id_foreign")
 
+  @@index([author_id], map: "event_announcement_author_id_foreign")
+  @@index([event_id], map: "event_announcement_event_id_foreign")
   @@map("event_announcement")
 }
 
@@ -209,11 +196,12 @@ model competition_submission {
   competition_id    String
   created_at        DateTime  @default(now())
   updated_at        DateTime?
-  submission_object String?
-  competition       event     @relation(fields: [competition_id], references: [id])
-  team              team      @relation(fields: [team_id], references: [id])
+  submission_object Json?
+  competition       event     @relation(fields: [competition_id], references: [id], map: "competition_submission_competition_id_foreign")
+  team              team      @relation(fields: [team_id], references: [id], map: "competition_submission_team_id_foreign")
 
   @@id([team_id, competition_id])
+  @@index([competition_id], map: "competition_submission_competition_id_foreign")
   @@map("competition_submission")
 }
 
@@ -223,79 +211,81 @@ model event_participant {
   date_added           DateTime                  @default(now())
   payment_proof        String?
   payment_verification payment_verification_enum @default(pending)
-  event                event                     @relation(fields: [event_id], references: [id])
-  user                 user                      @relation(fields: [user_id], references: [id])
+  event                event                     @relation(fields: [event_id], references: [id], map: "event_participant_event_id_foreign")
+  user                 user                      @relation(fields: [user_id], references: [id], map: "event_participant_user_id_foreign")
 
   @@id([user_id, event_id])
+  @@index([event_id], map: "event_participant_event_id_foreign")
   @@map("event_participant")
 }
 
 model event_staff {
   event_id   String
   user_id    String
-  created_at DateTime?
-  updated_at DateTime?
-  user       user_identity @relation(fields: [user_id], references: [id], onDelete: Cascade)
-  event      event         @relation(fields: [event_id], references: [id], onDelete: Cascade)
+  created_at DateTime?     @db.Timestamp(0)
+  updated_at DateTime?     @db.Timestamp(0)
+  event      event         @relation(fields: [event_id], references: [id], onDelete: Cascade, map: "event_staff_event_id_foreign")
+  user       user_identity @relation(fields: [user_id], references: [id], onDelete: Cascade, map: "event_staff_user_id_foreign")
 
   @@id([event_id, user_id])
+  @@index([user_id], map: "event_staff_user_id_foreign")
   @@map("event_staff")
 }
 
 model cache {
-  key        String @id
-  value      String
+  key        String @id @db.VarChar(255)
+  value      String @db.MediumText
   expiration Int
 
   @@index([expiration], map: "cache_expiration_index")
 }
 
 model cache_locks {
-  key        String @id
-  owner      String
+  key        String @id @db.VarChar(255)
+  owner      String @db.VarChar(255)
   expiration Int
 
   @@index([expiration], map: "cache_locks_expiration_index")
 }
 
 model failed_jobs {
-  id         Int      @id @default(autoincrement())
-  uuid       String   @unique(map: "failed_jobs_uuid_unique")
-  connection String
-  queue      String
-  payload    String
-  exception  String
-  failed_at  DateTime @default(now())
+  id         BigInt   @id @default(autoincrement()) @db.UnsignedBigInt
+  uuid       String   @unique(map: "failed_jobs_uuid_unique") @db.VarChar(255)
+  connection String   @db.Text
+  queue      String   @db.Text
+  payload    String   @db.LongText
+  exception  String   @db.LongText
+  failed_at  DateTime @default(now()) @db.Timestamp(0)
 }
 
 model job_batches {
-  id             String  @id
-  name           String
+  id             String  @id @db.VarChar(255)
+  name           String  @db.VarChar(255)
   total_jobs     Int
   pending_jobs   Int
   failed_jobs    Int
-  failed_job_ids String
-  options        String?
+  failed_job_ids String  @db.LongText
+  options        String? @db.MediumText
   cancelled_at   Int?
   created_at     Int
   finished_at    Int?
 }
 
 model jobs {
-  id           Int    @id @default(autoincrement())
-  queue        String
-  payload      String
-  attempts     Int
-  reserved_at  Int?
-  available_at Int
-  created_at   Int
+  id           BigInt @id @default(autoincrement()) @db.UnsignedBigInt
+  queue        String @db.VarChar(255)
+  payload      String @db.LongText
+  attempts     Int    @db.UnsignedTinyInt
+  reserved_at  Int?   @db.UnsignedInt
+  available_at Int    @db.UnsignedInt
+  created_at   Int    @db.UnsignedInt
 
   @@index([queue], map: "jobs_queue_index")
 }
 
 model migrations {
-  id        Int    @id @default(autoincrement())
-  migration String
+  id        Int    @id @default(autoincrement()) @db.UnsignedInt
+  migration String @db.VarChar(255)
   batch     Int
 }
 
@@ -353,18 +343,7 @@ enum event_type_enum {
   non_competition
 }
 
-enum participation_type_enum {
-  individual
-  team
-}
-
 enum jenis_kelamin_enum {
   laki2
   perempuan
-}
-
-enum bundling_enum {
-  day1
-  day2
-  day1_day2
 }

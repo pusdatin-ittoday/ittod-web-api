@@ -32,9 +32,11 @@ The backend serves as the core API for the user-facing web platform. It handles 
    - Users upload payment proofs and competition deliverables.
    - The backend validates the files and securely uploads them to Cloudflare R2 Storage (placed inside the `uploads/` prefix folder).
    - After a successful upload to R2, the backend saves the public R2 URL (`R2_PUBLIC` + `uploads/key`) into the `media` table of the MySQL database via Prisma.
-3. **Dynamic Configuration**:
+3. **Dynamic Configuration & Event Data**:
    - The backend connects directly to the shared central MySQL database (managed by the Admin Dashboard) to read from tables like `event`, `event_timeline`, and `event_announcement`.
-   - Instead of static configurations, the backend provides dynamic event status (such as `is_active` and `requires_submission` flags) so the frontend can accurately display available registrations based on the database state.
+   - Instead of static configurations, the backend provides dynamic event status (such as `is_active`, `requires_submission`, `method`, and `max_noncompetition_participant`) so the frontend can accurately display available registrations based on the database state.
+   - For non-competition events, the backend enforces a participant registration limit using `max_noncompetition_participant`.
+   - Contact person fields (`contact_person1`, `contact_person2`) are stored as numeric strings and dynamically formatted into full `wa.me/` URLs for public API consumption.
 4. **Competition Participation Types**:
    - Each competition exposes `participation_type` with either `individual` or `team`.
    - User competition dashboard responses include `participationType` so the frontend can distinguish internal one-member records from real teams.

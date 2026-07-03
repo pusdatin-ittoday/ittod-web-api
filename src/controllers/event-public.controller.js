@@ -20,6 +20,7 @@ const getEventsController = async (req, res) => {
                 price: true,
                 contact_person1: true,
                 contact_person2: true,
+                method: true,
                 max_noncompetition_participant: true,
                 requires_submission: true,
                 is_active: true,
@@ -35,7 +36,13 @@ const getEventsController = async (req, res) => {
             }
         });
 
-        return res.status(200).json({ success: true, data: events });
+        const formattedEvents = events.map(event => ({
+            ...event,
+            contact_person1: event.contact_person1,
+            contact_person2: event.contact_person2,
+        }));
+
+        return res.status(200).json({ success: true, data: formattedEvents });
     } catch (error) {
         console.error("Error fetching events:", error);
         return res.status(500).json({ success: false, error: "Internal server error" });
@@ -57,6 +64,7 @@ const getEventByIdController = async (req, res) => {
                 price: true,
                 contact_person1: true,
                 contact_person2: true,
+                method: true,
                 max_noncompetition_participant: true,
                 requires_submission: true,
                 is_active: true,
@@ -76,7 +84,13 @@ const getEventByIdController = async (req, res) => {
             return res.status(404).json({ success: false, error: "Event not found" });
         }
 
-        return res.status(200).json({ success: true, data: event });
+        const formattedEvent = {
+            ...event,
+            contact_person1: event.contact_person1,
+            contact_person2: event.contact_person2,
+        };
+
+        return res.status(200).json({ success: true, data: formattedEvent });
     } catch (error) {
         console.error("Error fetching event by id:", error);
         return res.status(500).json({ success: false, error: "Internal server error" });

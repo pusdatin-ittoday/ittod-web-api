@@ -1,7 +1,7 @@
 const prisma = require("../prisma.js");
 const { uploadFileToR2 } = require("./r2.service");
 
-const BOOTCAMP_EVENT_ID = "bootcamp";
+const BOOTCAMP_EVENT_ID = "Bootcamp";
 
 const uploadBootcampPaymentService = async ({ user_id, payment_proof }) => {
     if (!user_id) {

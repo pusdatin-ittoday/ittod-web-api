@@ -44,19 +44,6 @@ Table user_identity {
   updated_at DateTime
   event_staff event_staff [not null]
   user user [not null]
-  notifications notification [not null]
-}
-
-Table notification {
-  id String [pk]
-  user_id String [not null]
-  title String [not null]
-  message String [not null]
-  type notification_type_enum [not null, default: 'info']
-  is_read Int [not null, default: 0]
-  related_id String
-  created_at DateTime [default: `now()`, not null]
-  user user_identity [not null]
 }
 
 Table password_reset_tokens {
@@ -80,15 +67,16 @@ Table event {
   description String
   guide_book_url String
   type event_type_enum [not null]
-  participation_type participation_type_enum [not null, default: 'team']
+  participation_type String [not null, default: 'team']
+  is_active Boolean [not null, default: true]
+  requires_submission Boolean [not null, default: false]
   price Int [not null, default: 0]
   contact_person1 String
   contact_person2 String
   max_noncompetition_participant Int
-  is_active Boolean [not null, default: true]
-  requires_submission Boolean [not null, default: false]
   whatsapp_group_link String
   logo_url String
+  method String [not null, default: 'offline']
   submissions competition_submission [not null]
   announcements event_announcement [not null]
   participants event_participant [not null]
@@ -124,8 +112,8 @@ Table team {
   updated_at DateTime
   payment_proof_id String
   submissions competition_submission [not null]
-  payment_proof media
   competition event [not null]
+  payment_proof media
   members team_member [not null]
 }
 
@@ -155,14 +143,14 @@ Table event_timeline {
 
 Table event_announcement {
   id String [pk]
-  event_id String [not null]
+  event_id String
   author_id String [not null]
   title String [not null]
   description String [not null]
   created_at DateTime [default: `now()`, not null]
   updated_at DateTime [not null]
   author user [not null]
-  event event [not null]
+  event event
 }
 
 Table competition_submission {
@@ -170,7 +158,7 @@ Table competition_submission {
   competition_id String [not null]
   created_at DateTime [default: `now()`, not null]
   updated_at DateTime
-  submission_object String
+  submission_object Json
   competition event [not null]
   team team [not null]
 
@@ -198,8 +186,8 @@ Table event_staff {
   user_id String [not null]
   created_at DateTime
   updated_at DateTime
-  user user_identity [not null]
   event event [not null]
+  user user_identity [not null]
 
   indexes {
     (event_id, user_id) [pk]
@@ -219,7 +207,7 @@ Table cache_locks {
 }
 
 Table failed_jobs {
-  id Int [pk, increment]
+  id BigInt [pk, increment]
   uuid String [unique, not null]
   connection String [not null]
   queue String [not null]
@@ -242,7 +230,7 @@ Table job_batches {
 }
 
 Table jobs {
-  id Int [pk, increment]
+  id BigInt [pk, increment]
   queue String [not null]
   payload String [not null]
   attempts Int [not null]
@@ -255,13 +243,6 @@ Table migrations {
   id Int [pk, increment]
   migration String [not null]
   batch Int [not null]
-}
-
-Enum notification_type_enum {
-  info
-  success
-  warning
-  error
 }
 
 Enum pendidikan_enum {
@@ -318,31 +299,18 @@ Enum event_type_enum {
   non_competition
 }
 
-Enum participation_type_enum {
-  individual
-  team
-}
-
 Enum jenis_kelamin_enum {
   laki2
   perempuan
 }
 
-Enum bundling_enum {
-  day1
-  day2
-  day1_day2
-}
-
 Ref: user_identity.id - user.id
-
-Ref: notification.user_id > user_identity.id [delete: Cascade]
 
 Ref: media.uploader_id > user.id
 
-Ref: team.payment_proof_id > media.id
-
 Ref: team.competition_id > event.id
+
+Ref: team.payment_proof_id > media.id
 
 Ref: team_member.kartu_id > media.id
 
@@ -354,7 +322,7 @@ Ref: event_timeline.event_id > event.id
 
 Ref: event_announcement.author_id > user.id
 
-Ref: event_announcement.event_id > event.id
+Ref: event_announcement.event_id > event.id [delete: Restrict]
 
 Ref: competition_submission.competition_id > event.id
 
@@ -364,6 +332,6 @@ Ref: event_participant.event_id > event.id
 
 Ref: event_participant.user_id > user.id
 
-Ref: event_staff.user_id > user_identity.id [delete: Cascade]
-
 Ref: event_staff.event_id > event.id [delete: Cascade]
+
+Ref: event_staff.user_id > user_identity.id [delete: Cascade]

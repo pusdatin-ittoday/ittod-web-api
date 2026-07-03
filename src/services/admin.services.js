@@ -14,6 +14,8 @@ const getCompetitionById = async id => {
             guide_book_url: true,
             contact_person1: true,
             contact_person2: true,
+            method: true,
+            max_noncompetition_participant: true,
             timeline: {
                 select: {
                     id: true,
