@@ -3,7 +3,7 @@
 const prisma = require("../prisma.js");
 const passport = require("passport");
 const { Strategy: LocalStrategy } = require("passport-local");
-const bcrypt = require("bcryptjs");
+const argon2 = require("argon2");
 
 passport.serializeUser((user, done) => {
     done(null, user.id);
@@ -42,31 +42,44 @@ passport.use(
         { usernameField: "email" },
         async (email, password, done) => {
             try {
-                const user = await prisma.user_identity.findUnique({
+                const identity = await prisma.user_identity.findUnique({
                     where: { email },
+                    include: { user: true },
                 });
 
                 // Check user existence and hash existence
-                if (!user || !user.hash) {
+                if (!identity || !identity.hash) {
                     return done(null, false, {
                         message: "Invalid email or password",
                     });
                 }
 
-                // Check verification status
-                if (!user.is_verified) {
+                // Check verification status (Integer 1 means verified)
+                if (identity.is_verified !== 1) {
                     return done(null, false, {
                         message: "Please verify your email before logging in",
                     });
                 }
 
-                // Verify password
-                const valid = await bcrypt.compare(password, user.hash);
+                // Verify password using Argon2
+                const valid = await argon2.verify(identity.hash, password);
                 if (!valid) {
                     return done(null, false, {
                         message: "Invalid email or password",
                     });
                 }
+
+                // Combine identity + user data to make sure it matches deserializeUser
+                const user = {
+                    id: identity.id,
+                    email: identity.email,
+                    role: identity.role,
+                    is_verified: identity.is_verified,
+                    full_name: identity.user?.full_name,
+                    name: identity.user?.full_name, // For auth.controller
+                    phone_number: identity.user?.phone_number,
+                };
+
                 return done(null, user);
             } catch (err) {
                 console.error("Authentication error:", err);
