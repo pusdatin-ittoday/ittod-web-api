@@ -98,6 +98,7 @@ model event {
   whatsapp_group_link            String?                  @db.VarChar(255)
   logo_url                       String?                  @db.VarChar(255)
   method                         String                   @default("offline") @db.VarChar(255)
+  submission_fields              Json?
   submissions                    competition_submission[]
   announcements                  event_announcement[]
   participants                   event_participant[]
