@@ -46,12 +46,12 @@
     },
     "devDependencies": {
         "@biomejs/biome": "1.9.4",
-        "@prisma/client": "^6.19.3",
+        "@prisma/client": "^5.22.0",
         "husky": "^9.1.7",
         "lint-staged": "^15.5.1",
         "nodemon": "^3.1.9",
         "prettier": "^3.5.3",
-        "prisma": "^6.19.3",
+        "prisma": "^5.22.0",
         "prisma-dbml-generator": "^0.12.0"
     }
 }

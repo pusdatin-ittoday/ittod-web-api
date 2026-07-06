@@ -2,7 +2,31 @@ const prisma = require("../prisma.js");
 
 exports.getAllAnnouncements = async (req, res) => {
     try {
+        const userId = req.user.id;
         const announcements = await prisma.event_announcement.findMany({
+            where: {
+                OR: [
+                    { event_id: null },
+                    {
+                        event: {
+                            participants: {
+                                some: { user_id: userId },
+                            },
+                        },
+                    },
+                    {
+                        event: {
+                            teams: {
+                                some: {
+                                    members: {
+                                        some: { user_id: userId },
+                                    },
+                                },
+                            },
+                        },
+                    },
+                ],
+            },
             select: {
                 id: true,
                 title: true,
