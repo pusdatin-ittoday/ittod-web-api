@@ -45,32 +45,30 @@ exports.register = async ({ email, password, full_name }) => {
     sendVerificationEmail(email, token, full_name).catch(err =>
         console.error("Failed to send verification email (not critical):", err)
     );
-
+    
     return { message: "Registered. Please verify your email." };
 };
+    
 
 exports.verifyEmail = async token => {
-    const user = await prisma.user_identity.findFirst({
+    const identity = await prisma.user_identity.findFirst({
         where: {
             verification_token: token,
             verification_token_expiration: { gt: new Date() },
         },
     });
 
-    if (!user) throw { status: 400, message: "Invalid or expired token" };
+    if (!identity) throw { status: 400, message: "Invalid or expired token" };
 
-    await prisma.user.update({
-        where: { id: user.id },
+    // Update langsung ke tabel user_identity menggunakan id milik identity itu sendiri
+    await prisma.user_identity.update({
+        where: { id: identity.id },
         data: {
-            identity: {
-                update: {
-                    is_verified: true,
-                    verification_token: "BASIC_VERIFIED",
-                    verification_token_expiration: new Date(
-                        Date.now() + 100 * 365 * 24 * 60 * 60 * 1000
-                    ),
-                },
-            },
+            is_verified: 1, 
+            verification_token: "BASIC_VERIFIED",
+            verification_token_expiration: new Date(
+                Date.now() + 100 * 365 * 24 * 60 * 60 * 1000
+            ),
         },
     });
 

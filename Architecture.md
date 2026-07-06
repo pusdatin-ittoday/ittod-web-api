@@ -38,6 +38,7 @@ The backend serves as the core API for the user-facing web platform. It handles 
    - For non-competition events, the backend enforces a participant registration limit using `max_noncompetition_participant`.
    - Contact person fields (`contact_person1`, `contact_person2`) are stored as numeric strings and dynamically formatted into full `wa.me/` URLs for public API consumption.
    - Authenticated participants receive announcements through `GET /api/announcements`, ordered newest first with related event and author data. A nullable `event_id` represents a general announcement for every participant; event-specific records are scoped server-side to non-competition registrations in `event_participant` or competition memberships in `team_member`.
+   - Submission fields (`submission_fields`) containing the list of required inputs and types configured by the admin are stored as a JSON column in the `event` table. The backend serves this dynamic array to the frontend so that the participant submission form fields (such as text/link prompts) are dynamically rendered based on the database state rather than being hardcoded.
 4. **Competition Participation Types**:
    - Each competition exposes `participation_type` with either `individual` or `team`.
    - User competition dashboard responses include `participationType` so the frontend can distinguish internal one-member records from real teams.
