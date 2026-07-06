@@ -1,5 +1,5 @@
 const prisma = require("../prisma.js");
-const argon2 = require("argon2");
+const bcrypt = require("bcryptjs");
 const crypto = require("crypto");
 const {
     sendVerificationEmail,
@@ -17,7 +17,7 @@ exports.register = async ({ email, password, full_name }) => {
     if (existing) throw { status: 409, message: "Email already used" };
 
     const provider = "basic";
-    const hashed = await argon2.hash(password);
+    const hashed = await bcrypt.hash(password, 10);
     const token = crypto.randomBytes(32).toString("hex");
     const generatedId = crypto.randomUUID();
 
@@ -124,7 +124,7 @@ exports.resetPassword = async (token, newPassword) => {
         throw { status: 400, message: "Invalid or expired reset token" };
     }
 
-    const hashedPassword = await argon2.hash(newPassword);
+    const hashedPassword = await bcrypt.hash(newPassword, 10);
 
     await prisma.user_identity.update({
         where: { id: user.id },
