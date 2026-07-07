@@ -1,5 +1,8 @@
 const prisma = require("../prisma.js");
 
+const COMPETITION_TIMELINE_FALLBACK_MESSAGE =
+    "Belum ada timeline competition yang tersedia";
+
 exports.getAllTimelines = async (req, res) => {
     try {
         const timelines = await prisma.event_timeline.findMany({
@@ -58,7 +61,7 @@ exports.getCompetitionTimelines = async (req, res) => {
         });
 
         // Map database fields to the structure expected by the frontend (start_date/end_date)
-        const formatted = timelines.map((t) => ({
+        const formatted = timelines.map(t => ({
             id: t.id,
             event_id: t.event_id,
             title: t.title,
@@ -66,9 +69,12 @@ exports.getCompetitionTimelines = async (req, res) => {
             end_date: null,
         }));
 
+        res.set("X-Empty-Message", COMPETITION_TIMELINE_FALLBACK_MESSAGE);
         res.status(200).json(formatted);
     } catch (err) {
         console.error("Error fetching competition timelines:", err);
-        res.status(500).json({ error: "Failed to fetch competition timelines" });
+        res.status(500).json({
+            error: COMPETITION_TIMELINE_FALLBACK_MESSAGE,
+        });
     }
 };
