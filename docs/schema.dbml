@@ -279,7 +279,9 @@ Enum document_verification_enum {
 Enum user_identity_role_enum {
   superadmin
   admin_keuangan
+  admin_biasa
   panitia
+  panitia_lomba
   user
 }
 
