@@ -3,7 +3,7 @@ const prisma = require("../prisma.js");
 const COMPETITION_TIMELINE_FALLBACK_MESSAGE =
     "Belum ada timeline competition yang tersedia";
 
-const GLOBAL_TIMELINE_TABLE = "timeline_global";
+const GLOBAL_TIMELINE_TABLE = "competition_timeline";
 
 const pickFirstExistingKey = (row, keys) =>
     keys.find(key => Object.prototype.hasOwnProperty.call(row, key));
