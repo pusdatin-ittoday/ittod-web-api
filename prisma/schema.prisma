@@ -291,9 +291,8 @@ model migrations {
 
 enum pendidikan_enum {
   sma
-  s1
-  d3
-  d4
+  mahasiswa
+  lainnya
 }
 
 enum team_member_role_enum {
@@ -346,4 +345,16 @@ enum event_type_enum {
 enum jenis_kelamin_enum {
   laki2
   perempuan
+}
+
+model competition_timeline {
+  id          String    @id @default(uuid())
+  title       String    @db.Text
+  start_date  DateTime
+  end_date    DateTime?
+  description String?   @db.Text
+  created_at  DateTime? @db.Timestamp(0)
+  updated_at  DateTime? @db.Timestamp(0)
+
+  @@map("competition_timeline")
 }

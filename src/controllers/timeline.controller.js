@@ -43,3 +43,17 @@ exports.getTimelineByEventId = async (req, res) => {
         });
     }
 };
+
+exports.getCompetitionTimelines = async (req, res) => {
+    try {
+        const timelines = await prisma.competition_timeline.findMany({
+            orderBy: {
+                start_date: "asc",
+            },
+        });
+        res.status(200).json(timelines);
+    } catch (err) {
+        console.error("Error fetching competition timelines:", err);
+        res.status(500).json({ error: "Failed to fetch competition timelines" });
+    }
+};

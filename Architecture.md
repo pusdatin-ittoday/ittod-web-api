@@ -47,6 +47,11 @@ The backend serves as the core API for the user-facing web platform. It handles 
    - Individual competitions do not require a team name. The API creates an internal one-member team record (`max_member = 1`) so existing competition, payment, and submission relations remain compatible.
    - Duplicate registration for the same user and competition is rejected.
    - `team_member.is_verified` stores each member's document-verification result from the Laravel-managed database.
+   - **Global Competition Timelines (`competition_timeline`)**:
+      - The `competition_timeline` model maps to the global competition agenda table in the MySQL database.
+      - The Express API exposes the `GET /api/competition-timeline` endpoint to serve global competition milestones sorted chronologically by `start_date` ascending.
+   - **Education Enum Alignment (`pendidikan_enum`)**:
+      - The `pendidikan_enum` type in the Prisma schema is synchronized to match the database values (`sma`, `mahasiswa`, `lainnya`) to prevent Prisma deserialization errors and API crashes during user authentication and profile reads.
 5. **Database Schema Ownership**:
    - Laravel Admin is the source of truth for database migrations.
    - After a Laravel migration changes the shared schema, the API synchronizes Prisma with `npx prisma db pull` followed by `npx prisma generate`.

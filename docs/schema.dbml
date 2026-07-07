@@ -246,11 +246,20 @@ Table migrations {
   batch Int [not null]
 }
 
+Table competition_timeline {
+  id String [pk]
+  title String [not null]
+  start_date DateTime [not null]
+  end_date DateTime
+  description String
+  created_at DateTime
+  updated_at DateTime
+}
+
 Enum pendidikan_enum {
   sma
-  s1
-  d3
-  d4
+  mahasiswa
+  lainnya
 }
 
 Enum team_member_role_enum {
