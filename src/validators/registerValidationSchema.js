@@ -9,7 +9,7 @@ const registerSchema = Joi.object({
         "string.min": "Password must be at least 8 characters long.",
         "any.required": "Password is required.",
     }),
-    full_name: Joi.string().min(2).required().messages({
+    full_name: Joi.string().trim().min(2).required().messages({
         "string.min": "Full name must be at least 2 characters long.",
         "any.required": "Full name is required.",
     }),
