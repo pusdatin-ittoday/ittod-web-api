@@ -86,6 +86,36 @@ const editUserProfile = async ({
                 where: { id: user_id },
                 data: dataToUpdate,
             });
+
+            // Reset verification status for the member in all teams
+            await tx.team_member.updateMany({
+                where: { user_id: user_id },
+                data: {
+                    verification_error: null,
+                    is_verified: false,
+                }
+            });
+
+            // Find all teams this user belongs to
+            const memberTeams = await tx.team_member.findMany({
+                where: { user_id: user_id },
+                select: { team_id: true }
+            });
+            const teamIds = memberTeams.map(t => t.team_id);
+
+            // Reset team verification status to pending if it was rejected
+            if (teamIds.length > 0) {
+                await tx.team.updateMany({
+                    where: {
+                        id: { in: teamIds },
+                        is_document_verified: "rejected"
+                    },
+                    data: {
+                        is_document_verified: "pending",
+                        verification_error: null,
+                    }
+                });
+            }
         });
 
         return { message: "Profile updated successfully!" };
