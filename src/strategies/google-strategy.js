@@ -1,5 +1,6 @@
 const prisma = require("../prisma.js");
 const passport = require("passport");
+const crypto = require("crypto");
 const { Strategy: GoogleStrategy } = require("passport-google-oauth20");
 const { checkAdmin } = require("../middleware/adminOnlyMiddleware");
 
@@ -26,7 +27,6 @@ module.exports = passport.use(
             callbackURL: process.env.GOOGLE_REDIRECT,
         },
         async (accessToken, refreshToken, profile, done) => {
-            const externalId = profile.id;
             const email = profile.emails?.[0]?.value ?? null;
             const fullName = profile.displayName ?? null;
             const provider = "google";
@@ -34,11 +34,9 @@ module.exports = passport.use(
             if (!email) return done(new Error("Email is required."), null);
 
             try {
-                const identity = await prisma.user_identity.findUnique({
-                    where: {
-                        id: externalId,
-                        provider: provider,
-                    },
+                // Look up existing identity by email + provider
+                const identity = await prisma.user_identity.findFirst({
+                    where: { email, provider },
                     include: { user: true },
                 });
                 if (identity) {
@@ -47,42 +45,25 @@ module.exports = passport.use(
 
                 const existingUser = await prisma.user.findUnique({
                     where: { email },
+                    include: { identity: true },
                 });
 
                 if (existingUser) {
-                    const checkGoogle = await prisma.user_identity.findFirst({
-                        where: {
-                            id: existingUser.id,
-                            provider: "google",
-                        },
-                    });
-
-                    if (!checkGoogle) {
+                    // User exists but registered with a different provider
+                    if (existingUser.identity && existingUser.identity.provider !== "google") {
                         return done(
-                            "You already registered without google, please login with your email.",
+                            "You already registered without Google, please login with your email.",
                             null
                         );
                     }
-                    await prisma.user_identity.create({
-                        data: {
-                            id: externalId,
-                            provider,
-                            email,
-                            is_verified: true,
-                            hash: null,
-                            role: "user",
-                            verification_token: "OAUTH_USER",
-                            verification_token_expiration: new Date(
-                                Date.now() + 100 * 365 * 24 * 60 * 60 * 1000
-                            ),
-                        },
-                    });
-
                     return done(null, existingUser);
                 }
+
+                // New user — generate a proper UUID
+                const newId = crypto.randomUUID();
                 const user = await prisma.user.create({
                     data: {
-                        id: externalId,
+                        id: newId,
                         email,
                         full_name: fullName,
                         identity: {
@@ -90,6 +71,8 @@ module.exports = passport.use(
                                 provider,
                                 email,
                                 hash: null,
+                                is_verified: 1,
+                                role: "user",
                                 verification_token: "OAUTH_USER",
                                 verification_token_expiration: new Date(
                                     Date.now() + 100 * 365 * 24 * 60 * 60 * 1000

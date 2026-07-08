@@ -96,15 +96,6 @@ exports.registerTeamThenInsertLeader = async ({
 
     try {
         await prisma.$transaction(async tx => {
-            const activeBatch = await tx.competition_timeline.findFirst({
-                where: {
-                    is_registration_batch: true,
-                    start_date: { lte: new Date() },
-                    end_date: { gte: new Date() }
-                },
-                orderBy: { price: 'asc' }
-            });
-
             // Create the team
             await tx.team.create({
                 data: {
@@ -112,7 +103,6 @@ exports.registerTeamThenInsertLeader = async ({
                     competition_id,
                     team_name: resolvedTeamName,
                     team_code,
-                    amount_paid: activeBatch ? activeBatch.price : 0,
                     ...(isIndividual ? { max_member: 1 } : {}),
                 },
             });
