@@ -38,7 +38,7 @@ exports.getAllTimelines = async (req, res) => {
     try {
         const timelines = await prisma.event_timeline.findMany({
             include: {
-                event: false,
+                event: true,
             },
             orderBy: {
                 date: "asc",
