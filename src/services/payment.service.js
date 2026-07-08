@@ -44,7 +44,11 @@ const uploadPaymentCompetition = async ({ team_id, payment_proof, user_id }) => 
 
             const updatedTeam = await tx.team.update({
                 where: { id: team_id },
-                data: { payment_proof_id: payment_proof_key },
+                data: {
+                    payment_proof_id: payment_proof_key,
+                    is_verified: "pending",
+                    verification_error: null
+                },
             });
 
             return {

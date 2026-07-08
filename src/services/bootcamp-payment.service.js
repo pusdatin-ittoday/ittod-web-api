@@ -81,6 +81,7 @@ const uploadBootcampPaymentService = async ({ user_id, payment_proof }) => {
                 },
                 data: {
                     payment_proof: payment_proof_key,
+                    payment_verification: "pending",
                 },
             });
 
