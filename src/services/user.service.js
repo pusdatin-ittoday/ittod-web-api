@@ -87,6 +87,35 @@ const editUserProfile = async ({
                 data: dataToUpdate,
             });
 
+            // Recalculate is_registration_complete status
+            const updatedUser = await tx.user.findUnique({
+                where: { id: user_id },
+            });
+
+            const isFieldFilled = (val) => {
+                return val !== null && val !== undefined && String(val).trim() !== "";
+            };
+
+            const isRegistrationComplete = !!(
+                isFieldFilled(updatedUser.full_name) &&
+                updatedUser.birth_date &&
+                isFieldFilled(updatedUser.phone_number) &&
+                isFieldFilled(updatedUser.jenis_kelamin) &&
+                isFieldFilled(updatedUser.id_discord) &&
+                isFieldFilled(updatedUser.id_instagram) &&
+                isFieldFilled(updatedUser.pendidikan) &&
+                isFieldFilled(updatedUser.nama_sekolah) &&
+                isFieldFilled(updatedUser.ktm_key) &&
+                isFieldFilled(updatedUser.twibbon_key)
+            );
+
+            await tx.user.update({
+                where: { id: user_id },
+                data: {
+                    is_registration_complete: isRegistrationComplete ? 1 : 0
+                }
+            });
+
             // Reset verification status for the member in all teams
             await tx.team_member.updateMany({
                 where: { user_id: user_id },
