@@ -20,6 +20,9 @@ const getCompetitionData = async (req, res) => {
                         title: true,
                         participation_type: true,
                         whatsapp_group_link: true,
+                        timelines: {
+                            orderBy: { date: 'asc' }
+                        },
                     },
                 },
                 members: {
@@ -47,6 +50,7 @@ const getCompetitionData = async (req, res) => {
             competitionName: team.competition?.title ?? "N/A",
             participationType: team.competition?.participation_type ?? "team",
             whatsappGroupLink: team.competition?.whatsapp_group_link ?? null,
+            timelines: team.competition?.timelines ?? [],
             members: team.members
                 .sort((a, b) => (a.role === "leader" ? -1 : 1)) // Sort leader to the top
                 .map(member => ({
@@ -90,6 +94,9 @@ const getUserCompetitionData = async (req, res) => {
                         participation_type: true,
                         requires_submission: true,
                         whatsapp_group_link: true,
+                        timelines: {
+                            orderBy: { date: 'asc' }
+                        },
                     },
                 },
                 submissions: true,
@@ -123,6 +130,7 @@ const getUserCompetitionData = async (req, res) => {
             requiresSubmission: team.competition?.requires_submission ?? false,
             participationType: team.competition?.participation_type ?? "team",
             whatsappGroupLink: team.competition?.whatsapp_group_link ?? null,
+            timelines: team.competition?.timelines ?? [],
             submissionData: team.submissions?.length > 0 ? team.submissions[0] : null,
             members: team.members
                 .sort((a, b) => (a.role === "leader" ? -1 : 1)) // Sort leader to the top
