@@ -166,11 +166,12 @@ model team_member {
 }
 
 model event_timeline {
-  id       String   @id
+  id       String    @id
   event_id String
-  title    String   @db.Text
+  title    String    @db.Text
   date     DateTime
-  event    event    @relation(fields: [event_id], references: [id], map: "event_timeline_event_id_foreign")
+  end_date DateTime?
+  event    event     @relation(fields: [event_id], references: [id], map: "event_timeline_event_id_foreign")
 
   @@index([event_id], map: "event_timeline_event_id_foreign")
   @@map("event_timeline")
