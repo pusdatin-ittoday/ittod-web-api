@@ -74,6 +74,7 @@ Table event {
   contact_person1 String
   contact_person2 String
   max_noncompetition_participant Int
+  max_member Int [not null, default: 3]
   whatsapp_group_link String
   logo_url String
   method String [not null, default: 'offline']
@@ -148,6 +149,7 @@ Table event_announcement {
   author_id String [not null]
   title String [not null]
   description String [not null]
+  is_pinned Boolean [not null, default: false]
   created_at DateTime [default: `now()`, not null]
   updated_at DateTime [not null]
   author user [not null]

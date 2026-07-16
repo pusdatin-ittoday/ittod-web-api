@@ -94,6 +94,7 @@ model event {
   contact_person1                String?
   contact_person2                String?
   max_noncompetition_participant Int?
+  max_member                     Int                      @default(3)
   whatsapp_group_link            String?                  @db.VarChar(255)
   logo_url                       String?                  @db.VarChar(255)
   method                         String                   @default("offline") @db.VarChar(255)
@@ -181,6 +182,7 @@ model event_announcement {
   author_id   String
   title       String   @db.Text
   description String   @db.Text
+  is_pinned   Boolean  @default(false)
   created_at  DateTime @default(now())
   updated_at  DateTime @updatedAt
   author      user     @relation(fields: [author_id], references: [id], map: "event_announcement_author_id_foreign")

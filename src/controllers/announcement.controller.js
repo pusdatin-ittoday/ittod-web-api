@@ -31,6 +31,7 @@ exports.getAllAnnouncements = async (req, res) => {
                 id: true,
                 title: true,
                 description: true,
+                is_pinned: true,
                 created_at: true,
                 updated_at: true,
                 event: {
@@ -46,9 +47,10 @@ exports.getAllAnnouncements = async (req, res) => {
                     },
                 },
             },
-            orderBy: {
-                created_at: "desc",
-            },
+            orderBy: [
+                { is_pinned: "desc" },
+                { created_at: "desc" },
+            ],
         });
 
         res.json({

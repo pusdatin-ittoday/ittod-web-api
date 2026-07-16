@@ -103,7 +103,7 @@ exports.registerTeamThenInsertLeader = async ({
                     competition_id,
                     team_name: resolvedTeamName,
                     team_code,
-                    ...(isIndividual ? { max_member: 1 } : {}),
+                    max_member: isIndividual ? 1 : (competitionExists.max_member ?? 3),
                 },
             });
             // Add the leader to the team
