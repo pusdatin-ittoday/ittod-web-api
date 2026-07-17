@@ -38,7 +38,7 @@ Table user_identity {
   password_recovery_token String
   password_recovery_token_expiration DateTime
   refresh_token String
-  role user_identity_role_enum [not null, default: 'user']
+  role user_identity_role [not null, default: 'user']
   remember_token String
   created_at DateTime [default: `now()`, not null]
   updated_at DateTime
@@ -70,15 +70,16 @@ Table event {
   participation_type String [not null, default: 'team']
   is_active Boolean [not null, default: true]
   requires_submission Boolean [not null, default: false]
+  submission_fields Json
   price Int [not null, default: 0]
   contact_person1 String
   contact_person2 String
   max_noncompetition_participant Int
   max_member Int [not null, default: 3]
   whatsapp_group_link String
+  external_platform_link String
   logo_url String
   method String [not null, default: 'offline']
-  submission_fields Json
   submissions competition_submission [not null]
   announcements event_announcement [not null]
   participants event_participant [not null]
@@ -110,6 +111,7 @@ Table team {
   is_document_verified document_verification_enum [not null, default: 'pending']
   is_verified document_verification_enum [not null, default: 'pending']
   verification_error String
+  amount_paid Int [not null, default: 0]
   created_at DateTime [default: `now()`, not null]
   updated_at DateTime
   payment_proof_id String
@@ -140,6 +142,7 @@ Table event_timeline {
   event_id String [not null]
   title String [not null]
   date DateTime [not null]
+  end_date DateTime
   event event [not null]
 }
 
@@ -248,6 +251,25 @@ Table migrations {
   batch Int [not null]
 }
 
+Table competition_timeline {
+  id String [pk]
+  title String [not null]
+  start_date DateTime [not null]
+  end_date DateTime
+  description String
+  is_registration_batch Boolean [not null, default: false]
+  price Int
+  created_at DateTime
+  updated_at DateTime
+}
+
+Table settings {
+  key String [pk]
+  value String
+  created_at DateTime
+  updated_at DateTime
+}
+
 Enum pendidikan_enum {
   sma
   s1
@@ -278,15 +300,6 @@ Enum document_verification_enum {
   rejected
 }
 
-Enum user_identity_role_enum {
-  superadmin
-  admin_keuangan
-  admin_biasa
-  panitia
-  panitia_lomba
-  user
-}
-
 Enum media_grouping_enum {
   payments
   dokum_tahun_lalu
@@ -307,6 +320,13 @@ Enum event_type_enum {
 Enum jenis_kelamin_enum {
   laki2
   perempuan
+}
+
+Enum user_identity_role {
+  superadmin
+  admin_biasa
+  panitia_lomba
+  user
 }
 
 Ref: user_identity.id - user.id

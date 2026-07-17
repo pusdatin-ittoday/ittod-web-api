@@ -50,7 +50,7 @@ model user_identity {
   password_recovery_token            String?
   password_recovery_token_expiration DateTime?
   refresh_token                      String?
-  role                               user_identity_role_enum     @default(user)
+  role                               user_identity_role          @default(user)
   remember_token                     String?                     @db.VarChar(100)
   created_at                         DateTime                    @default(now())
   updated_at                         DateTime?
@@ -90,15 +90,16 @@ model event {
   participation_type             String                   @default("team") @db.VarChar(255)
   is_active                      Boolean                  @default(true)
   requires_submission            Boolean                  @default(false)
+  submission_fields              Json?
   price                          Int                      @default(0)
   contact_person1                String?
   contact_person2                String?
   max_noncompetition_participant Int?
   max_member                     Int                      @default(3)
   whatsapp_group_link            String?                  @db.VarChar(255)
+  external_platform_link         String?                  @db.VarChar(255)
   logo_url                       String?                  @db.VarChar(255)
   method                         String                   @default("offline") @db.VarChar(255)
-  submission_fields              Json?
   submissions                    competition_submission[]
   announcements                  event_announcement[]
   participants                   event_participant[]
@@ -135,6 +136,7 @@ model team {
   is_document_verified document_verification_enum @default(pending)
   is_verified          document_verification_enum @default(pending)
   verification_error   String?                    @db.Text
+  amount_paid          Int                        @default(0)
   created_at           DateTime                   @default(now())
   updated_at           DateTime?
   payment_proof_id     String?
@@ -292,6 +294,25 @@ model migrations {
   batch     Int
 }
 
+model competition_timeline {
+  id                    String    @id
+  title                 String    @db.Text
+  start_date            DateTime
+  end_date              DateTime?
+  description           String?   @db.Text
+  is_registration_batch Boolean   @default(false)
+  price                 Int?
+  created_at            DateTime? @db.Timestamp(0)
+  updated_at            DateTime? @db.Timestamp(0)
+}
+
+model settings {
+  key        String    @id @db.VarChar(255)
+  value      String?   @db.Text
+  created_at DateTime? @db.Timestamp(0)
+  updated_at DateTime? @db.Timestamp(0)
+}
+
 enum pendidikan_enum {
   sma
   s1
@@ -322,15 +343,6 @@ enum document_verification_enum {
   rejected
 }
 
-enum user_identity_role_enum {
-  superadmin
-  admin_keuangan
-  admin_biasa
-  panitia
-  panitia_lomba
-  user
-}
-
 enum media_grouping_enum {
   payments
   dokum_tahun_lalu
@@ -351,4 +363,11 @@ enum event_type_enum {
 enum jenis_kelamin_enum {
   laki2
   perempuan
+}
+
+enum user_identity_role {
+  superadmin
+  admin_biasa
+  panitia_lomba
+  user
 }
