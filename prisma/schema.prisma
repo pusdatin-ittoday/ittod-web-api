@@ -136,7 +136,6 @@ model team {
   is_document_verified document_verification_enum @default(pending)
   is_verified          document_verification_enum @default(pending)
   verification_error   String?                    @db.Text
-  amount_paid          Int                        @default(0)
   created_at           DateTime                   @default(now())
   updated_at           DateTime?
   payment_proof_id     String?

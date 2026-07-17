@@ -111,7 +111,6 @@ Table team {
   is_document_verified document_verification_enum [not null, default: 'pending']
   is_verified document_verification_enum [not null, default: 'pending']
   verification_error String
-  amount_paid Int [not null, default: 0]
   created_at DateTime [default: `now()`, not null]
   updated_at DateTime
   payment_proof_id String
