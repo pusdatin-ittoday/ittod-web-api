@@ -1,4 +1,4 @@
-const { editUserProfile } = require("../services/user.service");
+const { editUserProfile, markAnnouncementsAsRead } = require("../services/user.service");
 
 const editUserProfileController = async (req, res) => {
     try {
@@ -44,4 +44,18 @@ const editUserProfileController = async (req, res) => {
     }
 };
 
-module.exports = { editUserProfileController };
+const markAnnouncementsAsReadController = async (req, res) => {
+    try {
+        const user_id = req.user?.id;
+        if (!user_id) {
+            return res.status(400).json({ message: "User ID is missing" });
+        }
+        const result = await markAnnouncementsAsRead(user_id);
+        res.status(200).json(result);
+    } catch (error) {
+        console.error("Mark Announcements As Read Controller Error:", error);
+        res.status(error.status || 500).json({ message: error.message });
+    }
+};
+
+module.exports = { editUserProfileController, markAnnouncementsAsReadController };

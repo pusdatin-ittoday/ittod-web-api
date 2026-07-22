@@ -1,5 +1,5 @@
 const { Router } = require("express");
-const { editUserProfileController } = require("../controllers/user.controller");
+const { editUserProfileController, markAnnouncementsAsReadController } = require("../controllers/user.controller");
 const { isAuthenticated } = require("../middleware/authMiddleware.js");
 const { validateUserProfile } = require("../middleware/userDataMiddleware");
 const { validateFile } = require("../middleware/imageValidator");
@@ -36,5 +36,6 @@ usersRouter.put(
 );
 
 usersRouter.get("/api/user", isAuthenticated, viewUserData);
+usersRouter.post("/api/user/read-announcements", isAuthenticated, markAnnouncementsAsReadController);
 
 module.exports = usersRouter;

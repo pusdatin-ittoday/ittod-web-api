@@ -15,6 +15,7 @@ Table user {
   id_discord String
   id_instagram String
   is_registration_complete Int [not null, default: 0]
+  last_read_announcements_at DateTime
   jenis_kelamin jenis_kelamin_enum
   ktm_key String
   twibbon_key String

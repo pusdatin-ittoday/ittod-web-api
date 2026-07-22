@@ -189,6 +189,7 @@ const viewUserDataService = async user_id => {
                 ktm_key: true,
                 twibbon_key: true,
                 jenis_kelamin: true,
+                last_read_announcements_at: true,
             },
         });
         if (!user) {
@@ -208,4 +209,25 @@ const viewUserDataService = async user_id => {
         }
     }
 };
-module.exports = { editUserProfile, viewUserDataService };
+
+const markAnnouncementsAsRead = async (user_id) => {
+    if (!user_id) {
+        throw { status: 400, message: "User ID is required!" };
+    }
+    try {
+        await prisma.user.update({
+            where: { id: user_id },
+            data: { last_read_announcements_at: new Date() }
+        });
+        return { message: "Announcements marked as read successfully." };
+    } catch (err) {
+        console.error("Mark Announcements As Read Error:", err);
+        throw {
+            status: 500,
+            message: "Failed to mark announcements as read.",
+            details: err.message,
+        };
+    }
+};
+
+module.exports = { editUserProfile, viewUserDataService, markAnnouncementsAsRead };
