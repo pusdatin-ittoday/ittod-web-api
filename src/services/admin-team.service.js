@@ -308,10 +308,99 @@ const updateMemberStatus = async (memberId, isComplete) => {
     }
 };
 
+// Delete Team Permanently
+const deleteTeam = async (teamId) => {
+    const existingTeam = await prisma.team.findUnique({
+        where: { id: teamId },
+    });
+
+    if (!existingTeam) {
+        throw { status: 404, message: "Team not found" };
+    }
+
+    return prisma.$transaction(async (tx) => {
+        // Delete related submissions
+        await tx.competition_submission.deleteMany({
+            where: { team_id: teamId },
+        });
+
+        // Delete team member associations
+        await tx.team_member.deleteMany({
+            where: { team_id: teamId },
+        });
+
+        // Delete the team itself
+        const deletedTeam = await tx.team.delete({
+            where: { id: teamId },
+        });
+
+        return { message: "Team deleted successfully", team_id: teamId, team_name: deletedTeam.team_name };
+    });
+};
+
+// Remove a specific member from a team
+const removeMemberFromTeam = async (teamId, memberId) => {
+    const member = await prisma.team_member.findUnique({
+        where: {
+            user_id_team_id: {
+                user_id: memberId,
+                team_id: teamId,
+            },
+        },
+    });
+
+    if (!member) {
+        throw { status: 404, message: "Member not found in this team" };
+    }
+
+    return prisma.$transaction(async (tx) => {
+        // Remove the member
+        await tx.team_member.delete({
+            where: {
+                user_id_team_id: {
+                    user_id: memberId,
+                    team_id: teamId,
+                },
+            },
+        });
+
+        // Check remaining members
+        const remainingMembers = await tx.team_member.findMany({
+            where: { team_id: teamId },
+            orderBy: { role: "asc" },
+        });
+
+        // If no members remain, delete the team automatically
+        if (remainingMembers.length === 0) {
+            await tx.competition_submission.deleteMany({ where: { team_id: teamId } });
+            await tx.team.delete({ where: { id: teamId } });
+            return { message: "Member removed and empty team deleted successfully" };
+        }
+
+        // If the removed member was a leader, promote another member to leader
+        if (member.role === "leader") {
+            const newLeader = remainingMembers[0];
+            await tx.team_member.update({
+                where: {
+                    user_id_team_id: {
+                        user_id: newLeader.user_id,
+                        team_id: teamId,
+                    },
+                },
+                data: { role: "leader" },
+            });
+        }
+
+        return { message: "Member removed from team successfully" };
+    });
+};
+
 module.exports = {
     getTeamsByCompetition,
     getTeamDetail,
     verifyTeam,
     rejectTeam,
     updateMemberStatus,
+    deleteTeam,
+    removeMemberFromTeam,
 };

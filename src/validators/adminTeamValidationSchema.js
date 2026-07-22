@@ -65,10 +65,32 @@ const teamsByCompetitionSchema = Joi.object({
         }),
 });
 
+// Validation for delete team
+const deleteTeamSchema = Joi.object({
+    teamId: Joi.string().uuid().required().messages({
+        "string.guid": "Team ID must be a valid UUID.",
+        "any.required": "Team ID is required.",
+    }),
+});
+
+// Validation for removing a member from team
+const removeMemberSchema = Joi.object({
+    teamId: Joi.string().uuid().required().messages({
+        "string.guid": "Team ID must be a valid UUID.",
+        "any.required": "Team ID is required.",
+    }),
+    memberId: Joi.string().uuid().required().messages({
+        "string.guid": "Member ID must be a valid UUID.",
+        "any.required": "Member ID is required.",
+    }),
+});
+
 module.exports = {
     verifyTeamSchema,
     rejectTeamSchema,
     updateMemberStatusSchema,
     teamDetailSchema,
     teamsByCompetitionSchema,
+    deleteTeamSchema,
+    removeMemberSchema,
 };

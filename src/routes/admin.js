@@ -1,5 +1,5 @@
 const { Router } = require("express");
-const { checkAdmin } = require("../middleware/adminOnlyMiddleware");
+const { checkAdmin, checkSuperAdmin } = require("../middleware/adminOnlyMiddleware");
 const { syncKtm } = require("../controllers/sync-ktm.controller");
 const { isAuthenticated } = require("../middleware/authMiddleware.js");
 const passport = require("../strategies/admin-strategy");
@@ -19,6 +19,8 @@ const {
     verifyTeam,
     rejectTeam,
     updateMemberStatus,
+    deleteTeam,
+    removeMemberFromTeam,
 } = require("../controllers/admin-team.controller");
 const { validateRequest } = require("../middleware/validationMiddleware");
 const {
@@ -27,6 +29,8 @@ const {
     updateMemberStatusSchema,
     teamDetailSchema,
     teamsByCompetitionSchema,
+    deleteTeamSchema,
+    removeMemberSchema,
 } = require("../validators/adminTeamValidationSchema");
 
 const adminRouter = Router();
@@ -108,6 +112,24 @@ adminRouter.patch(
     checkAdmin,
     validateRequest(updateMemberStatusSchema, "combined"),
     updateMemberStatus
+);
+
+// Delete Tim Permanently (SUPERADMIN ONLY)
+adminRouter.delete(
+    "/api/admin/teams/:teamId",
+    isAuthenticated,
+    checkSuperAdmin,
+    validateRequest(deleteTeamSchema, "params"),
+    deleteTeam
+);
+
+// Remove Member from Team (SUPERADMIN ONLY)
+adminRouter.delete(
+    "/api/admin/teams/:teamId/members/:memberId",
+    isAuthenticated,
+    checkSuperAdmin,
+    validateRequest(removeMemberSchema, "params"),
+    removeMemberFromTeam
 );
 
 // ONLY RUN ONCE!

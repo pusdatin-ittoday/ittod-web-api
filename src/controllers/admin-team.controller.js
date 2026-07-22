@@ -186,10 +186,74 @@ const updateMemberStatus = async (req, res) => {
     }
 };
 
+// Delete Tim Permanently
+const deleteTeam = async (req, res) => {
+    try {
+        const { teamId } = req.params;
+        const result = await adminTeamService.deleteTeam(teamId);
+
+        res.status(200).json({
+            success: true,
+            message: result.message,
+            data: result,
+        });
+    } catch (error) {
+        console.error("Error deleting team:", {
+            message: error.message,
+            stack: error.stack,
+            timestamp: new Date().toISOString(),
+        });
+
+        if (error.status === 404) {
+            return res.status(404).json({
+                success: false,
+                message: error.message,
+            });
+        }
+        res.status(500).json({
+            success: false,
+            message: "Internal server error",
+        });
+    }
+};
+
+// Remove Member from Team
+const removeMemberFromTeam = async (req, res) => {
+    try {
+        const { teamId, memberId } = req.params;
+        const result = await adminTeamService.removeMemberFromTeam(teamId, memberId);
+
+        res.status(200).json({
+            success: true,
+            message: result.message,
+            data: result,
+        });
+    } catch (error) {
+        console.error("Error removing member from team:", {
+            message: error.message,
+            stack: error.stack,
+            timestamp: new Date().toISOString(),
+        });
+
+        if (error.status === 404) {
+            return res.status(404).json({
+                success: false,
+                message: error.message,
+            });
+        }
+        res.status(500).json({
+            success: false,
+            message: "Internal server error",
+        });
+    }
+};
+
 module.exports = {
     getTeamsByCompetition,
     getTeamDetail,
     verifyTeam,
     rejectTeam,
     updateMemberStatus,
+    deleteTeam,
+    removeMemberFromTeam,
 };

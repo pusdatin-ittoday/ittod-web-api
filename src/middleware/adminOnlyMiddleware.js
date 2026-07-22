@@ -6,7 +6,8 @@ const checkAdmin = async (req, res, next) => {
             where: { id: req.user.id },
         });
         const role = user?.role;
-        if (role !== "admin") {
+        const allowedAdminRoles = ["admin", "superadmin", "admin_keuangan", "admin_biasa", "panitia"];
+        if (!allowedAdminRoles.includes(role)) {
             return res.status(403).json({ message: "Admin Only" });
         }
         next();
@@ -16,4 +17,20 @@ const checkAdmin = async (req, res, next) => {
     }
 };
 
-module.exports = { checkAdmin };
+const checkSuperAdmin = async (req, res, next) => {
+    try {
+        const user = await prisma.user_identity.findUnique({
+            where: { id: req.user.id },
+        });
+        const role = user?.role;
+        if (role !== "superadmin") {
+            return res.status(403).json({ message: "Superadmin Only" });
+        }
+        next();
+    } catch (error) {
+        console.error("Error in superadmin middleware:", error);
+        return res.status(500).json({ message: "Internal server error" });
+    }
+};
+
+module.exports = { checkAdmin, checkSuperAdmin };
