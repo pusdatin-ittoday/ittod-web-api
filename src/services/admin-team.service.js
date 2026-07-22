@@ -395,6 +395,88 @@ const removeMemberFromTeam = async (teamId, memberId) => {
     });
 };
 
+// Update Team Details
+const updateTeam = async (teamId, data) => {
+    const existingTeam = await prisma.team.findUnique({ where: { id: teamId } });
+    if (!existingTeam) throw { status: 404, message: "Team not found" };
+
+    const updateData = {};
+    if (data.team_name && data.team_name.trim() !== "") updateData.team_name = data.team_name.trim();
+    if (data.max_member && Number.isInteger(data.max_member)) updateData.max_member = data.max_member;
+    if (data.is_verified) updateData.is_verified = data.is_verified;
+    if (data.is_document_verified) updateData.is_document_verified = data.is_document_verified;
+    if (data.verification_error !== undefined) updateData.verification_error = data.verification_error;
+
+    const updated = await prisma.team.update({
+        where: { id: teamId },
+        data: updateData,
+    });
+    return { message: "Team updated successfully", data: updated };
+};
+
+// Add Member to Team
+const addMemberToTeam = async (teamId, { email, user_id, role = "member" }) => {
+    const team = await prisma.team.findUnique({
+        where: { id: teamId },
+        include: { members: true },
+    });
+    if (!team) throw { status: 404, message: "Team not found" };
+
+    if (team.members.length >= team.max_member) {
+        throw { status: 400, message: "Team is already full" };
+    }
+
+    let targetUser = null;
+    if (user_id) {
+        targetUser = await prisma.user.findUnique({ where: { id: user_id } });
+    } else if (email) {
+        targetUser = await prisma.user.findUnique({ where: { email } });
+    }
+
+    if (!targetUser) throw { status: 404, message: "User not found" };
+
+    const existingMember = await prisma.team_member.findUnique({
+        where: { user_id_team_id: { user_id: targetUser.id, team_id: teamId } },
+    });
+    if (existingMember) throw { status: 409, message: "User is already a member of this team" };
+
+    const newMember = await prisma.team_member.create({
+        data: {
+            user_id: targetUser.id,
+            team_id: teamId,
+            role: role === "leader" ? "leader" : "member",
+        },
+    });
+
+    return { message: "Member added to team successfully", data: newMember };
+};
+
+// Transfer Team Leadership
+const transferTeamLeadership = async (teamId, newLeaderId) => {
+    const team = await prisma.team.findUnique({
+        where: { id: teamId },
+        include: { members: true },
+    });
+    if (!team) throw { status: 404, message: "Team not found" };
+
+    const targetMember = team.members.find(m => m.user_id === newLeaderId);
+    if (!targetMember) throw { status: 404, message: "Target user is not a member of this team" };
+
+    return prisma.$transaction(async (tx) => {
+        await tx.team_member.updateMany({
+            where: { team_id: teamId, role: "leader" },
+            data: { role: "member" },
+        });
+
+        await tx.team_member.update({
+            where: { user_id_team_id: { user_id: newLeaderId, team_id: teamId } },
+            data: { role: "leader" },
+        });
+
+        return { message: "Leadership transferred successfully", new_leader_id: newLeaderId };
+    });
+};
+
 module.exports = {
     getTeamsByCompetition,
     getTeamDetail,
@@ -403,4 +485,7 @@ module.exports = {
     updateMemberStatus,
     deleteTeam,
     removeMemberFromTeam,
+    updateTeam,
+    addMemberToTeam,
+    transferTeamLeadership,
 };

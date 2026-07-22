@@ -248,6 +248,70 @@ const removeMemberFromTeam = async (req, res) => {
     }
 };
 
+// Update Team Details
+const updateTeam = async (req, res) => {
+    try {
+        const { teamId } = req.params;
+        const result = await adminTeamService.updateTeam(teamId, req.body);
+
+        res.status(200).json({
+            success: true,
+            message: result.message,
+            data: result.data,
+        });
+    } catch (error) {
+        console.error("Error updating team:", error);
+        res.status(error.status || 500).json({
+            success: false,
+            message: error.message || "Internal server error",
+        });
+    }
+};
+
+// Add Member to Team
+const addMemberToTeam = async (req, res) => {
+    try {
+        const { teamId } = req.params;
+        const result = await adminTeamService.addMemberToTeam(teamId, req.body);
+
+        res.status(201).json({
+            success: true,
+            message: result.message,
+            data: result.data,
+        });
+    } catch (error) {
+        console.error("Error adding member to team:", error);
+        res.status(error.status || 500).json({
+            success: false,
+            message: error.message || "Internal server error",
+        });
+    }
+};
+
+// Transfer Leadership
+const transferTeamLeadership = async (req, res) => {
+    try {
+        const { teamId } = req.params;
+        const { newLeaderId } = req.body;
+        if (!newLeaderId) {
+            return res.status(400).json({ success: false, message: "newLeaderId is required" });
+        }
+        const result = await adminTeamService.transferTeamLeadership(teamId, newLeaderId);
+
+        res.status(200).json({
+            success: true,
+            message: result.message,
+            data: result,
+        });
+    } catch (error) {
+        console.error("Error transferring leadership:", error);
+        res.status(error.status || 500).json({
+            success: false,
+            message: error.message || "Internal server error",
+        });
+    }
+};
+
 module.exports = {
     getTeamsByCompetition,
     getTeamDetail,
@@ -256,4 +320,7 @@ module.exports = {
     updateMemberStatus,
     deleteTeam,
     removeMemberFromTeam,
+    updateTeam,
+    addMemberToTeam,
+    transferTeamLeadership,
 };

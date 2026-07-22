@@ -21,7 +21,22 @@ const {
     updateMemberStatus,
     deleteTeam,
     removeMemberFromTeam,
+    updateTeam,
+    addMemberToTeam,
+    transferTeamLeadership,
 } = require("../controllers/admin-team.controller");
+const {
+    getUsersList,
+    getUserDetail,
+    updateUser,
+    changeUserRole,
+    deleteUser,
+} = require("../controllers/admin-user.controller");
+const {
+    createAnnouncement,
+    updateAnnouncement,
+    deleteAnnouncement,
+} = require("../controllers/admin-announcement.controller");
 const { validateRequest } = require("../middleware/validationMiddleware");
 const {
     verifyTeamSchema,
@@ -34,8 +49,11 @@ const {
 } = require("../validators/adminTeamValidationSchema");
 
 const adminRouter = Router();
+
+// Sync KTM
 adminRouter.get("/api/admin/sync-ktm", isAuthenticated, checkAdmin, syncKtm);
 
+// Login Admin
 adminRouter.post(
     "/api/admin/login",
     loginLimiter,
@@ -45,7 +63,7 @@ adminRouter.post(
     loginAdmin
 );
 
-//json untuk tampilin data kompetisi
+// Competition view data
 adminRouter.get(
     "/api/admin/competition-view/:id",
     isAuthenticated,
@@ -53,7 +71,6 @@ adminRouter.get(
     getCompetitionById
 );
 
-//json untuk data dropdown
 adminRouter.get(
     "/api/admin/competition-list",
     isAuthenticated,
@@ -61,13 +78,15 @@ adminRouter.get(
     getCompetitionList
 );
 
-// Create new timeline
+// Timeline Management
 adminRouter.post(
     "/api/admin/create-timeline",
     isAuthenticated,
     checkAdmin,
     createTimeline
 );
+
+// ==================== TEAM MANAGEMENT ====================
 
 // Get List Tim Berdasarkan Kompetisi
 adminRouter.get(
@@ -114,6 +133,30 @@ adminRouter.patch(
     updateMemberStatus
 );
 
+// Update Team Details
+adminRouter.patch(
+    "/api/admin/teams/:teamId",
+    isAuthenticated,
+    checkAdmin,
+    updateTeam
+);
+
+// Add Member to Team
+adminRouter.post(
+    "/api/admin/teams/:teamId/members",
+    isAuthenticated,
+    checkAdmin,
+    addMemberToTeam
+);
+
+// Transfer Team Leadership
+adminRouter.patch(
+    "/api/admin/teams/:teamId/leader",
+    isAuthenticated,
+    checkAdmin,
+    transferTeamLeadership
+);
+
 // Delete Tim Permanently (SUPERADMIN ONLY)
 adminRouter.delete(
     "/api/admin/teams/:teamId",
@@ -130,6 +173,74 @@ adminRouter.delete(
     checkSuperAdmin,
     validateRequest(removeMemberSchema, "params"),
     removeMemberFromTeam
+);
+
+// ==================== USER MANAGEMENT ====================
+
+// List all users
+adminRouter.get(
+    "/api/admin/users",
+    isAuthenticated,
+    checkAdmin,
+    getUsersList
+);
+
+// Get user detail
+adminRouter.get(
+    "/api/admin/users/:userId",
+    isAuthenticated,
+    checkAdmin,
+    getUserDetail
+);
+
+// Update user profile
+adminRouter.patch(
+    "/api/admin/users/:userId",
+    isAuthenticated,
+    checkAdmin,
+    updateUser
+);
+
+// Change user role (SUPERADMIN ONLY)
+adminRouter.patch(
+    "/api/admin/users/:userId/role",
+    isAuthenticated,
+    checkSuperAdmin,
+    changeUserRole
+);
+
+// Delete user account (SUPERADMIN ONLY)
+adminRouter.delete(
+    "/api/admin/users/:userId",
+    isAuthenticated,
+    checkSuperAdmin,
+    deleteUser
+);
+
+// ==================== ANNOUNCEMENT MANAGEMENT ====================
+
+// Create announcement
+adminRouter.post(
+    "/api/admin/announcements",
+    isAuthenticated,
+    checkAdmin,
+    createAnnouncement
+);
+
+// Update announcement
+adminRouter.put(
+    "/api/admin/announcements/:announcementId",
+    isAuthenticated,
+    checkAdmin,
+    updateAnnouncement
+);
+
+// Delete announcement
+adminRouter.delete(
+    "/api/admin/announcements/:announcementId",
+    isAuthenticated,
+    checkAdmin,
+    deleteAnnouncement
 );
 
 // ONLY RUN ONCE!
