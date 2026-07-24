@@ -64,6 +64,7 @@ Table sessions {
 
 Table event {
   id String [pk]
+  slug String [unique]
   title String [not null]
   description String
   guide_book_url String

@@ -84,6 +84,7 @@ model sessions {
 
 model event {
   id                             String                   @id
+  slug                           String?                  @unique(map: "event_slug_unique") @db.VarChar(255)
   title                          String                   @db.Text
   description                    String?                  @db.Text
   guide_book_url                 String?                  @db.Text

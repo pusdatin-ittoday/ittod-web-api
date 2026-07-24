@@ -13,6 +13,7 @@ const getEventsController = async (req, res) => {
             where: filter,
             select: {
                 id: true,
+                slug: true,
                 title: true,
                 description: true,
                 type: true,
@@ -52,10 +53,15 @@ const getEventsController = async (req, res) => {
 
 const getEventByIdController = async (req, res) => {
     try {
-        const { id } = req.params;
+        const { id: idOrSlug } = req.params;
 
-        const event = await prisma.event.findUnique({
-            where: { id },
+        const event = await prisma.event.findFirst({
+            where: {
+                OR: [
+                    { id: idOrSlug },
+                    { slug: idOrSlug }
+                ]
+            },
             select: {
                 id: true,
                 title: true,
