@@ -64,6 +64,7 @@ const getEventByIdController = async (req, res) => {
             },
             select: {
                 id: true,
+                slug: true,
                 title: true,
                 description: true,
                 type: true,

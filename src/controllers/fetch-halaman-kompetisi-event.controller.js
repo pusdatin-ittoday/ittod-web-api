@@ -10,6 +10,7 @@ const fetchHalamanKompetisiEvent = async (req, res) => {
         const events = await prisma.event.findMany({
             select: {
                 id: true,
+                slug: true,
                 title: true,
                 description: true,
                 guide_book_url: true,
