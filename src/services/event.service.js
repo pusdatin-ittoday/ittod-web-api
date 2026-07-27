@@ -8,7 +8,12 @@ const registerUserIntoEvent = async (
     date_of_birth
 ) => {
     const eventExists = await prisma.event.findFirst({
-        where: { id: event_id },
+        where: {
+            OR: [
+                { id: event_id },
+                { slug: event_id }
+            ]
+        },
     });
 
     if (date_of_birth) {
@@ -25,8 +30,10 @@ const registerUserIntoEvent = async (
         };
     }
 
+    const actualEventId = eventExists.id;
+
     const userAlreadyInEvent = await prisma.event_participant.findFirst({
-        where: { user_id, event_id },
+        where: { user_id, event_id: actualEventId },
     });
 
     if (userAlreadyInEvent) {
@@ -41,7 +48,7 @@ const registerUserIntoEvent = async (
             const lockedEvent = await tx.$queryRaw`
                 SELECT max_noncompetition_participant
                 FROM event
-                WHERE id = ${event_id}
+                WHERE id = ${actualEventId}
                     FOR UPDATE
             `;
 
@@ -49,7 +56,7 @@ const registerUserIntoEvent = async (
 
             const eventParticipantCount = await tx.event_participant.count({
                 where: { 
-                    event_id,
+                    event_id: actualEventId,
                     payment_verification: { in: ['pending', 'accepted'] }
                 },
             });
@@ -76,14 +83,14 @@ const registerUserIntoEvent = async (
             await tx.event_participant.create({
                 data: {
                     user_id,
-                    event_id,
+                    event_id: actualEventId,
                     date_added: new Date(),
                 },
             });
         });
 
         return {
-            message: `User has been registered into event with id ${event_id}`,
+            message: `User has been registered into event with id ${actualEventId}`,
         };
     } catch (err) {
         console.error("Registration error:", err);
