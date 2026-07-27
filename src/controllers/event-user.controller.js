@@ -34,7 +34,7 @@ const eventShowController = async (req, res) => {
                 event_id: true,
                 payment_verification: true,
                 event: {
-                    select: { title: true },
+                    select: { id: true, slug: true, title: true, whatsapp_group_link: true },
                 },
             },
         });
