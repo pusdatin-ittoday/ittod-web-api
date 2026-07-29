@@ -173,6 +173,14 @@ exports.memberJoinWithTeamCode = async ({ user_id, team_code }) => {
                 },
             });
 
+            // Reset verifikasi berkas tim ke pending karena ada anggota baru
+            // yang berkasnya belum diperiksa panitia.
+            // is_verified (pembayaran) tidak diubah.
+            await tx.team.update({
+                where: { id: team.id },
+                data: { is_document_verified: "pending" },
+            });
+
             return { message: "Successfully joined the team" };
         },
         { isolationLevel: "Serializable" }
