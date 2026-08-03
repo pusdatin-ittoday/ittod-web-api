@@ -29,92 +29,106 @@ exports.registerTeamThenInsertLeader = async ({
         throw { status: 400, message: "Team name is required" };
     }
 
-    const existingRegistration = await prisma.team_member.findFirst({
-        where: {
-            user_id: leader_id,
-            team: {
-                competition_id,
-            },
-        },
-    });
-
-    if (existingRegistration) {
-        throw {
-            status: 409,
-            message: "You are already registered for this competition",
-        };
-    }
-
-    const existingTeamLeadership = !isIndividual
-        ? await prisma.team_member.findFirst({
-              where: {
-                  user_id: leader_id,
-                  role: "leader",
-                  team: {
-                      competition: {
-                          participation_type: "team",
-                      },
-                  },
-              },
-          })
-        : null;
-
-    if (existingTeamLeadership) {
-        throw {
-            status: 403,
-            message: "You can only register one team as a leader",
-        };
-    }
-    await checkUserCompetitionLimit(prisma, leader_id);
-    const random_id = crypto.randomUUID();
-    const resolvedTeamName = isIndividual
-        ? `${leaderExists.full_name} - ${competitionExists.title} - ${random_id.slice(0, 8)}`
-        : submittedTeamName;
-    const MAX_RETRIES = 10;
-    let retryCount = 0;
-    let team_code;
-    let existingTeamWithCode;
-    // Ensure team code is unique
-    do {
-        team_code = crypto.randomBytes(6).toString("base64url");
-        existingTeamWithCode = await prisma.team.findUnique({
-            where: { team_code },
-        });
-        retryCount++;
-        if (retryCount >= MAX_RETRIES && existingTeamWithCode) {
-            throw {
-                status: 500,
-                message: "Failed to generate unique team code",
-            };
-        }
-    } while (existingTeamWithCode);
-
-    const teamExists = await prisma.team.findFirst({
-        where: { team_name: resolvedTeamName },
-    });
-    if (teamExists) throw { status: 409, message: "Team name already exists" };
-
     try {
-        await prisma.$transaction(async tx => {
-            // Create the team
-            await tx.team.create({
-                data: {
-                    id: random_id,
-                    competition_id,
-                    team_name: resolvedTeamName,
-                    team_code,
-                    max_member: isIndividual ? 1 : (competitionExists.max_member ?? 3),
-                },
-            });
-            // Add the leader to the team
-            await tx.team_member.create({
-                data: {
-                    user_id: leader_id,
-                    team_id: random_id,
-                    role: "leader",
-                },
-            });
-        });
+        await prisma.$transaction(
+            async (tx) => {
+                const existingRegistration = await tx.team_member.findFirst({
+                    where: {
+                        user_id: leader_id,
+                        team: {
+                            competition_id,
+                        },
+                    },
+                });
+
+                if (existingRegistration) {
+                    throw {
+                        status: 409,
+                        message: "You are already registered for this competition",
+                    };
+                }
+
+                const existingTeamLeadership = !isIndividual
+                    ? await tx.team_member.findFirst({
+                          where: {
+                              user_id: leader_id,
+                              role: "leader",
+                              team: {
+                                  competition: {
+                                      participation_type: "team",
+                                  },
+                              },
+                          },
+                      })
+                    : null;
+
+                if (existingTeamLeadership) {
+                    throw {
+                        status: 403,
+                        message: "You can only register one team as a leader",
+                    };
+                }
+
+                await checkUserCompetitionLimit(tx, leader_id);
+
+                const random_id = crypto.randomUUID();
+                const resolvedTeamName = isIndividual
+                    ? `${leaderExists.full_name} - ${competitionExists.title} - ${random_id.slice(0, 8)}`
+                    : submittedTeamName;
+
+                const teamExists = await tx.team.findFirst({
+                    where: {
+                        competition_id,
+                        team_name: resolvedTeamName,
+                    },
+                });
+                if (teamExists) {
+                    throw { status: 409, message: "Team name already exists" };
+                }
+
+                const MAX_RETRIES = 10;
+                let retryCount = 0;
+                let team_code;
+                let existingTeamWithCode;
+                // Ensure team code is unique
+                do {
+                    team_code = crypto.randomBytes(6).toString("base64url");
+                    existingTeamWithCode = await tx.team.findUnique({
+                        where: { team_code },
+                    });
+                    retryCount++;
+                    if (retryCount >= MAX_RETRIES && existingTeamWithCode) {
+                        throw {
+                            status: 500,
+                            message: "Failed to generate unique team code",
+                        };
+                    }
+                } while (existingTeamWithCode);
+
+                // Create the team
+                await tx.team.create({
+                    data: {
+                        id: random_id,
+                        competition_id,
+                        team_name: resolvedTeamName,
+                        team_code,
+                        max_member: isIndividual
+                            ? 1
+                            : (competitionExists.max_member ?? 3),
+                    },
+                });
+
+                // Add the leader to the team
+                await tx.team_member.create({
+                    data: {
+                        user_id: leader_id,
+                        team_id: random_id,
+                        role: "leader",
+                    },
+                });
+            },
+            { isolationLevel: "Serializable" }
+        );
 
         return {
             message: isIndividual
@@ -123,6 +137,7 @@ exports.registerTeamThenInsertLeader = async ({
             participation_type: competitionExists.participation_type,
         };
     } catch (error) {
+        if (error.status) throw error;
         console.error("Registration error:", error);
         throw { status: 500, message: "Failed to register team" };
     }
@@ -130,11 +145,26 @@ exports.registerTeamThenInsertLeader = async ({
 
 exports.memberJoinWithTeamCode = async ({ user_id, team_code }) => {
     return prisma.$transaction(
-        async tx => {
+        async (tx) => {
             await checkUserCompetitionLimit(tx, user_id);
 
             const team = await tx.team.findUnique({ where: { team_code } });
             if (!team) throw { status: 404, message: "Invalid team code" };
+
+            const existingCompetitionRegistration = await tx.team_member.findFirst({
+                where: {
+                    user_id: user_id,
+                    team: {
+                        competition_id: team.competition_id,
+                    },
+                },
+            });
+            if (existingCompetitionRegistration) {
+                throw {
+                    status: 409,
+                    message: "You are already registered for a team in this competition",
+                };
+            }
 
             const existingMember = await tx.team_member.findUnique({
                 where: { user_id_team_id: { user_id, team_id: team.id } },
@@ -184,5 +214,5 @@ exports.memberJoinWithTeamCode = async ({ user_id, team_code }) => {
             return { message: "Successfully joined the team" };
         },
         { isolationLevel: "Serializable" }
-    ); // Important!
+    );
 };
