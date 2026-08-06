@@ -5,13 +5,27 @@ const upsertTeamSubmission = async (team_id, submission_object) => {
         await prisma.$transaction(async tx => {
             const team = await tx.team.findUnique({
                 where: { id: team_id },
-                select: { competition_id: true },
+                select: {
+                    competition_id: true,
+                    is_verified: true,
+                    is_document_verified: true,
+                },
             });
 
             if (!team) {
                 throw {
                     status: 404,
                     message: "Team not found",
+                };
+            }
+
+            const isPaymentVerified = team.is_verified === true || team.is_verified === 1 || team.is_verified === "approved";
+            const isDocumentVerified = team.is_document_verified === true || team.is_document_verified === 1 || team.is_document_verified === "approved";
+
+            if (!isPaymentVerified || !isDocumentVerified) {
+                throw {
+                    status: 403,
+                    message: "Tim belum sepenuhnya terverifikasi. Pastikan berkas dan pembayaran sudah disetujui.",
                 };
             }
 
