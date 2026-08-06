@@ -94,6 +94,7 @@ const getUserCompetitionData = async (req, res) => {
                         participation_type: true,
                         requires_submission: true,
                         whatsapp_group_link: true,
+                        external_platform_link: true,
                         timelines: {
                             orderBy: { date: 'asc' }
                         },
@@ -128,8 +129,8 @@ const getUserCompetitionData = async (req, res) => {
             participationType:
                 team.competition?.participation_type ?? "team",
             requiresSubmission: team.competition?.requires_submission ?? false,
-            participationType: team.competition?.participation_type ?? "team",
             whatsappGroupLink: team.competition?.whatsapp_group_link ?? null,
+            externalPlatformLink: team.competition?.external_platform_link ?? null,
             timelines: team.competition?.timelines ?? [],
             submissionData: team.submissions?.length > 0 ? team.submissions[0] : null,
             members: team.members
