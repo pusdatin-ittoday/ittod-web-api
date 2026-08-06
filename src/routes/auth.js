@@ -51,15 +51,26 @@ authRouter.get(
 
 authRouter.get(
     "/api/auth/google/redirect",
-    passport.authenticate("google-user", { failureRedirect: "/login" }),
-    (req, res) => {
-        const frontendUrl = process.env.FRONTEND_URL;
-        if (!frontendUrl) {
-            return res
-                .status(500)
-                .send("FRONTEND_URL is not set in the environment variables.");
-        }
-        res.redirect(`${frontendUrl}/dashboard/beranda`);
+    (req, res, next) => {
+        passport.authenticate("google-user", (err, user, info) => {
+            const frontendUrl = process.env.FRONTEND_URL;
+            if (!frontendUrl) {
+                return res.status(500).send("FRONTEND_URL is not set in the environment variables.");
+            }
+            if (err) {
+                return res.redirect(`${frontendUrl}/login?error=internal_error`);
+            }
+            if (!user) {
+                const message = info ? info.message : 'Login failed';
+                return res.redirect(`${frontendUrl}/login?error=${encodeURIComponent(message)}`);
+            }
+            req.logIn(user, (loginErr) => {
+                if (loginErr) {
+                    return res.redirect(`${frontendUrl}/login?error=internal_error`);
+                }
+                return res.redirect(`${frontendUrl}/dashboard/beranda`);
+            });
+        })(req, res, next);
     }
 );
 
