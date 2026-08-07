@@ -190,6 +190,7 @@ model event_announcement {
   title       String   @db.Text
   description String   @db.Text
   is_pinned   Boolean  @default(false)
+  priority    Int      @default(0)
   created_at  DateTime @default(now())
   updated_at  DateTime @updatedAt
   author      user     @relation(fields: [author_id], references: [id], map: "event_announcement_author_id_foreign")

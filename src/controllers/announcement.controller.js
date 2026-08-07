@@ -3,55 +3,112 @@ const prisma = require("../prisma.js");
 exports.getAllAnnouncements = async (req, res) => {
     try {
         const userId = req.user.id;
-        const announcements = await prisma.event_announcement.findMany({
-            where: {
-                OR: [
-                    { event_id: null },
-                    {
-                        event: {
-                            participants: {
-                                some: { user_id: userId },
+        let announcements;
+
+        try {
+            announcements = await prisma.event_announcement.findMany({
+                where: {
+                    OR: [
+                        { event_id: null },
+                        {
+                            event: {
+                                participants: {
+                                    some: { user_id: userId },
+                                },
                             },
                         },
-                    },
-                    {
-                        event: {
-                            teams: {
-                                some: {
-                                    members: {
-                                        some: { user_id: userId },
+                        {
+                            event: {
+                                teams: {
+                                    some: {
+                                        members: {
+                                            some: { user_id: userId },
+                                        },
                                     },
                                 },
                             },
                         },
+                    ],
+                },
+                select: {
+                    id: true,
+                    title: true,
+                    description: true,
+                    is_pinned: true,
+                    priority: true,
+                    created_at: true,
+                    updated_at: true,
+                    event: {
+                        select: {
+                            id: true,
+                            title: true,
+                        },
                     },
+                    author: {
+                        select: {
+                            id: true,
+                            full_name: true,
+                        },
+                    },
+                },
+                orderBy: [
+                    { priority: "desc" },
+                    { is_pinned: "desc" },
+                    { created_at: "desc" },
                 ],
-            },
-            select: {
-                id: true,
-                title: true,
-                description: true,
-                is_pinned: true,
-                created_at: true,
-                updated_at: true,
-                event: {
-                    select: {
-                        id: true,
-                        title: true,
+            });
+        } catch (dbErr) {
+            console.warn("Fallback fetching announcements without priority column:", dbErr.message);
+            announcements = await prisma.event_announcement.findMany({
+                where: {
+                    OR: [
+                        { event_id: null },
+                        {
+                            event: {
+                                participants: {
+                                    some: { user_id: userId },
+                                },
+                            },
+                        },
+                        {
+                            event: {
+                                teams: {
+                                    some: {
+                                        members: {
+                                            some: { user_id: userId },
+                                        },
+                                    },
+                                },
+                            },
+                        },
+                    ],
+                },
+                select: {
+                    id: true,
+                    title: true,
+                    description: true,
+                    is_pinned: true,
+                    created_at: true,
+                    updated_at: true,
+                    event: {
+                        select: {
+                            id: true,
+                            title: true,
+                        },
+                    },
+                    author: {
+                        select: {
+                            id: true,
+                            full_name: true,
+                        },
                     },
                 },
-                author: {
-                    select: {
-                        id: true,
-                        full_name: true,
-                    },
-                },
-            },
-            orderBy: [
-                { is_pinned: "desc" },
-                { created_at: "desc" },
-            ],
-        });
+                orderBy: [
+                    { is_pinned: "desc" },
+                    { created_at: "desc" },
+                ],
+            });
+        }
 
         res.json({
             success: true,
