@@ -289,19 +289,24 @@ exports.updateTeamName = async ({ team_id, team_name, user_id }) => {
                 };
             }
 
+            const now = new Date();
             const updatedTeam = await tx.team.update({
                 where: { id: team_id },
                 data: {
+                    previous_team_name: team.team_name,
                     team_name: trimmedName,
                     is_name_changed: true,
-                    updated_at: new Date(),
+                    name_changed_at: now,
+                    updated_at: now,
                 },
             });
 
             return {
                 message: "Nama tim berhasil diubah",
                 team_name: updatedTeam.team_name,
+                previous_team_name: updatedTeam.previous_team_name,
                 is_name_changed: updatedTeam.is_name_changed,
+                name_changed_at: updatedTeam.name_changed_at,
             };
         },
         { isolationLevel: "Serializable" }
