@@ -35,6 +35,7 @@ model user {
   event_participants       event_participant[]
   media                    media[]
   team_members             team_member[]
+  user_feedbacks           user_feedback[]
   identity                 user_identity?
 
   @@map("user")
@@ -199,6 +200,21 @@ model event_announcement {
   @@index([author_id], map: "event_announcement_author_id_foreign")
   @@index([event_id], map: "event_announcement_event_id_foreign")
   @@map("event_announcement")
+}
+
+model user_feedback {
+  id         String   @id
+  user_id    String
+  subject    String   @db.VarChar(191)
+  content    String   @db.Text
+  media_urls Json?
+  status     String   @default("pending") @db.VarChar(50)
+  created_at DateTime @default(now())
+  updated_at DateTime @updatedAt
+  user       user     @relation(fields: [user_id], references: [id], onDelete: Cascade, map: "user_feedback_user_id_foreign")
+
+  @@index([user_id], map: "user_feedback_user_id_foreign")
+  @@map("user_feedback")
 }
 
 model competition_submission {
