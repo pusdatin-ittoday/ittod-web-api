@@ -112,6 +112,7 @@ Table team {
   max_member Int [not null, default: 3]
   is_document_verified document_verification_enum [not null, default: 'pending']
   is_verified document_verification_enum [not null, default: 'pending']
+  is_name_changed Boolean [not null, default: false]
   verification_error String
   created_at DateTime [default: `now()`, not null]
   updated_at DateTime

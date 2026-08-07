@@ -137,6 +137,7 @@ model team {
   max_member           Int                        @default(3)
   is_document_verified document_verification_enum @default(pending)
   is_verified          document_verification_enum @default(pending)
+  is_name_changed      Boolean                    @default(false)
   verification_error   String?                    @db.Text
   created_at           DateTime                   @default(now())
   updated_at           DateTime?

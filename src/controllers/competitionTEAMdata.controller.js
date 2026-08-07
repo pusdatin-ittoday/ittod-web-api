@@ -13,6 +13,7 @@ const getCompetitionData = async (req, res) => {
                 team_name: true,
                 team_code: true,
                 is_verified: true,
+                is_name_changed: true,
                 payment_proof_id: true,
                 verification_error: true,
                 competition: {
@@ -44,6 +45,7 @@ const getCompetitionData = async (req, res) => {
             teamID: team.id,
             teamJoinCode: team.team_code,
             teamName: team.team_name,
+            isNameChanged: team.is_name_changed ?? false,
             isVerified: team.is_verified,
             paymentProofID: team.payment_proof_id,
             verificationError: team.verification_error,
@@ -85,6 +87,7 @@ const getUserCompetitionData = async (req, res) => {
                 team_code: true,
                 is_verified: true,
                 is_document_verified: true,
+                is_name_changed: true,
                 verification_error: true,
                 payment_proof_id: true,
                 competition: {
@@ -120,6 +123,7 @@ const getUserCompetitionData = async (req, res) => {
             teamID: team.id,
             teamJoinCode: team.team_code,
             teamName: team.team_name,
+            isNameChanged: team.is_name_changed ?? false,
             isVerified: team.is_verified,
             isDocumentVerified: team.is_document_verified,
             paymentProofID: team.payment_proof_id,
