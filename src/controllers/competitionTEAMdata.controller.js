@@ -7,43 +7,86 @@ const prisma = require("../prisma.js");
  */
 const getCompetitionData = async (req, res) => {
     try {
-        const competitionData = await prisma.team.findMany({
-            select: {
-                id: true,
-                team_name: true,
-                team_code: true,
-                is_verified: true,
-                payment_proof_id: true,
-                verification_error: true,
-                competition: {
-                    select: {
-                        title: true,
-                        participation_type: true,
-                        whatsapp_group_link: true,
-                        timelines: {
-                            orderBy: { date: 'asc' }
+        let competitionData;
+        try {
+            competitionData = await prisma.team.findMany({
+                select: {
+                    id: true,
+                    team_name: true,
+                    team_code: true,
+                    is_verified: true,
+                    is_name_changed: true,
+                    previous_team_name: true,
+                    name_changed_at: true,
+                    payment_proof_id: true,
+                    verification_error: true,
+                    competition: {
+                        select: {
+                            title: true,
+                            participation_type: true,
+                            whatsapp_group_link: true,
+                            timelines: {
+                                orderBy: { date: 'asc' }
+                            },
                         },
                     },
-                },
-                members: {
-                    select: {
-                        role: true,
-                        verification_error: true, // Include verification error for members
-                        user: {
-                            select: {
-                                full_name: true,
-                                is_registration_complete: true,
+                    members: {
+                        select: {
+                            role: true,
+                            verification_error: true,
+                            user: {
+                                select: {
+                                    full_name: true,
+                                    is_registration_complete: true,
+                                },
                             },
                         },
                     },
                 },
-            },
-        });
+            });
+        } catch (dbErr) {
+            console.warn("Fallback query for getCompetitionData (DB columns missing):", dbErr.message);
+            competitionData = await prisma.team.findMany({
+                select: {
+                    id: true,
+                    team_name: true,
+                    team_code: true,
+                    is_verified: true,
+                    payment_proof_id: true,
+                    verification_error: true,
+                    competition: {
+                        select: {
+                            title: true,
+                            participation_type: true,
+                            whatsapp_group_link: true,
+                            timelines: {
+                                orderBy: { date: 'asc' }
+                            },
+                        },
+                    },
+                    members: {
+                        select: {
+                            role: true,
+                            verification_error: true,
+                            user: {
+                                select: {
+                                    full_name: true,
+                                    is_registration_complete: true,
+                                },
+                            },
+                        },
+                    },
+                },
+            });
+        }
 
         const formattedData = competitionData.map(team => ({
             teamID: team.id,
             teamJoinCode: team.team_code,
             teamName: team.team_name,
+            isNameChanged: team.is_name_changed ?? false,
+            previousTeamName: team.previous_team_name ?? null,
+            nameChangedAt: team.name_changed_at ?? null,
             isVerified: team.is_verified,
             paymentProofID: team.payment_proof_id,
             verificationError: team.verification_error,
@@ -52,12 +95,12 @@ const getCompetitionData = async (req, res) => {
             whatsappGroupLink: team.competition?.whatsapp_group_link ?? null,
             timelines: team.competition?.timelines ?? [],
             members: team.members
-                .sort((a, b) => (a.role === "leader" ? -1 : 1)) // Sort leader to the top
+                .sort((a, b) => (a.role === "leader" ? -1 : 1))
                 .map(member => ({
                     fullName: member.user.full_name,
                     isRegistrationComplete:
                         member.user.is_registration_complete,
-                    verificationError: member.verification_error, // Include member's verification error
+                    verificationError: member.verification_error,
                 })),
         }));
 
@@ -71,54 +114,110 @@ const getCompetitionData = async (req, res) => {
 const getUserCompetitionData = async (req, res) => {
     const user_id = req.user.id;
     try {
-        const userCompetitionData = await prisma.team.findMany({
-            where: {
-                members: {
-                    some: {
-                        user_id: user_id,
-                    },
-                },
-            },
-            select: {
-                id: true,
-                team_name: true,
-                team_code: true,
-                is_verified: true,
-                is_document_verified: true,
-                verification_error: true,
-                payment_proof_id: true,
-                competition: {
-                    select: {
-                        id: true,
-                        title: true,
-                        participation_type: true,
-                        requires_submission: true,
-                        whatsapp_group_link: true,
-                        timelines: {
-                            orderBy: { date: 'asc' }
+        let userCompetitionData;
+        try {
+            userCompetitionData = await prisma.team.findMany({
+                where: {
+                    members: {
+                        some: {
+                            user_id: user_id,
                         },
                     },
                 },
-                submissions: true,
-                members: {
-                    select: {
-                        role: true,
-                        verification_error: true, // Include verification error for members
-                        user: {
-                            select: {
-                                full_name: true,
-                                is_registration_complete: true,
+                select: {
+                    id: true,
+                    team_name: true,
+                    team_code: true,
+                    is_verified: true,
+                    is_document_verified: true,
+                    is_name_changed: true,
+                    previous_team_name: true,
+                    name_changed_at: true,
+                    verification_error: true,
+                    payment_proof_id: true,
+                    competition: {
+                        select: {
+                            id: true,
+                            title: true,
+                            participation_type: true,
+                            requires_submission: true,
+                            whatsapp_group_link: true,
+                            external_platform_link: true,
+                            timelines: {
+                                orderBy: { date: 'asc' }
+                            },
+                        },
+                    },
+                    submissions: true,
+                    members: {
+                        select: {
+                            role: true,
+                            verification_error: true,
+                            user: {
+                                select: {
+                                    full_name: true,
+                                    is_registration_complete: true,
+                                },
                             },
                         },
                     },
                 },
-            },
-        });
+            });
+        } catch (dbErr) {
+            console.warn("Fallback query for getUserCompetitionData (DB columns missing):", dbErr.message);
+            userCompetitionData = await prisma.team.findMany({
+                where: {
+                    members: {
+                        some: {
+                            user_id: user_id,
+                        },
+                    },
+                },
+                select: {
+                    id: true,
+                    team_name: true,
+                    team_code: true,
+                    is_verified: true,
+                    is_document_verified: true,
+                    verification_error: true,
+                    payment_proof_id: true,
+                    competition: {
+                        select: {
+                            id: true,
+                            title: true,
+                            participation_type: true,
+                            requires_submission: true,
+                            whatsapp_group_link: true,
+                            external_platform_link: true,
+                            timelines: {
+                                orderBy: { date: 'asc' }
+                            },
+                        },
+                    },
+                    submissions: true,
+                    members: {
+                        select: {
+                            role: true,
+                            verification_error: true,
+                            user: {
+                                select: {
+                                    full_name: true,
+                                    is_registration_complete: true,
+                                },
+                            },
+                        },
+                    },
+                },
+            });
+        }
 
         const formattedData = userCompetitionData.map(team => ({
             teamID: team.id,
             teamJoinCode: team.team_code,
             teamName: team.team_name,
+            isNameChanged: team.is_name_changed ?? false,
+            previousTeamName: team.previous_team_name ?? null,
+            nameChangedAt: team.name_changed_at ?? null,
             isVerified: team.is_verified,
             isDocumentVerified: team.is_document_verified,
             paymentProofID: team.payment_proof_id,
@@ -128,17 +227,17 @@ const getUserCompetitionData = async (req, res) => {
             participationType:
                 team.competition?.participation_type ?? "team",
             requiresSubmission: team.competition?.requires_submission ?? false,
-            participationType: team.competition?.participation_type ?? "team",
             whatsappGroupLink: team.competition?.whatsapp_group_link ?? null,
+            externalPlatformLink: team.competition?.external_platform_link ?? null,
             timelines: team.competition?.timelines ?? [],
             submissionData: team.submissions?.length > 0 ? team.submissions[0] : null,
             members: team.members
-                .sort((a, b) => (a.role === "leader" ? -1 : 1)) // Sort leader to the top
+                .sort((a, b) => (a.role === "leader" ? -1 : 1))
                 .map(member => ({
                     fullName: member.user.full_name,
                     isRegistrationComplete:
                         member.user.is_registration_complete,
-                    verificationError: member.verification_error, // Include member's verification error
+                    verificationError: member.verification_error,
                 })),
         }));
 

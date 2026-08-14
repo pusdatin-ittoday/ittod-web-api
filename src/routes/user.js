@@ -35,6 +35,23 @@ usersRouter.put(
     putTwibbonUser
 );
 
+const { submitFeedback, getMyFeedbacks } = require("../controllers/user-feedback.controller");
+
+const feedbackUpload = multer({
+    storage: multer.memoryStorage(),
+    limits: {
+        fileSize: 5 * 1024 * 1024, // 5MB limit per screenshot
+    },
+});
+
+usersRouter.post(
+    "/api/user/feedback",
+    isAuthenticated,
+    feedbackUpload.array("media", 5),
+    submitFeedback
+);
+usersRouter.get("/api/user/feedback", isAuthenticated, getMyFeedbacks);
+
 usersRouter.get("/api/user", isAuthenticated, viewUserData);
 usersRouter.post("/api/user/read-announcements", isAuthenticated, markAnnouncementsAsReadController);
 

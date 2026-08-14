@@ -51,10 +51,9 @@ module.exports = passport.use(
                 if (existingUser) {
                     // User exists but registered with a different provider
                     if (existingUser.identity && existingUser.identity.provider !== "google") {
-                        return done(
-                            "You already registered without Google, please login with your email.",
-                            null
-                        );
+                        return done(null, false, {
+                            message: "Email ini sudah terdaftar. Silakan login menggunakan email & password."
+                        });
                     }
                     return done(null, existingUser);
                 }

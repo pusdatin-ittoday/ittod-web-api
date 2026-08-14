@@ -216,3 +216,100 @@ exports.memberJoinWithTeamCode = async ({ user_id, team_code }) => {
         { isolationLevel: "Serializable" }
     );
 };
+
+exports.updateTeamName = async ({ team_id, team_name, user_id }) => {
+    const trimmedName = typeof team_name === "string" ? team_name.trim() : "";
+    if (!trimmedName) {
+        throw { status: 400, message: "Nama tim tidak boleh kosong" };
+    }
+    if (trimmedName.length < 3) {
+        throw { status: 400, message: "Nama tim minimal 3 karakter" };
+    }
+    if (trimmedName.length > 50) {
+        throw { status: 400, message: "Nama tim maksimal 50 karakter" };
+    }
+
+    return prisma.$transaction(
+        async (tx) => {
+            const team = await tx.team.findUnique({
+                where: { id: team_id },
+                include: {
+                    competition: true,
+                    members: true,
+                },
+            });
+
+            if (!team) {
+                throw { status: 404, message: "Tim tidak ditemukan" };
+            }
+
+            if (team.competition?.participation_type === "individual") {
+                throw {
+                    status: 400,
+                    message: "Nama tim untuk kategori individu tidak dapat diubah",
+                };
+            }
+
+            const leaderMember = team.members.find(
+                (m) => m.user_id === user_id && m.role === "leader"
+            );
+            if (!leaderMember) {
+                throw {
+                    status: 403,
+                    message: "Hanya ketua tim yang dapat mengubah nama tim",
+                };
+            }
+
+            if (team.is_name_changed) {
+                throw {
+                    status: 403,
+                    message: "Nama tim hanya dapat diubah 1 kali",
+                };
+            }
+
+            if (team.team_name === trimmedName) {
+                throw {
+                    status: 400,
+                    message: "Nama tim baru sama dengan nama tim saat ini",
+                };
+            }
+
+            const existingTeamName = await tx.team.findFirst({
+                where: {
+                    competition_id: team.competition_id,
+                    team_name: trimmedName,
+                    NOT: { id: team_id },
+                },
+            });
+
+            if (existingTeamName) {
+                throw {
+                    status: 409,
+                    message: "Nama tim sudah digunakan di kompetisi ini",
+                };
+            }
+
+            const now = new Date();
+            const updatedTeam = await tx.team.update({
+                where: { id: team_id },
+                data: {
+                    previous_team_name: team.team_name,
+                    team_name: trimmedName,
+                    is_name_changed: true,
+                    name_changed_at: now,
+                    updated_at: now,
+                },
+            });
+
+            return {
+                message: "Nama tim berhasil diubah",
+                team_name: updatedTeam.team_name,
+                previous_team_name: updatedTeam.previous_team_name,
+                is_name_changed: updatedTeam.is_name_changed,
+                name_changed_at: updatedTeam.name_changed_at,
+            };
+        },
+        { isolationLevel: "Serializable" }
+    );
+};
+

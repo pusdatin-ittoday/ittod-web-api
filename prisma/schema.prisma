@@ -35,6 +35,7 @@ model user {
   event_participants       event_participant[]
   media                    media[]
   team_members             team_member[]
+  user_feedbacks           user_feedback[]
   identity                 user_identity?
 
   @@map("user")
@@ -139,6 +140,9 @@ model team {
   is_verified          document_verification_enum @default(pending)
   is_finalist          Boolean                    @default(false)
   rank                 Int?
+  is_name_changed      Boolean                    @default(false)
+  previous_team_name   String?                    @db.Text
+  name_changed_at      DateTime?
   verification_error   String?                    @db.Text
   created_at           DateTime                   @default(now())
   updated_at           DateTime?
@@ -190,6 +194,7 @@ model event_announcement {
   title       String   @db.Text
   description String   @db.Text
   is_pinned   Boolean  @default(false)
+  priority    Int      @default(0)
   created_at  DateTime @default(now())
   updated_at  DateTime @updatedAt
   author      user     @relation(fields: [author_id], references: [id], map: "event_announcement_author_id_foreign")
@@ -198,6 +203,21 @@ model event_announcement {
   @@index([author_id], map: "event_announcement_author_id_foreign")
   @@index([event_id], map: "event_announcement_event_id_foreign")
   @@map("event_announcement")
+}
+
+model user_feedback {
+  id         String   @id
+  user_id    String
+  subject    String   @db.VarChar(191)
+  content    String   @db.Text
+  media_urls Json?
+  status     String   @default("pending") @db.VarChar(50)
+  created_at DateTime @default(now())
+  updated_at DateTime @updatedAt
+  user       user     @relation(fields: [user_id], references: [id], onDelete: Cascade, map: "user_feedback_user_id_foreign")
+
+  @@index([user_id], map: "user_feedback_user_id_foreign")
+  @@map("user_feedback")
 }
 
 model competition_submission {

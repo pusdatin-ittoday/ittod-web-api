@@ -114,6 +114,9 @@ Table team {
   is_verified document_verification_enum [not null, default: 'pending']
   is_finalist Boolean [not null, default: false]
   rank Int
+  is_name_changed Boolean [not null, default: false]
+  previous_team_name String
+  name_changed_at DateTime
   verification_error String
   created_at DateTime [default: `now()`, not null]
   updated_at DateTime
