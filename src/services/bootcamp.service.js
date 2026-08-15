@@ -7,48 +7,59 @@ exports.registerUserIntoBootcamp = async ({
     phone_number,
     bundling,
 }) => {
-    if (event_id.toLowerCase() !== "bootcamp") {
+    if (!event_id || !event_id.toLowerCase().includes("bootcamp")) {
         throw {
             status: 400,
             message: "Bootcamp only!",
         };
     }
 
+    // Resolve actual event record from DB (case-insensitive or by slug)
+    const targetEvent = await prisma.event.findFirst({
+        where: {
+            OR: [
+                { id: { in: ["Bootcamp", "bootcamp", "BOOTCAMP"] } },
+                { slug: { in: ["bootcamp", "Bootcamp"] } },
+                { title: { contains: "Bootcamp" } },
+            ],
+        },
+    });
+
+    const resolvedEventId = targetEvent ? targetEvent.id : "Bootcamp";
+
     const alreadyRegistered = await prisma.event_participant.findFirst({
         where: {
             user_id,
-            event_id,
+            event_id: resolvedEventId,
         },
     });
 
     if (alreadyRegistered) {
-        throw {
-            status: 403,
+        // Safe idempotent return if already registered
+        return {
             message: "User already registered in the bootcamp!",
+            event_participant: alreadyRegistered,
         };
     }
 
     try {
-        await prisma.$transaction(async tx => {
+        return await prisma.$transaction(async tx => {
             // --- INSIDE THE TRANSACTION ---
-
-            const lockedEventArr = await tx.$queryRaw`
-                SELECT max_noncompetition_participant
-                FROM event
-                WHERE id = ${event_id}
-                    FOR UPDATE
-            `;
-            const lockedEvent = lockedEventArr[0] || {};
+            const lockedEvent = await tx.event.findUnique({
+                where: { id: resolvedEventId },
+                select: { max_noncompetition_participant: true },
+            });
 
             const eventParticipantCount = await tx.event_participant.count({
                 where: { 
-                    event_id,
+                    event_id: resolvedEventId,
                     payment_verification: { in: ['pending', 'accepted'] }
                 },
             });
 
             const isEventFull =
-                lockedEvent.max_noncompetition_participant !== null &&
+                lockedEvent?.max_noncompetition_participant !== null &&
+                lockedEvent?.max_noncompetition_participant !== undefined &&
                 eventParticipantCount >=
                     lockedEvent.max_noncompetition_participant;
 
@@ -59,59 +70,70 @@ exports.registerUserIntoBootcamp = async ({
                 };
             }
 
-            await tx.user.update({
-                where: { id: user_id },
-                data: {
-                    nama_sekolah: institution_name,
-                    phone_number,
-                },
-            });
+            const updateData = {};
+            if (institution_name) updateData.nama_sekolah = institution_name;
+            if (phone_number) updateData.phone_number = phone_number;
+
+            if (Object.keys(updateData).length > 0) {
+                await tx.user.update({
+                    where: { id: user_id },
+                    data: updateData,
+                });
+            }
 
             const userData = await tx.user.findFirst({
                 where: { id: user_id },
                 select: {
+                    email: true,
                     nama_sekolah: true,
                     is_registration_complete: true,
                 },
             });
 
-            const isMinetodArr = await tx.$queryRaw`
-                SELECT t.is_verified
-                FROM team_member tm
-                         JOIN team t ON tm.team_id = t.id
-                WHERE tm.user_id = ${user_id}
-                  AND t.competition_id = 'minetoday'
-                  AND t.is_verified = 'approved'
-            `;
-            const isMinetod = isMinetodArr.length > 0;
+            const minetodMember = await tx.team_member.findFirst({
+                where: {
+                    user_id,
+                    team: {
+                        OR: [
+                            { competition_id: { in: ["MineToday", "minetoday", "mine-today", "MINETODAY"] } },
+                            { competition: { slug: { in: ["mine-today", "minetoday"] } } },
+                            { competition: { title: { contains: "Mine" } } },
+                        ],
+                    },
+                },
+            });
+            const isMinetod = !!minetodMember;
 
-            const namaSekolah = userData.nama_sekolah || "";
-            const canBeFree =
-                isMinetod ||
-                ((namaSekolah.toLowerCase().includes("ipb") ||
-                    namaSekolah
-                        .toLowerCase()
-                        .includes("institut pertanian bogor")) &&
-                    userData.is_registration_complete === true);
+            const namaSekolah = userData?.nama_sekolah || "";
+            const userEmail = userData?.email || "";
+            const isIPB =
+                namaSekolah.toLowerCase().includes("ipb") ||
+                namaSekolah.toLowerCase().includes("institut pertanian bogor") ||
+                /@(apps\.)?ipb\.ac\.id$/i.test(userEmail);
+            const canBeFree = isIPB;
 
-            await tx.event_participant.create({
+            const newParticipant = await tx.event_participant.create({
                 data: {
                     user_id,
-                    event_id,
-                    bundling,
-                    paid_for_user: !canBeFree, // true if NOT free, false if free
+                    event_id: resolvedEventId,
+                    payment_verification: canBeFree ? "accepted" : "pending",
                     date_added: new Date(),
                 },
             });
+
+            return {
+                message: "Successfully registered into bootcamp!",
+                event_participant: newParticipant,
+            };
         });
     } catch (e) {
         console.error("Registration error:", e);
         if (e.status) {
-            throw e; // Re-throw if it's already a formatted error
+            throw e;
         }
         throw {
             status: 500,
-            message: "Failed to register user into bootcamp.",
+            message: e.message || "Failed to register user into bootcamp.",
         };
     }
 };

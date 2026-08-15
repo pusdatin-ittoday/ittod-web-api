@@ -45,14 +45,12 @@ const registerUserIntoEvent = async (
 
     try {
         await prisma.$transaction(async tx => {
-            const lockedEvent = await tx.$queryRaw`
-                SELECT max_noncompetition_participant
-                FROM event
-                WHERE id = ${actualEventId}
-                    FOR UPDATE
-            `;
+            const lockedEvent = await tx.event.findUnique({
+                where: { id: actualEventId },
+                select: { max_noncompetition_participant: true },
+            });
 
-            const maxParticipants = lockedEvent[0]?.max_noncompetition_participant;
+            const maxParticipants = lockedEvent?.max_noncompetition_participant;
 
             const eventParticipantCount = await tx.event_participant.count({
                 where: { 

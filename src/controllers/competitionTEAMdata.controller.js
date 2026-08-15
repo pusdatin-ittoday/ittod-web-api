@@ -216,6 +216,7 @@ const getUserCompetitionData = async (req, res) => {
             teamJoinCode: team.team_code,
             teamName: team.team_name,
             isNameChanged: team.is_name_changed ?? false,
+            hasBootcampAddon: Boolean(team.has_bootcamp_addon),
             previousTeamName: team.previous_team_name ?? null,
             nameChangedAt: team.name_changed_at ?? null,
             isVerified: team.is_verified,

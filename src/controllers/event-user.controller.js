@@ -74,35 +74,69 @@ const bootcampRegistrationController = async (req, res) => {
 const checkIPBOrMinetodayController = async (req, res) => {
     try {
         const user_id = req.user.id;
-        // 1. Check if user's institution is 'IPB'
+        // 1. Check if user's institution or email is 'IPB'
         const user = await prisma.user.findUnique({
             where: { id: user_id },
-            select: { nama_sekolah: true },
+            select: { email: true, nama_sekolah: true, is_registration_complete: true },
         });
         const namaSekolah = user?.nama_sekolah?.toLowerCase() || "";
-        const isIPB = /(ipb|institut pertanian bogor)/i.test(namaSekolah);
+        const email = user?.email?.toLowerCase() || "";
+        const isIPB = /(ipb|institut pertanian bogor)/i.test(namaSekolah) || /(@(apps\.)?ipb\.ac\.id)$/i.test(email);
 
-        // 2. Check if user is registered to 'minetoday' event (by title)
-        // Find the event ID for 'minetoday' (case-insensitive)
-        const minetodayEvent = await prisma.event.findFirst({
-            where: { title: { equals: "Mine Today" } },
-            select: { id: true },
+        // 2. Check if user is registered to 'minetoday' competition (as team member)
+        const minetodTeamMember = await prisma.team_member.findFirst({
+            where: {
+                user_id,
+                team: {
+                    OR: [
+                        { competition_id: { in: ["MineToday", "minetoday", "mine-today", "MINETODAY"] } },
+                        { competition: { slug: { in: ["mine-today", "minetoday"] } } },
+                        { competition: { title: { contains: "Mine" } } },
+                    ],
+                },
+            },
+            include: {
+                team: {
+                    select: {
+                        id: true,
+                        team_name: true,
+                        is_verified: true,
+                        is_document_verified: true,
+                        payment_proof_id: true,
+                    },
+                },
+            },
         });
-        let isRegisteredToMinetoday = false;
-        let paymentVerification = null;
-        let paymentStatus = false;
-        if (minetodayEvent) {
-            const participant = await prisma.event_participant.findFirst({
-                where: { user_id, event_id: minetodayEvent.id },
-                select: { payment_verification: true },
+
+        let isRegisteredToMinetoday = Boolean(minetodTeamMember);
+        let paymentVerification = minetodTeamMember?.team?.is_verified || null;
+        let paymentStatus =
+            minetodTeamMember?.team?.is_verified === "approved" ||
+            minetodTeamMember?.team?.is_verified === "verified";
+
+        // Fallback check if user is registered in event_participant for minetoday
+        if (!isRegisteredToMinetoday) {
+            const minetodayEvent = await prisma.event.findFirst({
+                where: {
+                    OR: [
+                        { id: { in: ["MineToday", "minetoday", "mine-today", "MINETODAY"] } },
+                        { title: { contains: "Mine Today" } },
+                        { slug: { in: ["mine-today", "minetoday"] } },
+                    ],
+                },
+                select: { id: true },
             });
-            isRegisteredToMinetoday = !!participant;
-            paymentVerification = participant
-                ? participant.payment_verification
-                : null;
-            paymentStatus = participant
-                ? participant.payment_verification === "accepted"
-                : false;
+            if (minetodayEvent) {
+                const participant = await prisma.event_participant.findFirst({
+                    where: { user_id, event_id: minetodayEvent.id },
+                    select: { payment_verification: true },
+                });
+                if (participant) {
+                    isRegisteredToMinetoday = true;
+                    paymentVerification = participant.payment_verification;
+                    paymentStatus = participant.payment_verification === "accepted";
+                }
+            }
         }
 
         res.status(200).json({
@@ -110,6 +144,7 @@ const checkIPBOrMinetodayController = async (req, res) => {
             isRegisteredToMinetoday,
             paymentVerification,
             paymentStatus,
+            minetodayTeam: minetodTeamMember?.team || null,
         });
     } catch (err) {
         console.error("Error checking IPB or minetoday registration", err);
@@ -126,3 +161,4 @@ module.exports = {
     checkIPBOrMinetodayController,
     bootcampRegistrationController,
 };
+

@@ -50,16 +50,16 @@ exports.registerTeamThenInsertLeader = async ({
 
                 const existingTeamLeadership = !isIndividual
                     ? await tx.team_member.findFirst({
-                          where: {
-                              user_id: leader_id,
-                              role: "leader",
-                              team: {
-                                  competition: {
-                                      participation_type: "team",
-                                  },
-                              },
-                          },
-                      })
+                        where: {
+                            user_id: leader_id,
+                            role: "leader",
+                            team: {
+                                competition: {
+                                    participation_type: "team",
+                                },
+                            },
+                        },
+                    })
                     : null;
 
                 if (existingTeamLeadership) {

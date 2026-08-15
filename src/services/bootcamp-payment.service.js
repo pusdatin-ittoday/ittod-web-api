@@ -11,22 +11,6 @@ const uploadBootcampPaymentService = async ({ user_id, payment_proof }) => {
         };
     }
 
-    const userData = await prisma.event_participant.findUnique({
-        where: {
-            user_id_event_id: {
-                user_id,
-                event_id: BOOTCAMP_EVENT_ID,
-            },
-        },
-    });
-
-    if (!userData) {
-        throw {
-            status: 400,
-            message: "Row does not exist yet, please post the data first!",
-        };
-    }
-
     let payment_proof_key = null;
 
     if (payment_proof) {
@@ -44,12 +28,13 @@ const uploadBootcampPaymentService = async ({ user_id, payment_proof }) => {
             "image/png",
             "image/jpg",
             "image/webp",
+            "application/pdf",
         ];
         if (!allowedMimeTypes.includes(mimetype)) {
             throw {
                 status: 400,
                 message:
-                    "Invalid file type. Only JPEG, PNG, and WebP images are allowed.",
+                    "Invalid file type. Only JPEG, PNG, WebP, and PDF are allowed.",
             };
         }
         try {
@@ -72,18 +57,39 @@ const uploadBootcampPaymentService = async ({ user_id, payment_proof }) => {
 
     try {
         return await prisma.$transaction(async tx => {
-            const updatedParticipantRow = await tx.event_participant.update({
+            const existingParticipant = await tx.event_participant.findUnique({
                 where: {
                     user_id_event_id: {
                         user_id,
                         event_id: BOOTCAMP_EVENT_ID,
                     },
                 },
-                data: {
-                    payment_proof: payment_proof_key,
-                    payment_verification: "pending",
-                },
             });
+
+            let updatedParticipantRow;
+            if (existingParticipant) {
+                updatedParticipantRow = await tx.event_participant.update({
+                    where: {
+                        user_id_event_id: {
+                            user_id,
+                            event_id: BOOTCAMP_EVENT_ID,
+                        },
+                    },
+                    data: {
+                        payment_proof: payment_proof_key,
+                        payment_verification: "pending",
+                    },
+                });
+            } else {
+                updatedParticipantRow = await tx.event_participant.create({
+                    data: {
+                        user_id,
+                        event_id: BOOTCAMP_EVENT_ID,
+                        payment_proof: payment_proof_key,
+                        payment_verification: "pending",
+                    },
+                });
+            }
 
             return {
                 message: "Payment uploaded successfully!",

@@ -142,6 +142,7 @@ model team {
   previous_team_name   String?                    @db.Text
   name_changed_at      DateTime?
   verification_error   String?                    @db.Text
+  has_bootcamp_addon   Boolean                    @default(false)
   created_at           DateTime                   @default(now())
   updated_at           DateTime?
   payment_proof_id     String?
