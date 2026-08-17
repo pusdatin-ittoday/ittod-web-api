@@ -33,6 +33,7 @@ const eventShowController = async (req, res) => {
             select: {
                 event_id: true,
                 payment_verification: true,
+                payment_proof: true,
                 event: {
                     select: { id: true, slug: true, title: true, price: true, whatsapp_group_link: true },
                 },
@@ -44,6 +45,8 @@ const eventShowController = async (req, res) => {
             return {
                 event_id: p.event_id,
                 payment_verification: p.payment_verification,
+                payment_proof: p.payment_proof || null,
+                has_payment_proof: Boolean(p.payment_proof),
                 event: {
                     id: p.event?.id,
                     slug: p.event?.slug,
