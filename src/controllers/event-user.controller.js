@@ -155,11 +155,19 @@ const checkIPBOrMinetodayController = async (req, res) => {
             }
         }
 
+        const isMineTodayPaymentVerified = Boolean(paymentStatus);
+        const isMineTodayDataVerified = Boolean(
+            minetodTeamMember?.is_verified === true ||
+            minetodTeamMember?.team?.is_document_verified === "approved"
+        );
+
         res.status(200).json({
             isIPB,
             isRegisteredToMinetoday,
             paymentVerification,
             paymentStatus,
+            isMineTodayPaymentVerified,
+            isMineTodayDataVerified,
             minetodayTeam: minetodTeamMember?.team || null,
         });
     } catch (err) {

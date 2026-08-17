@@ -130,6 +130,7 @@ exports.registerUserIntoBootcamp = async ({
                             { competition: { slug: { in: ["mine-today", "minetoday"] } } },
                             { competition: { title: { contains: "Mine" } } },
                         ],
+                        is_verified: "approved",
                     },
                 },
             });
