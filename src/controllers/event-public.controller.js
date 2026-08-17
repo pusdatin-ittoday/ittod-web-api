@@ -29,7 +29,6 @@ const getEventsController = async (req, res) => {
                 guide_book_url: true,
                 participation_type: true,
                 logo_url: true,
-                whatsapp_group_link: true,
                 submission_fields: true,
                 timelines: {
                     orderBy: {
@@ -81,7 +80,6 @@ const getEventByIdController = async (req, res) => {
                 guide_book_url: true,
                 participation_type: true,
                 logo_url: true,
-                whatsapp_group_link: true,
                 submission_fields: true,
                 timelines: {
                     orderBy: {

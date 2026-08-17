@@ -28,17 +28,33 @@ const eventJoinController = async (req, res) => {
 const eventShowController = async (req, res) => {
     try {
         const user_id = req.user.id;
-        const result = await prisma.event_participant.findMany({
+        const participants = await prisma.event_participant.findMany({
             where: { user_id },
             select: {
                 event_id: true,
                 payment_verification: true,
                 event: {
-                    select: { id: true, slug: true, title: true, whatsapp_group_link: true },
+                    select: { id: true, slug: true, title: true, price: true, whatsapp_group_link: true },
                 },
             },
         });
-        res.status(200).json(result);
+
+        const formatted = participants.map((p) => {
+            const isVerified = p.payment_verification === "accepted" || p.event?.price === 0;
+            return {
+                event_id: p.event_id,
+                payment_verification: p.payment_verification,
+                event: {
+                    id: p.event?.id,
+                    slug: p.event?.slug,
+                    title: p.event?.title,
+                    price: p.event?.price,
+                    whatsapp_group_link: isVerified ? (p.event?.whatsapp_group_link || null) : null,
+                },
+            };
+        });
+
+        res.status(200).json(formatted);
     } catch (err) {
         console.error("Error fetching user events", err);
         res.status(err.status || 500).json({
