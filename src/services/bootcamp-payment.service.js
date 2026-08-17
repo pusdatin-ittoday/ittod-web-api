@@ -1,4 +1,5 @@
 const prisma = require("../prisma.js");
+const crypto = require("crypto");
 const { uploadFileToR2 } = require("./r2.service");
 
 const BOOTCAMP_EVENT_ID = "Bootcamp";
@@ -93,6 +94,68 @@ const uploadBootcampPaymentService = async ({ user_id, payment_proof }) => {
                     status: 400,
                     message: "Lengkapi data profil dan berkas identitas terlebih dahulu di menu Edit Profil sebelum mengunggah pembayaran.",
                 };
+            }
+
+            // Create media record for payment proof
+            const mediaId = crypto.randomUUID();
+            await tx.media.create({
+                data: {
+                    id: mediaId,
+                    url: payment_proof_key,
+                    grouping: "payments",
+                    uploader_id: user_id,
+                },
+            });
+
+            // Update or create individual team payment link
+            const existingTeam = await tx.team.findFirst({
+                where: {
+                    competition_id: BOOTCAMP_EVENT_ID,
+                    members: {
+                        some: { user_id },
+                    },
+                },
+            });
+
+            if (existingTeam) {
+                await tx.team.update({
+                    where: { id: existingTeam.id },
+                    data: {
+                        payment_proof_id: mediaId,
+                        is_verified: "pending",
+                    },
+                });
+            } else {
+                const teamId = crypto.randomUUID();
+                let team_code;
+                let existingTeamWithCode;
+                do {
+                    team_code = crypto.randomBytes(6).toString("base64url");
+                    existingTeamWithCode = await tx.team.findUnique({
+                        where: { team_code },
+                    });
+                } while (existingTeamWithCode);
+
+                const teamName = user?.full_name ? `[Bootcamp] ${user.full_name}` : `[Bootcamp] ${user_id}`;
+                await tx.team.create({
+                    data: {
+                        id: teamId,
+                        competition_id: BOOTCAMP_EVENT_ID,
+                        team_name: teamName,
+                        team_code,
+                        max_member: 1,
+                        payment_proof_id: mediaId,
+                        is_document_verified: "pending",
+                        is_verified: "pending",
+                        members: {
+                            create: {
+                                user_id,
+                                role: "leader",
+                                is_verified: false,
+                            },
+                        },
+                    },
+                });
             }
 
             const existingParticipant = await tx.event_participant.findUnique({
