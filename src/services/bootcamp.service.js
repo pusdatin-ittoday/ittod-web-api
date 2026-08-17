@@ -84,11 +84,41 @@ exports.registerUserIntoBootcamp = async ({
             const userData = await tx.user.findFirst({
                 where: { id: user_id },
                 select: {
-                    email: true,
+                    full_name: true,
+                    birth_date: true,
+                    phone_number: true,
+                    jenis_kelamin: true,
+                    id_discord: true,
+                    id_instagram: true,
+                    pendidikan: true,
                     nama_sekolah: true,
+                    ktm_key: true,
+                    twibbon_key: true,
+                    email: true,
                     is_registration_complete: true,
                 },
             });
+
+            const isFieldFilled = (val) => val !== null && val !== undefined && String(val).trim() !== "";
+            const isComplete = userData?.is_registration_complete === 1 || (
+                isFieldFilled(userData?.full_name) &&
+                userData?.birth_date &&
+                isFieldFilled(userData?.phone_number) &&
+                isFieldFilled(userData?.jenis_kelamin) &&
+                isFieldFilled(userData?.id_discord) &&
+                isFieldFilled(userData?.id_instagram) &&
+                isFieldFilled(userData?.pendidikan) &&
+                isFieldFilled(userData?.nama_sekolah) &&
+                isFieldFilled(userData?.ktm_key) &&
+                isFieldFilled(userData?.twibbon_key)
+            );
+
+            if (!isComplete) {
+                throw {
+                    status: 400,
+                    message: "Lengkapi data profil dan berkas identitas terlebih dahulu di menu Edit Profil sebelum mendaftar.",
+                };
+            }
 
             const minetodMember = await tx.team_member.findFirst({
                 where: {

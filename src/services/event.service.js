@@ -70,13 +70,54 @@ const registerUserIntoEvent = async (
                 };
             }
 
-            await tx.user.update({
+            const userData = await tx.user.findFirst({
                 where: { id: user_id },
-                data: {
-                    nama_sekolah: institution_name,
-                    phone_number,
+                select: {
+                    full_name: true,
+                    birth_date: true,
+                    phone_number: true,
+                    jenis_kelamin: true,
+                    id_discord: true,
+                    id_instagram: true,
+                    pendidikan: true,
+                    nama_sekolah: true,
+                    ktm_key: true,
+                    twibbon_key: true,
+                    is_registration_complete: true,
                 },
             });
+
+            const isFieldFilled = (val) => val !== null && val !== undefined && String(val).trim() !== "";
+            const isComplete = userData?.is_registration_complete === 1 || (
+                isFieldFilled(userData?.full_name) &&
+                userData?.birth_date &&
+                isFieldFilled(userData?.phone_number) &&
+                isFieldFilled(userData?.jenis_kelamin) &&
+                isFieldFilled(userData?.id_discord) &&
+                isFieldFilled(userData?.id_instagram) &&
+                isFieldFilled(userData?.pendidikan) &&
+                isFieldFilled(userData?.nama_sekolah) &&
+                isFieldFilled(userData?.ktm_key) &&
+                isFieldFilled(userData?.twibbon_key)
+            );
+
+            if (!isComplete) {
+                throw {
+                    status: 400,
+                    message: "Lengkapi data profil dan berkas identitas terlebih dahulu di menu Edit Profil sebelum mendaftar.",
+                };
+            }
+
+            const updateData = {};
+            if (institution_name) updateData.nama_sekolah = institution_name;
+            if (phone_number) updateData.phone_number = phone_number;
+
+            if (Object.keys(updateData).length > 0) {
+                await tx.user.update({
+                    where: { id: user_id },
+                    data: updateData,
+                });
+            }
 
             await tx.event_participant.create({
                 data: {

@@ -57,6 +57,44 @@ const uploadBootcampPaymentService = async ({ user_id, payment_proof }) => {
 
     try {
         return await prisma.$transaction(async tx => {
+            const user = await tx.user.findUnique({
+                where: { id: user_id },
+                select: {
+                    full_name: true,
+                    birth_date: true,
+                    phone_number: true,
+                    jenis_kelamin: true,
+                    id_discord: true,
+                    id_instagram: true,
+                    pendidikan: true,
+                    nama_sekolah: true,
+                    ktm_key: true,
+                    twibbon_key: true,
+                    is_registration_complete: true,
+                },
+            });
+
+            const isFieldFilled = (val) => val !== null && val !== undefined && String(val).trim() !== "";
+            const isComplete = user?.is_registration_complete === 1 || (
+                isFieldFilled(user?.full_name) &&
+                user?.birth_date &&
+                isFieldFilled(user?.phone_number) &&
+                isFieldFilled(user?.jenis_kelamin) &&
+                isFieldFilled(user?.id_discord) &&
+                isFieldFilled(user?.id_instagram) &&
+                isFieldFilled(user?.pendidikan) &&
+                isFieldFilled(user?.nama_sekolah) &&
+                isFieldFilled(user?.ktm_key) &&
+                isFieldFilled(user?.twibbon_key)
+            );
+
+            if (!isComplete) {
+                throw {
+                    status: 400,
+                    message: "Lengkapi data profil dan berkas identitas terlebih dahulu di menu Edit Profil sebelum mengunggah pembayaran.",
+                };
+            }
+
             const existingParticipant = await tx.event_participant.findUnique({
                 where: {
                     user_id_event_id: {
