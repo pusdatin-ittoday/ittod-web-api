@@ -35,7 +35,7 @@ const eventShowController = async (req, res) => {
                 payment_verification: true,
                 payment_proof: true,
                 event: {
-                    select: { id: true, slug: true, title: true, price: true, whatsapp_group_link: true },
+                    select: { id: true, slug: true, title: true, price: true, whatsapp_group_link: true, type: true },
                 },
             },
         });
@@ -48,13 +48,20 @@ const eventShowController = async (req, res) => {
             select: {
                 competition_id: true,
                 is_verified: true,
-                paymentProof: {
+                payment_proof: {
                     select: { url: true },
+                },
+                competition: {
+                    select: { id: true, slug: true, title: true, price: true, whatsapp_group_link: true, type: true },
                 },
             },
         });
 
-        const formatted = participants.map((p) => {
+        const results = [];
+        const processedEventKeys = new Set();
+
+        // 1. Process event_participant rows
+        for (const p of participants) {
             const matchingTeam = individualTeams.find((t) => {
                 const cId = (t.competition_id || "").toLowerCase();
                 const eId = (p.event_id || "").toLowerCase();
@@ -67,14 +74,18 @@ const eventShowController = async (req, res) => {
                 );
             });
 
-            const effectivePaymentProof = p.payment_proof || matchingTeam?.paymentProof?.url || null;
+            const effectivePaymentProof = p.payment_proof || matchingTeam?.payment_proof?.url || null;
             const effectivePaymentVerification = (matchingTeam?.is_verified === "approved" || p.payment_verification === "accepted")
                 ? "accepted"
                 : (p.payment_verification || (matchingTeam?.is_verified === "rejected" ? "rejected" : "pending"));
 
             const isVerified = effectivePaymentVerification === "accepted";
+            const eventKey = (p.event?.slug || p.event_id || "").toLowerCase();
+            processedEventKeys.add(eventKey);
+            if (p.event_id) processedEventKeys.add(p.event_id.toLowerCase());
+            if (p.event?.title) processedEventKeys.add(p.event.title.toLowerCase());
 
-            return {
+            results.push({
                 event_id: p.event_id,
                 payment_verification: effectivePaymentVerification,
                 payment_proof: effectivePaymentProof,
@@ -86,10 +97,46 @@ const eventShowController = async (req, res) => {
                     price: p.event?.price,
                     whatsapp_group_link: isVerified ? (p.event?.whatsapp_group_link || null) : null,
                 },
-            };
-        });
+            });
+        }
 
-        res.status(200).json(formatted);
+        // 2. Also process any non-competition individual team that was not in event_participant
+        for (const t of individualTeams) {
+            const cId = (t.competition_id || "").toLowerCase();
+            const cSlug = (t.competition?.slug || "").toLowerCase();
+            const cTitle = (t.competition?.title || "").toLowerCase();
+
+            const isHandled = 
+                processedEventKeys.has(cId) || 
+                processedEventKeys.has(cSlug) || 
+                (cTitle && processedEventKeys.has(cTitle)) ||
+                (cId.includes("bootcamp") && (processedEventKeys.has("bootcamp") || [...processedEventKeys].some(x => x.includes("bootcamp"))));
+
+            if (!isHandled) {
+                // Include non_competition events or bootcamp
+                const isEvent = t.competition?.type === "non_competition" || cId.includes("bootcamp") || cSlug.includes("bootcamp") || cTitle.includes("bootcamp");
+                if (isEvent) {
+                    const isVerified = t.is_verified === "approved";
+                    const effectivePaymentProof = t.payment_proof?.url || null;
+
+                    results.push({
+                        event_id: t.competition_id,
+                        payment_verification: isVerified ? "accepted" : (t.is_verified === "rejected" ? "rejected" : "pending"),
+                        payment_proof: effectivePaymentProof,
+                        has_payment_proof: Boolean(effectivePaymentProof),
+                        event: {
+                            id: t.competition?.id || t.competition_id,
+                            slug: t.competition?.slug || (cId.includes("bootcamp") ? "bootcamp" : t.competition_id),
+                            title: t.competition?.title || (cId.includes("bootcamp") ? "Bootcamp Artificial Intelligence" : t.competition_id),
+                            price: t.competition?.price,
+                            whatsapp_group_link: isVerified ? (t.competition?.whatsapp_group_link || null) : null,
+                        },
+                    });
+                }
+            }
+        }
+
+        res.status(200).json(results);
     } catch (err) {
         console.error("Error fetching user events", err);
         res.status(err.status || 500).json({
