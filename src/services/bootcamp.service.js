@@ -174,7 +174,8 @@ exports.registerUserIntoBootcamp = async ({
                     });
                 } while (existingTeamWithCode);
 
-                const teamName = userData?.full_name ? `[Bootcamp] ${userData.full_name}` : `[Bootcamp] ${user_id}`;
+                const gatewayTag = bundling === "intelligo_gateway" ? " - Intelligo Gateway" : "";
+                const teamName = userData?.full_name ? `[Bootcamp${gatewayTag}] ${userData.full_name}` : `[Bootcamp${gatewayTag}] ${user_id}`;
 
                 await tx.team.create({
                     data: {
