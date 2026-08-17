@@ -83,6 +83,7 @@ const bootcampRegistrationController = async (req, res) => {
         console.error("Error registering user into bootcamp", err);
         res.status(err.status || 500).json({
             error: err.message || "Failed to register user into bootcamp",
+            message: err.message || "Failed to register user into bootcamp",
         });
     }
 };

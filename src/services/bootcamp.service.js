@@ -8,23 +8,33 @@ exports.registerUserIntoBootcamp = async ({
     phone_number,
     bundling,
 }) => {
-    if (!event_id || !event_id.toLowerCase().includes("bootcamp")) {
-        throw {
-            status: 400,
-            message: "Bootcamp only!",
-        };
+    // Resolve actual event record from DB (by ID, slug, or title)
+    let targetEvent = null;
+    if (event_id) {
+        targetEvent = await prisma.event.findFirst({
+            where: {
+                OR: [
+                    { id: event_id },
+                    { slug: event_id },
+                    { id: { in: ["Bootcamp", "bootcamp", "BOOTCAMP"] } },
+                    { slug: { in: ["bootcamp", "Bootcamp"] } },
+                    { title: { contains: "Bootcamp" } },
+                ],
+            },
+        });
     }
-
-    // Resolve actual event record from DB (case-insensitive or by slug)
-    const targetEvent = await prisma.event.findFirst({
-        where: {
-            OR: [
-                { id: { in: ["Bootcamp", "bootcamp", "BOOTCAMP"] } },
-                { slug: { in: ["bootcamp", "Bootcamp"] } },
-                { title: { contains: "Bootcamp" } },
-            ],
-        },
-    });
+    
+    if (!targetEvent) {
+        targetEvent = await prisma.event.findFirst({
+            where: {
+                OR: [
+                    { id: { in: ["Bootcamp", "bootcamp", "BOOTCAMP"] } },
+                    { slug: { in: ["bootcamp", "Bootcamp"] } },
+                    { title: { contains: "Bootcamp" } },
+                ],
+            },
+        });
+    }
 
     const resolvedEventId = targetEvent ? targetEvent.id : "Bootcamp";
 
@@ -110,14 +120,13 @@ exports.registerUserIntoBootcamp = async ({
                 isFieldFilled(userData?.id_instagram) &&
                 isFieldFilled(userData?.pendidikan) &&
                 isFieldFilled(userData?.nama_sekolah) &&
-                isFieldFilled(userData?.ktm_key) &&
-                isFieldFilled(userData?.twibbon_key)
+                isFieldFilled(userData?.ktm_key)
             );
 
             if (!isComplete) {
                 throw {
                     status: 400,
-                    message: "Lengkapi data profil dan berkas identitas terlebih dahulu di menu Edit Profil sebelum mendaftar.",
+                    message: "Lengkapi data profil dan kartu identitas terlebih dahulu di menu Edit Profil sebelum mendaftar.",
                 };
             }
 
