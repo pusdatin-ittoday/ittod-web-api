@@ -17,13 +17,10 @@ const bootcampRegisterSchema = Joi.object({
                 "Phone number must be a valid phone format.",
         }),
     bundling: Joi.string()
-        .valid("day1", "day2", "day1_day2", "")
         .optional()
         .allow(null, "")
         .messages({
             "string.base": "Bundling must be a string.",
-            "any.only":
-                "Bundling must be either 'day1', 'day2', or 'day1_day2'.",
         }),
 });
 
