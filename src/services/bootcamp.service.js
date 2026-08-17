@@ -1,4 +1,5 @@
 const prisma = require("../prisma.js");
+const crypto = require("crypto");
 
 exports.registerUserIntoBootcamp = async ({
     event_id,
@@ -142,11 +143,63 @@ exports.registerUserIntoBootcamp = async ({
                 /@(apps\.)?ipb\.ac\.id$/i.test(userEmail);
             const canBeFree = isIPB;
 
+            // Check if the user has been verified previously in any team
+            const previouslyVerified = await tx.team_member.findFirst({
+                where: {
+                    user_id,
+                    is_verified: true,
+                },
+            });
+            const isAutoVerified = !!previouslyVerified;
+
+            // Check if individual team entry already exists for this bootcamp event and user
+            const existingTeam = await tx.team.findFirst({
+                where: {
+                    competition_id: resolvedEventId,
+                    members: {
+                        some: { user_id },
+                    },
+                },
+            });
+
+            if (!existingTeam) {
+                const teamId = crypto.randomUUID();
+                let team_code;
+                let existingTeamWithCode;
+                do {
+                    team_code = crypto.randomBytes(6).toString("base64url");
+                    existingTeamWithCode = await tx.team.findUnique({
+                        where: { team_code },
+                    });
+                } while (existingTeamWithCode);
+
+                const teamName = userData?.full_name ? `[Bootcamp] ${userData.full_name}` : `[Bootcamp] ${user_id}`;
+
+                await tx.team.create({
+                    data: {
+                        id: teamId,
+                        competition_id: resolvedEventId,
+                        team_name: teamName,
+                        team_code,
+                        max_member: 1,
+                        is_document_verified: isAutoVerified ? "approved" : "pending",
+                        is_verified: isAutoVerified ? (canBeFree ? "approved" : "pending") : "pending",
+                        members: {
+                            create: {
+                                user_id,
+                                role: "leader",
+                                is_verified: isAutoVerified,
+                            },
+                        },
+                    },
+                });
+            }
+
             const newParticipant = await tx.event_participant.create({
                 data: {
                     user_id,
                     event_id: resolvedEventId,
-                    payment_verification: canBeFree ? "accepted" : "pending",
+                    payment_verification: isAutoVerified ? (canBeFree ? "accepted" : "pending") : "pending",
                     date_added: new Date(),
                 },
             });

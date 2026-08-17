@@ -1,4 +1,5 @@
 const prisma = require("../prisma.js");
+const crypto = require("crypto");
 
 const registerUserIntoEvent = async (
     user_id,
@@ -119,10 +120,63 @@ const registerUserIntoEvent = async (
                 });
             }
 
+            // Check if the user has been verified previously in any team
+            const previouslyVerified = await tx.team_member.findFirst({
+                where: {
+                    user_id,
+                    is_verified: true,
+                },
+            });
+            const isAutoVerified = !!previouslyVerified;
+
+            const existingTeam = await tx.team.findFirst({
+                where: {
+                    competition_id: actualEventId,
+                    members: {
+                        some: { user_id },
+                    },
+                },
+            });
+
+            if (!existingTeam) {
+                const teamId = crypto.randomUUID();
+                let team_code;
+                let existingTeamWithCode;
+                do {
+                    team_code = crypto.randomBytes(6).toString("base64url");
+                    existingTeamWithCode = await tx.team.findUnique({
+                        where: { team_code },
+                    });
+                } while (existingTeamWithCode);
+
+                const eventTitle = lockedEvent?.title || eventExists?.title || "Event";
+                const teamName = userData?.full_name ? `[${eventTitle}] ${userData.full_name}` : `[${eventTitle}] ${user_id}`;
+
+                await tx.team.create({
+                    data: {
+                        id: teamId,
+                        competition_id: actualEventId,
+                        team_name: teamName,
+                        team_code,
+                        max_member: 1,
+                        is_document_verified: isAutoVerified ? "approved" : "pending",
+                        is_verified: isAutoVerified ? (eventExists?.price === 0 ? "approved" : "pending") : "pending",
+                        members: {
+                            create: {
+                                user_id,
+                                role: "leader",
+                                is_verified: isAutoVerified,
+                            },
+                        },
+                    },
+                });
+            }
+
             await tx.event_participant.create({
                 data: {
                     user_id,
                     event_id: actualEventId,
+                    payment_verification: isAutoVerified ? (eventExists?.price === 0 ? "accepted" : "pending") : "pending",
                     date_added: new Date(),
                 },
             });
