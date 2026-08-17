@@ -132,9 +132,11 @@ const getUserCompetitionData = async (req, res) => {
                     is_document_verified: true,
                     is_name_changed: true,
                     previous_team_name: true,
-                    name_changed_at: true,
                     verification_error: true,
                     payment_proof_id: true,
+                    payment_proof: {
+                        select: { url: true },
+                    },
                     competition: {
                         select: {
                             id: true,
@@ -181,6 +183,9 @@ const getUserCompetitionData = async (req, res) => {
                     is_document_verified: true,
                     verification_error: true,
                     payment_proof_id: true,
+                    payment_proof: {
+                        select: { url: true },
+                    },
                     competition: {
                         select: {
                             id: true,
@@ -222,6 +227,7 @@ const getUserCompetitionData = async (req, res) => {
             isVerified: team.is_verified,
             isDocumentVerified: team.is_document_verified,
             paymentProofID: team.payment_proof_id,
+            paymentProofUrl: team.payment_proof?.url ?? null,
             verificationError: team.verification_error,
             competitionId: team.competition?.id,
             competitionName: team.competition?.title ?? "N/A",
