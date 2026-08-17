@@ -13,7 +13,7 @@ const validateOptionalFile = async (req, res, next) => {
 
         if (filesToValidate.length === 0) return next();
 
-        const allowedExts = ["png", "jpg", "jpeg", "webp"];
+        const allowedExts = ["png", "jpg", "jpeg", "webp", "pdf"];
 
         for (const file of filesToValidate) {
             // 1. Verify extension
@@ -30,7 +30,7 @@ const validateOptionalFile = async (req, res, next) => {
             try {
                 const { fileTypeFromBuffer } = await import("file-type");
                 const detected = await fileTypeFromBuffer(file.buffer);
-                if (!detected || !["image/png", "image/jpeg", "image/webp"].includes(detected.mime)) {
+                if (!detected || !["image/png", "image/jpeg", "image/webp", "application/pdf"].includes(detected.mime)) {
                     return res.status(400).json({ message: "Invalid file content" });
                 }
             } catch (err) {

@@ -173,7 +173,12 @@ const uploadBootcampPaymentService = async ({ user_id, payment_proof }) => {
             const existingParticipant = await tx.event_participant.findFirst({
                 where: {
                     user_id,
-                    event_id: resolvedEventId,
+                    OR: [
+                        { event_id: resolvedEventId },
+                        { event_id: { in: ["Bootcamp", "bootcamp", "BOOTCAMP"] } },
+                        { event: { slug: { in: ["bootcamp", "Bootcamp"] } } },
+                        { event: { title: { contains: "Bootcamp" } } },
+                    ],
                 },
             });
 
