@@ -40,13 +40,45 @@ const eventShowController = async (req, res) => {
             },
         });
 
+        // Also fetch individual teams for this user to ensure payment proof and status are always found
+        const individualTeams = await prisma.team.findMany({
+            where: {
+                members: { some: { user_id } },
+            },
+            select: {
+                competition_id: true,
+                is_verified: true,
+                paymentProof: {
+                    select: { url: true },
+                },
+            },
+        });
+
         const formatted = participants.map((p) => {
-            const isVerified = p.payment_verification === "accepted";
+            const matchingTeam = individualTeams.find((t) => {
+                const cId = (t.competition_id || "").toLowerCase();
+                const eId = (p.event_id || "").toLowerCase();
+                const eSlug = (p.event?.slug || "").toLowerCase();
+                const eTitle = (p.event?.title || "").toLowerCase();
+                return (
+                    cId === eId ||
+                    cId === eSlug ||
+                    (cId.includes("bootcamp") && (eId.includes("bootcamp") || eSlug.includes("bootcamp") || eTitle.includes("bootcamp")))
+                );
+            });
+
+            const effectivePaymentProof = p.payment_proof || matchingTeam?.paymentProof?.url || null;
+            const effectivePaymentVerification = (matchingTeam?.is_verified === "approved" || p.payment_verification === "accepted")
+                ? "accepted"
+                : (p.payment_verification || (matchingTeam?.is_verified === "rejected" ? "rejected" : "pending"));
+
+            const isVerified = effectivePaymentVerification === "accepted";
+
             return {
                 event_id: p.event_id,
-                payment_verification: p.payment_verification,
-                payment_proof: p.payment_proof || null,
-                has_payment_proof: Boolean(p.payment_proof),
+                payment_verification: effectivePaymentVerification,
+                payment_proof: effectivePaymentProof,
+                has_payment_proof: Boolean(effectivePaymentProof),
                 event: {
                     id: p.event?.id,
                     slug: p.event?.slug,
