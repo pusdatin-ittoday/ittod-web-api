@@ -40,7 +40,7 @@ const eventShowController = async (req, res) => {
         });
 
         const formatted = participants.map((p) => {
-            const isVerified = p.payment_verification === "accepted" || p.event?.price === 0;
+            const isVerified = p.payment_verification === "accepted";
             return {
                 event_id: p.event_id,
                 payment_verification: p.payment_verification,
