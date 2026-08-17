@@ -56,6 +56,19 @@ const uploadBootcampPaymentService = async ({ user_id, payment_proof }) => {
         };
     }
 
+    // Resolve actual event record from DB (by ID, slug, or title)
+    const targetEvent = await prisma.event.findFirst({
+        where: {
+            OR: [
+                { id: { in: ["Bootcamp", "bootcamp", "BOOTCAMP"] } },
+                { slug: { in: ["bootcamp", "Bootcamp"] } },
+                { title: { contains: "Bootcamp" } },
+            ],
+        },
+    });
+
+    const resolvedEventId = targetEvent ? targetEvent.id : "Bootcamp";
+
     try {
         return await prisma.$transaction(async tx => {
             const user = await tx.user.findUnique({
@@ -85,14 +98,13 @@ const uploadBootcampPaymentService = async ({ user_id, payment_proof }) => {
                 isFieldFilled(user?.id_instagram) &&
                 isFieldFilled(user?.pendidikan) &&
                 isFieldFilled(user?.nama_sekolah) &&
-                isFieldFilled(user?.ktm_key) &&
-                isFieldFilled(user?.twibbon_key)
+                isFieldFilled(user?.ktm_key)
             );
 
             if (!isComplete) {
                 throw {
                     status: 400,
-                    message: "Lengkapi data profil dan berkas identitas terlebih dahulu di menu Edit Profil sebelum mengunggah pembayaran.",
+                    message: "Lengkapi data profil dan kartu identitas terlebih dahulu di menu Edit Profil sebelum mengunggah pembayaran.",
                 };
             }
 
@@ -110,7 +122,7 @@ const uploadBootcampPaymentService = async ({ user_id, payment_proof }) => {
             // Update or create individual team payment link
             const existingTeam = await tx.team.findFirst({
                 where: {
-                    competition_id: BOOTCAMP_EVENT_ID,
+                    competition_id: resolvedEventId,
                     members: {
                         some: { user_id },
                     },
@@ -136,11 +148,11 @@ const uploadBootcampPaymentService = async ({ user_id, payment_proof }) => {
                     });
                 } while (existingTeamWithCode);
 
-                const teamName = user?.full_name ? `[Bootcamp] ${user.full_name}` : `[Bootcamp] ${user_id}`;
+                const teamName = user?.full_name ? `[Bootcamp - MineToday] ${user.full_name}` : `[Bootcamp - MineToday] ${user_id}`;
                 await tx.team.create({
                     data: {
                         id: teamId,
-                        competition_id: BOOTCAMP_EVENT_ID,
+                        competition_id: resolvedEventId,
                         team_name: teamName,
                         team_code,
                         max_member: 1,
@@ -158,12 +170,10 @@ const uploadBootcampPaymentService = async ({ user_id, payment_proof }) => {
                 });
             }
 
-            const existingParticipant = await tx.event_participant.findUnique({
+            const existingParticipant = await tx.event_participant.findFirst({
                 where: {
-                    user_id_event_id: {
-                        user_id,
-                        event_id: BOOTCAMP_EVENT_ID,
-                    },
+                    user_id,
+                    event_id: resolvedEventId,
                 },
             });
 
@@ -173,7 +183,7 @@ const uploadBootcampPaymentService = async ({ user_id, payment_proof }) => {
                     where: {
                         user_id_event_id: {
                             user_id,
-                            event_id: BOOTCAMP_EVENT_ID,
+                            event_id: existingParticipant.event_id,
                         },
                     },
                     data: {
@@ -185,9 +195,10 @@ const uploadBootcampPaymentService = async ({ user_id, payment_proof }) => {
                 updatedParticipantRow = await tx.event_participant.create({
                     data: {
                         user_id,
-                        event_id: BOOTCAMP_EVENT_ID,
+                        event_id: resolvedEventId,
                         payment_proof: payment_proof_key,
                         payment_verification: "pending",
+                        date_added: new Date(),
                     },
                 });
             }
@@ -206,7 +217,7 @@ const uploadBootcampPaymentService = async ({ user_id, payment_proof }) => {
         } else {
             throw {
                 status: 500,
-                message: "Failed to upload Payment.",
+                message: err.message || "Failed to upload Payment.",
                 details:
                     process.env.NODE_ENV === "production"
                         ? undefined
