@@ -174,8 +174,15 @@ exports.registerUserIntoBootcamp = async ({
                     });
                 } while (existingTeamWithCode);
 
-                const gatewayTag = bundling === "intelligo_gateway" ? " - Intelligo Gateway" : "";
-                const teamName = userData?.full_name ? `[Bootcamp${gatewayTag}] ${userData.full_name}` : `[Bootcamp${gatewayTag}] ${user_id}`;
+                let tag = "";
+                if (canBeFree) {
+                    tag = " - IPB";
+                } else if (bundling === "minetoday" || isMinetod) {
+                    tag = " - MineToday";
+                } else if (bundling === "intelligo_gateway") {
+                    tag = " - Intelligo Gateway";
+                }
+                const teamName = userData?.full_name ? `[Bootcamp${tag}] ${userData.full_name}` : `[Bootcamp${tag}] ${user_id}`;
 
                 await tx.team.create({
                     data: {
