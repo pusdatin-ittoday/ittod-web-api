@@ -29,6 +29,10 @@ const upsertTeamSubmission = async (team_id, submission_object) => {
                 };
             }
 
+            const finalPayload = typeof submission_object === 'string' 
+                ? submission_object 
+                : JSON.stringify(submission_object);
+
             await tx.competition_submission.upsert({
                 where: {
                     team_id_competition_id: {
@@ -36,11 +40,11 @@ const upsertTeamSubmission = async (team_id, submission_object) => {
                         competition_id: team.competition_id,
                     },
                 },
-                update: { submission_object },
+                update: { submission_object: finalPayload },
                 create: {
                     team_id,
                     competition_id: team.competition_id,
-                    submission_object,
+                    submission_object: finalPayload,
                 },
             });
         });
