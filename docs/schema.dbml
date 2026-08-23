@@ -149,6 +149,7 @@ Table event_timeline {
   title String [not null]
   date DateTime [not null]
   end_date DateTime
+  is_submission Boolean [not null, default: false]
   event event [not null]
 }
 
