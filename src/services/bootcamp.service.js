@@ -201,7 +201,7 @@ exports.registerUserIntoBootcamp = async ({
                         team_code,
                         max_member: 1,
                         is_document_verified: isAutoVerified ? "approved" : "pending",
-                        is_verified: isAutoVerified ? (canBeFree ? "approved" : "pending") : "pending",
+                        is_verified: "pending",
                         members: {
                             create: {
                                 user_id,
@@ -217,7 +217,7 @@ exports.registerUserIntoBootcamp = async ({
                 data: {
                     user_id,
                     event_id: resolvedEventId,
-                    payment_verification: isAutoVerified ? (canBeFree ? "accepted" : "pending") : "pending",
+                    payment_verification: "pending",
                     date_added: new Date(),
                 },
             });
