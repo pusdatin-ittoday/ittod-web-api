@@ -43,12 +43,12 @@ const getEventsController = async (req, res) => {
                 contact_person2: true,
                 method: true,
                 max_noncompetition_participant: true,
+                max_member: true,
                 requires_submission: true,
                 is_active: true,
                 guide_book_url: true,
                 participation_type: true,
                 logo_url: true,
-                whatsapp_group_link: true,
                 submission_fields: true,
                 timelines: {
                     orderBy: {
@@ -97,12 +97,12 @@ const getEventByIdController = async (req, res) => {
                 contact_person2: true,
                 method: true,
                 max_noncompetition_participant: true,
+                max_member: true,
                 requires_submission: true,
                 is_active: true,
                 guide_book_url: true,
                 participation_type: true,
                 logo_url: true,
-                whatsapp_group_link: true,
                 submission_fields: true,
                 timelines: {
                     orderBy: {

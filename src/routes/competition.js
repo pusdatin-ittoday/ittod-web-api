@@ -2,6 +2,7 @@ const { Router } = require("express");
 const {
     joinCompetitionWithTeamCode,
     registerCompetition,
+    updateTeamNameController,
 } = require("../controllers/competition.controller.js");
 const {
     uploadPaymentController,
@@ -52,4 +53,11 @@ compeRouter.put(
     upsertSubmissionController
 );
 
+compeRouter.put(
+    "/api/competition/team/name",
+    isAuthenticated,
+    updateTeamNameController
+);
+
 module.exports = compeRouter;
+

@@ -25,6 +25,7 @@ Table user {
   event_participants event_participant [not null]
   media media [not null]
   team_members team_member [not null]
+  user_feedbacks user_feedback [not null]
   identity user_identity
 }
 
@@ -112,7 +113,11 @@ Table team {
   max_member Int [not null, default: 3]
   is_document_verified document_verification_enum [not null, default: 'pending']
   is_verified document_verification_enum [not null, default: 'pending']
+  is_name_changed Boolean [not null, default: false]
+  previous_team_name String
+  name_changed_at DateTime
   verification_error String
+  has_bootcamp_addon Boolean [not null, default: false]
   created_at DateTime [default: `now()`, not null]
   updated_at DateTime
   payment_proof_id String
@@ -144,6 +149,7 @@ Table event_timeline {
   title String [not null]
   date DateTime [not null]
   end_date DateTime
+  is_submission Boolean [not null, default: false]
   event event [not null]
 }
 
@@ -154,10 +160,23 @@ Table event_announcement {
   title String [not null]
   description String [not null]
   is_pinned Boolean [not null, default: false]
+  priority Int [not null, default: 0]
   created_at DateTime [default: `now()`, not null]
   updated_at DateTime [not null]
   author user [not null]
   event event
+}
+
+Table user_feedback {
+  id String [pk]
+  user_id String [not null]
+  subject String [not null]
+  content String [not null]
+  media_urls Json
+  status String [not null, default: 'pending']
+  created_at DateTime [default: `now()`, not null]
+  updated_at DateTime [not null]
+  user user [not null]
 }
 
 Table competition_submission {
@@ -349,6 +368,8 @@ Ref: event_timeline.event_id > event.id
 Ref: event_announcement.author_id > user.id
 
 Ref: event_announcement.event_id > event.id [delete: Restrict]
+
+Ref: user_feedback.user_id > user.id [delete: Cascade]
 
 Ref: competition_submission.competition_id > event.id
 

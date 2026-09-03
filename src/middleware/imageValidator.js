@@ -13,7 +13,7 @@ const validateOptionalFile = async (req, res, next) => {
 
         if (filesToValidate.length === 0) return next();
 
-        const allowedExts = ["png", "jpg", "jpeg", "webp"];
+        const allowedExts = ["png", "jpg", "jpeg", "webp", "pdf"];
 
         for (const file of filesToValidate) {
             // 1. Verify extension
@@ -22,15 +22,15 @@ const validateOptionalFile = async (req, res, next) => {
                 return res.status(400).json({ message: "Invalid file extension: " + ext });
             }
 
-            if (file.size > 2 * 1024 * 1024) {
-                return res.status(400).json({ message: "File size exceeds limit of 2MB" });
+            if (file.size > 20 * 1024 * 1024) {
+                return res.status(400).json({ message: "File size exceeds limit of 20MB" });
             }
 
             // 2. Verify magic number (fallback gracefully if file-type fails to load)
             try {
                 const { fileTypeFromBuffer } = await import("file-type");
                 const detected = await fileTypeFromBuffer(file.buffer);
-                if (!detected || !["image/png", "image/jpeg", "image/webp"].includes(detected.mime)) {
+                if (!detected || !["image/png", "image/jpeg", "image/webp", "application/pdf"].includes(detected.mime)) {
                     return res.status(400).json({ message: "Invalid file content" });
                 }
             } catch (err) {

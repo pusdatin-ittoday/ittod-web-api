@@ -2,7 +2,7 @@ const prisma = require("../prisma.js");
 const crypto = require("crypto");
 
 // Create new Announcement
-const createAnnouncement = async ({ title, description, event_id, is_pinned = false, author_id }) => {
+const createAnnouncement = async ({ title, description, event_id, is_pinned = false, priority = 0, author_id }) => {
     if (!title || title.trim() === "") {
         throw { status: 400, message: "Title is required" };
     }
@@ -27,6 +27,7 @@ const createAnnouncement = async ({ title, description, event_id, is_pinned = fa
             description: description.trim(),
             event_id: event_id || null,
             is_pinned: Boolean(is_pinned),
+            priority: parseInt(priority, 10) || 0,
             author_id,
         },
         select: {
@@ -34,6 +35,7 @@ const createAnnouncement = async ({ title, description, event_id, is_pinned = fa
             title: true,
             description: true,
             is_pinned: true,
+            priority: true,
             event_id: true,
             created_at: true,
             updated_at: true,
@@ -53,6 +55,7 @@ const updateAnnouncement = async (announcementId, data) => {
     if (data.description && data.description.trim() !== "") updateData.description = data.description.trim();
     if (data.event_id !== undefined) updateData.event_id = data.event_id || null;
     if (data.is_pinned !== undefined) updateData.is_pinned = Boolean(data.is_pinned);
+    if (data.priority !== undefined) updateData.priority = parseInt(data.priority, 10) || 0;
 
     const updated = await prisma.event_announcement.update({
         where: { id: announcementId },
@@ -62,6 +65,7 @@ const updateAnnouncement = async (announcementId, data) => {
             title: true,
             description: true,
             is_pinned: true,
+            priority: true,
             event_id: true,
             updated_at: true,
         },

@@ -62,3 +62,27 @@ exports.joinCompetitionWithTeamCode = async (req, res) => {
         });
     }
 };
+
+exports.updateTeamNameController = async (req, res) => {
+    try {
+        const { team_id, team_name } = req.body;
+        if (!team_id || !team_name) {
+            return res.status(400).json({
+                error: "team_id dan team_name wajib diisi",
+            });
+        }
+        const user_id = req.user.id;
+        const result = await compService.updateTeamName({
+            team_id,
+            team_name,
+            user_id,
+        });
+        return res.status(200).json(result);
+    } catch (err) {
+        console.error("Error in updateTeamNameController:", err);
+        return res.status(err.status || 500).json({
+            error: err.message || "Gagal mengubah nama tim",
+        });
+    }
+};
+
