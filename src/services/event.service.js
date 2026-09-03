@@ -33,6 +33,39 @@ const registerUserIntoEvent = async (
 
     const actualEventId = eventExists.id;
 
+    if (!eventExists.is_active) {
+        throw {
+            status: 400,
+            message: "Pendaftaran untuk kegiatan ini telah ditutup.",
+        };
+    }
+
+    const regTimeline = await prisma.event_timeline.findFirst({
+        where: {
+            event_id: actualEventId,
+            is_registration: true,
+        },
+    });
+
+    if (regTimeline) {
+        const parseLocalDate = (dateStr) => {
+            if (!dateStr) return null;
+            const str = typeof dateStr === 'string' ? dateStr : dateStr.toISOString();
+            return new Date(str.endsWith('Z') ? str.slice(0, -1) : str);
+        };
+        const deadline = regTimeline.end_date ? parseLocalDate(regTimeline.end_date) : parseLocalDate(regTimeline.date);
+        if (deadline && new Date() > deadline) {
+            await prisma.event.update({
+                where: { id: actualEventId },
+                data: { is_active: false }
+            }).catch(() => {});
+            throw {
+                status: 400,
+                message: "Batas waktu pendaftaran untuk kegiatan ini telah berakhir.",
+            };
+        }
+    }
+
     const userAlreadyInEvent = await prisma.event_participant.findFirst({
         where: { user_id, event_id: actualEventId },
     });
