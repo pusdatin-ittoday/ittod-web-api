@@ -5,4 +5,4 @@ nixPkgs = ["...", "python3", "gcc", "gnumake"]
 cmds = ["npm install", "npx prisma generate"]
 
 [start]
-cmd = "npm run serve"
+cmd = "npx prisma generate && npm run serve"
