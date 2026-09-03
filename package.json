@@ -13,7 +13,8 @@
         "test": "echo \"Error: no test specified\" && exit 1",
         "dev": "nodemon src/server.js",
         "serve": "node src/server.js",
-        "format": "prettier --write ."
+        "format": "prettier --write .",
+        "postinstall": "prisma generate"
     },
     "keywords": [],
     "author": "",

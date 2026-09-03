@@ -1,0 +1,49 @@
+name: Deploy ITTOD Web API (Dokploy)
+
+on:
+  push:
+    branches:
+      - main
+  workflow_dispatch:
+
+jobs:
+  deploy:
+    name: Trigger Dokploy Deployment
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout Repository
+        uses: actions/checkout@v4
+
+      - name: Deploy to Dokploy
+        run: |
+          echo "🚀 Triggering deployment on Dokploy for ittod-web-api..."
+          if [ -n "${{ secrets.DOKPLOY_WEBHOOK_URL }}" ]; then
+            echo "Triggering via Dokploy Webhook URL..."
+            RESPONSE=$(curl -s -w "\n%{http_code}" -X POST "${{ secrets.DOKPLOY_WEBHOOK_URL }}" -H "Content-Type: application/json")
+            HTTP_CODE=$(echo "$RESPONSE" | tail -n1)
+            BODY=$(echo "$RESPONSE" | sed '$d')
+            echo "HTTP Status: $HTTP_CODE"
+            echo "Response: $BODY"
+            if [ "$HTTP_CODE" -lt 200 ] || [ "$HTTP_CODE" -ge 300 ]; then
+              echo "❌ Failed to trigger Dokploy webhook"
+              exit 1
+            fi
+          elif [ -n "${{ secrets.DOKPLOY_API_URL }}" ] && [ -n "${{ secrets.DOKPLOY_TOKEN }}" ] && [ -n "${{ secrets.DOKPLOY_APP_ID }}" ]; then
+            echo "Triggering via Dokploy API..."
+            RESPONSE=$(curl -s -w "\n%{http_code}" -X POST "${{ secrets.DOKPLOY_API_URL }}/api/application.deploy" \
+              -H "Authorization: Bearer ${{ secrets.DOKPLOY_TOKEN }}" \
+              -H "Content-Type: application/json" \
+              -d "{\"applicationId\": \"${{ secrets.DOKPLOY_APP_ID }}\"}")
+            HTTP_CODE=$(echo "$RESPONSE" | tail -n1)
+            BODY=$(echo "$RESPONSE" | sed '$d')
+            echo "HTTP Status: $HTTP_CODE"
+            echo "Response: $BODY"
+            if [ "$HTTP_CODE" -lt 200 ] || [ "$HTTP_CODE" -ge 300 ]; then
+              echo "❌ Failed to trigger Dokploy API"
+              exit 1
+            fi
+          else
+            echo "❌ Error: Please configure DOKPLOY_WEBHOOK_URL or (DOKPLOY_API_URL, DOKPLOY_TOKEN, DOKPLOY_APP_ID) in GitHub Secrets."
+            exit 1
+          fi
+          echo "✅ Deployment triggered successfully on Dokploy!"
