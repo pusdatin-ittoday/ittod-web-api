@@ -36,6 +36,14 @@ const eventRouter = Router();
 // Staging helper endpoint to easily trigger finalist & champion board
 eventRouter.get("/api/staging/trigger-finalist", async (req, res) => {
     try {
+        // 0. Ensure columns is_finalist and rank exist on table `team`
+        try {
+            await prisma.$executeRawUnsafe("ALTER TABLE `team` ADD COLUMN `is_finalist` TINYINT(1) NOT NULL DEFAULT 0;");
+        } catch (_) {}
+        try {
+            await prisma.$executeRawUnsafe("ALTER TABLE `team` ADD COLUMN `rank` INT NULL;");
+        } catch (_) {}
+
         const slug = req.query.slug || "ux-today";
         const event = await prisma.event.findFirst({
             where: {
