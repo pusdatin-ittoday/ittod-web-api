@@ -26,9 +26,14 @@ const {
     getEventByIdController,
 } = require("../controllers/event-public.controller");
 
+const {
+    getCompetitionResultsController,
+} = require("../controllers/competition-results.controller");
+
 const eventRouter = Router();
 
 eventRouter.get("/api/events", getEventsController);
+eventRouter.get("/api/events/:id/results", getCompetitionResultsController);
 eventRouter.get("/api/events/:id", getEventByIdController);
 
 eventRouter.post(
