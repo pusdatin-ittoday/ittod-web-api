@@ -53,8 +53,22 @@ const registerUserIntoEvent = async (
             const str = typeof dateStr === 'string' ? dateStr : dateStr.toISOString();
             return new Date(str.endsWith('Z') ? str.slice(0, -1) : str);
         };
+        const now = new Date();
+        const startDate = regTimeline.end_date ? parseLocalDate(regTimeline.date) : null;
         const deadline = regTimeline.end_date ? parseLocalDate(regTimeline.end_date) : parseLocalDate(regTimeline.date);
-        if (deadline && new Date() > deadline) {
+
+        if (startDate && now < startDate) {
+            await prisma.event.update({
+                where: { id: actualEventId },
+                data: { is_active: false }
+            }).catch(() => {});
+            throw {
+                status: 400,
+                message: "Pendaftaran untuk kegiatan ini belum dibuka.",
+            };
+        }
+
+        if (deadline && now > deadline) {
             await prisma.event.update({
                 where: { id: actualEventId },
                 data: { is_active: false }
@@ -219,6 +233,7 @@ const registerUserIntoEvent = async (
             message: `User has been registered into event with id ${actualEventId}`,
         };
     } catch (err) {
+        if (err.status) throw err;
         console.error("Registration error:", err);
         throw {
             status: 500,

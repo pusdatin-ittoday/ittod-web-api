@@ -32,8 +32,19 @@ exports.registerTeamThenInsertLeader = async ({
             const str = typeof dateStr === 'string' ? dateStr : dateStr.toISOString();
             return new Date(str.endsWith('Z') ? str.slice(0, -1) : str);
         };
+        const now = new Date();
+        const startDate = regTimeline.end_date ? parseLocalDate(regTimeline.date) : null;
         const deadline = regTimeline.end_date ? parseLocalDate(regTimeline.end_date) : parseLocalDate(regTimeline.date);
-        if (deadline && new Date() > deadline) {
+
+        if (startDate && now < startDate) {
+            await prisma.event.update({
+                where: { id: competition_id },
+                data: { is_active: false }
+            }).catch(() => {});
+            throw { status: 400, message: "Pendaftaran untuk kompetisi ini belum dibuka." };
+        }
+
+        if (deadline && now > deadline) {
             await prisma.event.update({
                 where: { id: competition_id },
                 data: { is_active: false }

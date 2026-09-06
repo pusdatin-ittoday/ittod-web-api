@@ -7,16 +7,27 @@ const parseLocalDate = (dateStr) => {
 };
 
 const checkAndApplyAutoClose = (event) => {
-    if (!event.is_active || !event.timelines) return;
+    if (!event.timelines) return;
     const regTimeline = event.timelines.find(t => t.is_registration === true || t.is_registration === 1);
     if (!regTimeline) return;
+
+    const now = new Date();
+    const startDate = regTimeline.end_date ? parseLocalDate(regTimeline.date) : null;
     const deadline = regTimeline.end_date ? parseLocalDate(regTimeline.end_date) : parseLocalDate(regTimeline.date);
-    if (deadline && new Date() > deadline) {
-        event.is_active = false;
+
+    let shouldBeActive = true;
+    if (startDate && now < startDate) {
+        shouldBeActive = false;
+    } else if (deadline && now > deadline) {
+        shouldBeActive = false;
+    }
+
+    if (event.is_active !== shouldBeActive) {
+        event.is_active = shouldBeActive;
         prisma.event.update({
             where: { id: event.id },
-            data: { is_active: false }
-        }).catch(err => console.error(`Error auto-closing event ${event.id}:`, err));
+            data: { is_active: shouldBeActive }
+        }).catch(err => console.error(`Error auto-syncing event ${event.id}:`, err));
     }
 };
 
@@ -47,7 +58,6 @@ const getEventsController = async (req, res) => {
                 requires_submission: true,
                 is_active: true,
                 guide_book_url: true,
-                participation_type: true,
                 logo_url: true,
                 submission_fields: true,
                 timelines: {
@@ -101,7 +111,6 @@ const getEventByIdController = async (req, res) => {
                 requires_submission: true,
                 is_active: true,
                 guide_book_url: true,
-                participation_type: true,
                 logo_url: true,
                 submission_fields: true,
                 timelines: {
