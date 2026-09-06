@@ -13,15 +13,25 @@ const CHAMPION_KEYWORD  = "juara";
 async function checkRevealTime(competitionId) {
     const now = new Date();
 
-    const timelines = await prisma.event_timeline.findMany({
+    const eventTimelines = await prisma.event_timeline.findMany({
         where: { event_id: competitionId },
         select: { title: true, date: true },
     });
 
+    const globalTimelines = await prisma.competition_timeline.findMany({
+        select: { title: true, start_date: true },
+    });
+
+    // Gabungkan timeline event spesifik dan timeline global
+    const allTimelines = [
+        ...eventTimelines,
+        ...globalTimelines.map(gt => ({ title: gt.title, date: gt.start_date }))
+    ];
+
     let finalistRevealed  = false;
     let championRevealed  = false;
 
-    for (const tl of timelines) {
+    for (const tl of allTimelines) {
         const titleLower = (tl.title || "").toLowerCase();
 
         // Prisma membaca MySQL DATETIME as UTC — tapi value sebenarnya WIB (UTC+7).
