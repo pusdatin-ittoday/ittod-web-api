@@ -11,11 +11,39 @@ const routes = require("./routes/index.js");
 const sessionConfig = require("./config/session.config.js");
 
 const app = express();
+const defaultOrigins = [
+    "https://ittoday.web.id",
+    "https://admin.ittoday.web.id",
+    "http://localhost:5173",
+    "http://localhost:5174",
+];
+
+const envOrigins = [
+    process.env.CORS_ORIGINS ? process.env.CORS_ORIGINS.split(",") : [],
+    process.env.FRONTEND_URL,
+    process.env.APP_FRONTEND_URL,
+]
+    .flat()
+    .filter(Boolean)
+    .map((o) => o.trim());
+
+const allowedOrigins = Array.from(new Set([...defaultOrigins, ...envOrigins]));
+
 //middlewares
 app.use(
     cors({
         methods: ["GET", "POST", "PUT", "DELETE", "PATCH", "OPTIONS"],
-        origin: ["https://ittoday.web.id", "http://localhost:5173", "http://localhost:5174"],
+        origin: (origin, callback) => {
+            if (!origin) return callback(null, true);
+            if (
+                allowedOrigins.includes(origin) ||
+                /^https:\/\/([a-z0-9-]+\.)*ittoday\.web\.id$/.test(origin) ||
+                origin.startsWith("http://localhost:")
+            ) {
+                return callback(null, true);
+            }
+            return callback(null, false);
+        },
         credentials: true,
     })
 );
