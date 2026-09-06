@@ -15,6 +15,44 @@ exports.registerTeamThenInsertLeader = async ({
     if (!competitionExists)
         throw { status: 404, message: "competition_id not found" };
 
+    if (!competitionExists.is_active) {
+        throw { status: 400, message: "Pendaftaran untuk kompetisi ini telah ditutup." };
+    }
+
+    const regTimeline = await prisma.event_timeline.findFirst({
+        where: {
+            event_id: competition_id,
+            is_registration: true,
+        },
+    });
+
+    if (regTimeline) {
+        const parseLocalDate = (dateStr) => {
+            if (!dateStr) return null;
+            const str = typeof dateStr === 'string' ? dateStr : dateStr.toISOString();
+            return new Date(str.endsWith('Z') ? str.slice(0, -1) : str);
+        };
+        const now = new Date();
+        const startDate = regTimeline.end_date ? parseLocalDate(regTimeline.date) : null;
+        const deadline = regTimeline.end_date ? parseLocalDate(regTimeline.end_date) : parseLocalDate(regTimeline.date);
+
+        if (startDate && now < startDate) {
+            await prisma.event.update({
+                where: { id: competition_id },
+                data: { is_active: false }
+            }).catch(() => {});
+            throw { status: 400, message: "Pendaftaran untuk kompetisi ini belum dibuka." };
+        }
+
+        if (deadline && now > deadline) {
+            await prisma.event.update({
+                where: { id: competition_id },
+                data: { is_active: false }
+            }).catch(() => {});
+            throw { status: 400, message: "Batas waktu pendaftaran untuk kompetisi ini telah berakhir." };
+        }
+    }
+
     const leaderExists = await prisma.user.findUnique({
         where: { id: leader_id },
     });
@@ -50,16 +88,16 @@ exports.registerTeamThenInsertLeader = async ({
 
                 const existingTeamLeadership = !isIndividual
                     ? await tx.team_member.findFirst({
-                          where: {
-                              user_id: leader_id,
-                              role: "leader",
-                              team: {
-                                  competition: {
-                                      participation_type: "team",
-                                  },
-                              },
-                          },
-                      })
+                        where: {
+                            user_id: leader_id,
+                            role: "leader",
+                            team: {
+                                competition: {
+                                    participation_type: "team",
+                                },
+                            },
+                        },
+                    })
                     : null;
 
                 if (existingTeamLeadership) {

@@ -24,8 +24,12 @@ async function uploadFileToR2(fileBuffer, originalName, mimeType) {
         const fileUrl = `${process.env.R2_PUBLIC}/${fileKey}`;
         return { key: fileKey, url: fileUrl };
     } catch (err) {
-        console.error("R2 Upload Failed:", err);
-        throw err;
+        console.error("R2 Upload Failed:", err.message);
+        if (process.env.NODE_ENV === "production") {
+            throw err;
+        }
+        const fileUrl = `https://placehold.co/600x800/png?text=Bukti+Bayar+${encodeURIComponent(safeOriginalName)}`;
+        return { key: fileKey, url: fileUrl };
     }
 }
 

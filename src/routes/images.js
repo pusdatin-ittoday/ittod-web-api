@@ -4,7 +4,10 @@ const {
     getFileFromBucket,
     uploadFileToBucket,
 } = require("../controllers/upload.controller");
-const images = multer({ storage: multer.memoryStorage() }); // Use memory storage for Buffer
+const images = multer({ 
+    storage: multer.memoryStorage(),
+    limits: { fileSize: 20 * 1024 * 1024 } // 20MB limit
+});
 const uploadRouter = Router();
 const { isAuthenticated } = require("../middleware/authMiddleware.js");
 const { validateFile } = require("../middleware/imageValidator.js");

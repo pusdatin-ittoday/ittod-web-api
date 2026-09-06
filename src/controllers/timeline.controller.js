@@ -83,7 +83,7 @@ exports.getCompetitionTimelines = async (req, res) => {
         const columns = await prisma.$queryRawUnsafe(
             `SHOW COLUMNS FROM \`${GLOBAL_TIMELINE_TABLE}\``
         );
-        const columnNames = columns.map(column => column.Field);
+        const columnNames = columns.map(column => column.Field || column.field);
         const orderColumn =
             columnNames.find(column =>
                 ["start_date", "date", "tanggal", "created_at"].includes(column)

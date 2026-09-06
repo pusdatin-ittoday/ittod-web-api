@@ -23,7 +23,10 @@ const uploadBootcampPaymentController = async (req, res) => {
         res.status(200).json(result);
     } catch (error) {
         console.error("Payment Upload Error:", error);
-        res.status(500).json({ message: "Internal server error" });
+        res.status(error.status || 500).json({
+            message: error.message || "Failed to upload payment proof.",
+            error: error.message || "Failed to upload payment proof.",
+        });
     }
 };
 

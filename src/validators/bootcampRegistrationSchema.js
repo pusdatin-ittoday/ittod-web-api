@@ -5,26 +5,22 @@ const bootcampRegisterSchema = Joi.object({
         "any.required": "Event ID is required.",
         "string.base": "Event ID must be a string.",
     }),
-    institution_name: Joi.string().required().messages({
-        "any.required": "Institution name is required.",
+    institution_name: Joi.string().optional().allow(null, "").messages({
         "string.base": "Institution name must be a string.",
     }),
     phone_number: Joi.string()
-        .pattern(/^\+?[1-9]\d{1,14}$/)
-        .required()
+        .pattern(/^(\+?[0-9]{8,16})$/)
+        .optional()
+        .allow(null, "")
         .messages({
-            "any.required": "Phone number is required.",
             "string.pattern.base":
-                "Phone number must be a valid international format.",
+                "Phone number must be a valid phone format.",
         }),
     bundling: Joi.string()
-        .valid("day1", "day2", "day1_day2")
-        .required()
+        .optional()
+        .allow(null, "")
         .messages({
-            "any.required": "Bundling is required.",
             "string.base": "Bundling must be a string.",
-            "any.only":
-                "Bundling must be either 'day1', 'day2', or 'day1_day2'.",
         }),
 });
 

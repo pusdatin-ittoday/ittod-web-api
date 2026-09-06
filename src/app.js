@@ -24,6 +24,14 @@ app.use(cookieParser(process.env.SECRET_KEY_SESSION));
 app.use(session(sessionConfig));
 app.use(passport.initialize());
 app.use(passport.session());
+app.use((req, res, next) => {
+    const start = Date.now();
+    res.on("finish", () => {
+        const duration = Date.now() - start;
+        console.log(`[${new Date().toISOString()}] ${req.method} ${req.originalUrl} -> ${res.statusCode} (${duration}ms)`);
+    });
+    next();
+});
 app.use(routes);
 
 module.exports = app;
