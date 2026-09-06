@@ -52,7 +52,7 @@ const getCompetitionResultsController = async (req, res) => {
                 OR: [{ id: idOrSlug }, { slug: idOrSlug }],
                 type: "competition",
             },
-            select: { id: true, title: true, slug: true },
+            select: { id: true, title: true, slug: true, participation_type: true },
         });
 
         if (!event) {
@@ -79,6 +79,7 @@ const getCompetitionResultsController = async (req, res) => {
             where: {
                 competition_id: event.id,
                 is_finalist:    true,
+                is_verified:    'approved',
             },
             orderBy: [
                 { rank: "asc" },
@@ -138,6 +139,7 @@ const getCompetitionResultsController = async (req, res) => {
             data: {
                 finalist_revealed:  finalistRevealed,
                 champion_revealed:  championRevealed,
+                is_individual:      event.participation_type === "individual",
                 finalists,
                 champions,
             },
