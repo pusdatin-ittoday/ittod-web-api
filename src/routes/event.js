@@ -33,8 +33,20 @@ const prisma = require("../prisma");
 
 const eventRouter = Router();
 
-// Staging helper endpoint to easily trigger finalist & champion board
+// Staging helper endpoint to easily trigger finalist & champion board (Strictly blocked in production)
 eventRouter.get("/api/staging/trigger-finalist", async (req, res) => {
+    // Safety Guard: Block execution if running in production
+    const isStaging = process.env.APP_BASE_URL?.includes("staging") ||
+                      req.hostname?.includes("staging") ||
+                      process.env.ALLOW_STAGING_TRIGGERS === "true";
+
+    if (!isStaging) {
+        return res.status(403).json({
+            success: false,
+            error: "Forbidden: Staging trigger endpoints are disabled in production environment.",
+        });
+    }
+
     try {
         // 0. Ensure columns is_finalist and rank exist on table `team`
         try {
