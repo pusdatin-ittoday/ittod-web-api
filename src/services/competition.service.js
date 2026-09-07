@@ -143,6 +143,15 @@ exports.registerTeamThenInsertLeader = async ({
                     }
                 } while (existingTeamWithCode);
 
+                // Check if leader's document was previously verified in any event/team
+                const previouslyVerified = await tx.team_member.findFirst({
+                    where: {
+                        user_id: leader_id,
+                        is_verified: true,
+                    },
+                });
+                const isAutoVerified = !!previouslyVerified;
+
                 // Create the team
                 await tx.team.create({
                     data: {
@@ -153,6 +162,7 @@ exports.registerTeamThenInsertLeader = async ({
                         max_member: isIndividual
                             ? 1
                             : (competitionExists.max_member ?? 3),
+                        is_document_verified: (isIndividual && isAutoVerified) ? "approved" : "pending",
                     },
                 });
 
@@ -162,6 +172,8 @@ exports.registerTeamThenInsertLeader = async ({
                         user_id: leader_id,
                         team_id: random_id,
                         role: "leader",
+                        is_verified: isAutoVerified,
+                        kartu_id: previouslyVerified?.kartu_id ?? undefined,
                     },
                 });
             },
@@ -233,21 +245,49 @@ exports.memberJoinWithTeamCode = async ({ user_id, team_code }) => {
                     message: "Team has reached the maximum member limit",
                 };
 
+            // Check if member's document was previously verified in any event/team
+            const previouslyVerified = await tx.team_member.findFirst({
+                where: {
+                    user_id,
+                    is_verified: true,
+                },
+            });
+            const isAutoVerified = !!previouslyVerified;
+
             await tx.team_member.create({
                 data: {
                     user_id,
                     team_id: team.id,
                     role: "member",
+                    is_verified: isAutoVerified,
+                    kartu_id: previouslyVerified?.kartu_id ?? undefined,
                 },
             });
 
-            // Reset verifikasi berkas tim ke pending karena ada anggota baru
-            // yang berkasnya belum diperiksa panitia.
-            // is_verified (pembayaran) tidak diubah.
-            await tx.team.update({
-                where: { id: team.id },
-                data: { is_document_verified: "pending" },
+            // Check if there are any unverified members in the team
+            const unverifiedCount = await tx.team_member.count({
+                where: {
+                    team_id: team.id,
+                    is_verified: false,
+                },
             });
+
+            if (unverifiedCount > 0) {
+                // If there are unverified members, ensure status is pending
+                await tx.team.update({
+                    where: { id: team.id },
+                    data: { is_document_verified: "pending" },
+                });
+            } else if (team.is_document_verified !== "approved") {
+                // If all members are verified, auto-approve team document verification
+                await tx.team.update({
+                    where: { id: team.id },
+                    data: {
+                        is_document_verified: "approved",
+                        verification_error: null,
+                    },
+                });
+            }
 
             return { message: "Successfully joined the team" };
         },
