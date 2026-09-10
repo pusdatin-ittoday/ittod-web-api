@@ -43,12 +43,19 @@ const upsertTeamSubmission = async (team_id, submission_object) => {
                 };
             }
 
-            // Prisma interprets MySQL DATETIME as UTC. 
-            // We strip the trailing Z to parse it as local time, just like the frontend.
+            // Prisma interprets MySQL DATETIME as UTC, but it is stored as Asia/Jakarta time (WIB, UTC+7).
+            // Explicitly parse with +07:00 offset to avoid timezone drift on UTC servers.
             const parseLocalDate = (dateStr) => {
                 if (!dateStr) return null;
                 const str = typeof dateStr === 'string' ? dateStr : dateStr.toISOString();
-                return new Date(str.endsWith('Z') ? str.slice(0, -1) : str);
+                let cleaned = str.replace(' ', 'T');
+                if (cleaned.endsWith('Z')) {
+                    cleaned = cleaned.slice(0, -1);
+                }
+                if (!cleaned.includes('+') && !cleaned.match(/-\d{2}:\d{2}$/)) {
+                    cleaned += '+07:00';
+                }
+                return new Date(cleaned);
             };
 
             const now = new Date();

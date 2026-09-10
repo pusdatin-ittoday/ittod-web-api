@@ -3,7 +3,14 @@ const prisma = require("../prisma.js");
 const parseLocalDate = (dateStr) => {
     if (!dateStr) return null;
     const str = typeof dateStr === 'string' ? dateStr : dateStr.toISOString();
-    return new Date(str.endsWith('Z') ? str.slice(0, -1) : str);
+    let cleaned = str.replace(' ', 'T');
+    if (cleaned.endsWith('Z')) {
+        cleaned = cleaned.slice(0, -1);
+    }
+    if (!cleaned.includes('+') && !cleaned.match(/-\d{2}:\d{2}$/)) {
+        cleaned += '+07:00';
+    }
+    return new Date(cleaned);
 };
 
 const checkAndApplyAutoClose = (event) => {

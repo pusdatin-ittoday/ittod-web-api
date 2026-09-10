@@ -440,11 +440,21 @@ const addMemberToTeam = async (teamId, { email, user_id, role = "member" }) => {
     });
     if (existingMember) throw { status: 409, message: "User is already a member of this team" };
 
+    const previouslyVerified = await prisma.team_member.findFirst({
+        where: {
+            user_id: targetUser.id,
+            is_verified: true,
+        },
+    });
+    const isAutoVerified = !!previouslyVerified;
+
     const newMember = await prisma.team_member.create({
         data: {
             user_id: targetUser.id,
             team_id: teamId,
             role: role === "leader" ? "leader" : "member",
+            is_verified: isAutoVerified,
+            kartu_id: previouslyVerified?.kartu_id ?? undefined,
         },
     });
 
