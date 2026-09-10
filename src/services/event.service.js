@@ -190,14 +190,33 @@ const registerUserIntoEvent = async (
                 });
             }
 
-            // Check if the user has been verified previously in any team
-            const previouslyVerified = await tx.team_member.findFirst({
+            // Check if the user has been verified previously in any team, member, or participant
+            const previouslyVerifiedTeam = await tx.team.findFirst({
+                where: {
+                    members: { some: { user_id } },
+                    OR: [
+                        { is_document_verified: "approved" },
+                        { is_verified: "approved" },
+                    ],
+                },
+            });
+
+            const previouslyVerifiedMember = await tx.team_member.findFirst({
                 where: {
                     user_id,
                     is_verified: true,
                 },
             });
-            const isAutoVerified = !!previouslyVerified;
+
+            const previouslyVerifiedParticipant = await tx.event_participant.findFirst({
+                where: {
+                    user_id,
+                    payment_verification: "accepted",
+                },
+            });
+
+            const isAutoVerified = !!(previouslyVerifiedTeam || previouslyVerifiedMember || previouslyVerifiedParticipant);
+            const isFreeEvent = eventExists?.price === 0;
 
             const existingTeam = await tx.team.findFirst({
                 where: {
@@ -230,7 +249,7 @@ const registerUserIntoEvent = async (
                         team_code,
                         max_member: 1,
                         is_document_verified: isAutoVerified ? "approved" : "pending",
-                        is_verified: isAutoVerified ? (eventExists?.price === 0 ? "approved" : "pending") : "pending",
+                        is_verified: isAutoVerified ? (isFreeEvent ? "approved" : "pending") : "pending",
                         members: {
                             create: {
                                 user_id,
@@ -240,16 +259,51 @@ const registerUserIntoEvent = async (
                         },
                     },
                 });
+            } else if (isAutoVerified) {
+                await tx.team.update({
+                    where: { id: existingTeam.id },
+                    data: {
+                        is_document_verified: "approved",
+                        ...(isFreeEvent ? { is_verified: "approved" } : {}),
+                    },
+                });
+                await tx.team_member.updateMany({
+                    where: { team_id: existingTeam.id, user_id },
+                    data: { is_verified: true },
+                });
             }
 
-            await tx.event_participant.create({
-                data: {
-                    user_id,
-                    event_id: actualEventId,
-                    payment_verification: isAutoVerified ? (eventExists?.price === 0 ? "accepted" : "pending") : "pending",
-                    date_added: new Date(),
+            const existingParticipant = await tx.event_participant.findUnique({
+                where: {
+                    user_id_event_id: {
+                        user_id,
+                        event_id: actualEventId,
+                    },
                 },
             });
+
+            if (!existingParticipant) {
+                await tx.event_participant.create({
+                    data: {
+                        user_id,
+                        event_id: actualEventId,
+                        payment_verification: isAutoVerified ? (isFreeEvent ? "accepted" : "pending") : "pending",
+                        date_added: new Date(),
+                    },
+                });
+            } else if (isAutoVerified && isFreeEvent && existingParticipant.payment_verification !== "accepted") {
+                await tx.event_participant.update({
+                    where: {
+                        user_id_event_id: {
+                            user_id,
+                            event_id: actualEventId,
+                        },
+                    },
+                    data: {
+                        payment_verification: "accepted",
+                    },
+                });
+            }
         });
 
         return {
