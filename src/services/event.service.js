@@ -40,18 +40,41 @@ const registerUserIntoEvent = async (
         };
     }
 
-    const regTimeline = await prisma.event_timeline.findFirst({
-        where: {
-            event_id: actualEventId,
-            is_registration: true,
-        },
-    });
+    let regTimeline = null;
+    try {
+        const rows = await prisma.$queryRawUnsafe(
+            "SELECT * FROM event_timeline WHERE event_id = ? AND is_registration = 1 LIMIT 1",
+            actualEventId
+        );
+        regTimeline = rows && rows.length > 0 ? rows[0] : null;
+    } catch (e) {
+        regTimeline = null;
+    }
+
+    if (!regTimeline) {
+        regTimeline = await prisma.event_timeline.findFirst({
+            where: {
+                event_id: actualEventId,
+                OR: [
+                    { title: { contains: "Pendaftaran" } },
+                    { title: { contains: "Registration" } },
+                ],
+            },
+        }).catch(() => null);
+    }
 
     if (regTimeline) {
         const parseLocalDate = (dateStr) => {
             if (!dateStr) return null;
             const str = typeof dateStr === 'string' ? dateStr : dateStr.toISOString();
-            return new Date(str.endsWith('Z') ? str.slice(0, -1) : str);
+            let cleaned = str.replace(' ', 'T');
+            if (cleaned.endsWith('Z')) {
+                cleaned = cleaned.slice(0, -1);
+            }
+            if (!cleaned.includes('+') && !cleaned.match(/-\d{2}:\d{2}$/)) {
+                cleaned += '+07:00';
+            }
+            return new Date(cleaned);
         };
         const now = new Date();
         const startDate = regTimeline.end_date ? parseLocalDate(regTimeline.date) : null;

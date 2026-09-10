@@ -152,6 +152,7 @@ Table event_timeline {
   date DateTime [not null]
   end_date DateTime
   is_submission Boolean [not null, default: false]
+  is_registration Boolean [not null, default: false]
   event event [not null]
 }
 

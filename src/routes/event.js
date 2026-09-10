@@ -92,7 +92,6 @@ eventRouter.get("/api/staging/trigger-finalist", async (req, res) => {
                     title: `Pengumuman Finalis ${event.title}`,
                     date: yesterday,
                     is_submission: false,
-                    is_registration: false,
                 },
             });
         }
@@ -118,7 +117,6 @@ eventRouter.get("/api/staging/trigger-finalist", async (req, res) => {
                     title: `Pengumuman Juara ${event.title}`,
                     date: yesterday,
                     is_submission: false,
-                    is_registration: false,
                 },
             });
         }
