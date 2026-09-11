@@ -166,11 +166,17 @@ exports.registerTeamThenInsertLeader = async ({
                     }
                 } while (existingTeamWithCode);
 
-                // Check if leader's document was previously verified in any event/team
+                // Check if leader's document was previously verified in any competition team
                 const previouslyVerified = await tx.team_member.findFirst({
                     where: {
                         user_id: leader_id,
                         is_verified: true,
+                        kartu_id: { not: null },
+                        team: {
+                            competition: {
+                                type: "competition",
+                            },
+                        },
                     },
                 });
                 const isAutoVerified = !!previouslyVerified;
@@ -268,11 +274,17 @@ exports.memberJoinWithTeamCode = async ({ user_id, team_code }) => {
                     message: "Team has reached the maximum member limit",
                 };
 
-            // Check if member's document was previously verified in any event/team
+            // Check if member's document was previously verified in any competition team
             const previouslyVerified = await tx.team_member.findFirst({
                 where: {
                     user_id,
                     is_verified: true,
+                    kartu_id: { not: null },
+                    team: {
+                        competition: {
+                            type: "competition",
+                        },
+                    },
                 },
             });
             const isAutoVerified = !!previouslyVerified;

@@ -444,6 +444,12 @@ const addMemberToTeam = async (teamId, { email, user_id, role = "member" }) => {
         where: {
             user_id: targetUser.id,
             is_verified: true,
+            kartu_id: { not: null },
+            team: {
+                competition: {
+                    type: "competition",
+                },
+            },
         },
     });
     const isAutoVerified = !!previouslyVerified;
