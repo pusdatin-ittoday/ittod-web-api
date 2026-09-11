@@ -239,4 +239,28 @@ eventRouter.get(
     checkIPBOrMinetodayController
 );
 
+// Seminar Nasional — kuesioner + upload bukti follow IG (PDF)
+const {
+    semnasRegisterController,
+} = require("../controllers/semnas.controller");
+
+const semnasUpload = multer({
+    storage: multer.memoryStorage(),
+    limits: { fileSize: 5 * 1024 * 1024 }, // 5MB for PDF
+    fileFilter: (req, file, cb) => {
+        if (file.mimetype === "application/pdf" || file.mimetype.startsWith("image/")) {
+            cb(null, true);
+        } else {
+            cb(new Error("File harus berupa PDF atau gambar."), false);
+        }
+    },
+});
+
+eventRouter.post(
+    "/api/event/semnas/register",
+    isAuthenticated,
+    semnasUpload.single("ig_follow_proof"),
+    semnasRegisterController
+);
+
 module.exports = eventRouter;
