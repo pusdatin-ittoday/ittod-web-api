@@ -69,9 +69,14 @@ const upsertTeamSubmission = async (team_id, submission_object) => {
                 };
             }
 
-            const finalPayload = typeof submission_object === 'string' 
-                ? submission_object 
-                : JSON.stringify(submission_object);
+            let finalPayload = submission_object;
+            if (typeof submission_object === 'string') {
+                try {
+                    finalPayload = JSON.parse(submission_object);
+                } catch {
+                    finalPayload = submission_object;
+                }
+            }
 
             await tx.competition_submission.upsert({
                 where: {
@@ -80,7 +85,10 @@ const upsertTeamSubmission = async (team_id, submission_object) => {
                         competition_id: team.competition_id,
                     },
                 },
-                update: { submission_object: finalPayload },
+                update: {
+                    submission_object: finalPayload,
+                    updated_at: new Date(),
+                },
                 create: {
                     team_id,
                     competition_id: team.competition_id,
@@ -95,7 +103,7 @@ const upsertTeamSubmission = async (team_id, submission_object) => {
         if (error.status) {
             throw error;
         }
-        throw { status: 500, message: "Submission Failed" };
+        throw { status: 500, message: error.message || "Submission Failed" };
     }
 };
 
