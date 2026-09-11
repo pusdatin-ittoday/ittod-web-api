@@ -141,6 +141,7 @@ const getUserCompetitionData = async (req, res) => {
                         select: {
                             id: true,
                             title: true,
+                            type: true,
                             participation_type: true,
                             requires_submission: true,
                             whatsapp_group_link: true,
@@ -190,6 +191,7 @@ const getUserCompetitionData = async (req, res) => {
                         select: {
                             id: true,
                             title: true,
+                            type: true,
                             participation_type: true,
                             requires_submission: true,
                             whatsapp_group_link: true,
@@ -231,6 +233,7 @@ const getUserCompetitionData = async (req, res) => {
             verificationError: team.verification_error,
             competitionId: team.competition?.id,
             competitionName: team.competition?.title ?? "N/A",
+            competitionType: team.competition?.type ?? "competition",
             participationType:
                 team.competition?.participation_type ?? "team",
             requiresSubmission: team.competition?.requires_submission ?? false,

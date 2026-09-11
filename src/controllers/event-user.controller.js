@@ -40,6 +40,21 @@ const eventShowController = async (req, res) => {
             },
         });
 
+        // Check if user has already been verified in any team / member / participant
+        const isUserAutoVerified = await prisma.team.findFirst({
+            where: {
+                members: { some: { user_id } },
+                OR: [
+                    { is_document_verified: "approved" },
+                    { is_verified: "approved" },
+                ],
+            },
+        }) || await prisma.team_member.findFirst({
+            where: { user_id, is_verified: true },
+        }) || await prisma.event_participant.findFirst({
+            where: { user_id, payment_verification: "accepted" },
+        });
+
         // Also fetch individual teams for this user to ensure payment proof and status are always found
         const individualTeams = await prisma.team.findMany({
             where: {
@@ -48,6 +63,7 @@ const eventShowController = async (req, res) => {
             select: {
                 competition_id: true,
                 is_verified: true,
+                is_document_verified: true,
                 payment_proof: {
                     select: { url: true },
                 },
@@ -75,9 +91,17 @@ const eventShowController = async (req, res) => {
             });
 
             const effectivePaymentProof = p.payment_proof || matchingTeam?.payment_proof?.url || null;
-            const effectivePaymentVerification = (matchingTeam?.is_verified === "approved" || p.payment_verification === "accepted")
+            const isFreeEvent = p.event?.price === 0 || matchingTeam?.competition?.price === 0;
+            const isDocApproved = matchingTeam?.is_document_verified === "approved" || Boolean(isUserAutoVerified);
+
+            let effectivePaymentVerification = (matchingTeam?.is_verified === "approved" || p.payment_verification === "accepted")
                 ? "accepted"
                 : (p.payment_verification || (matchingTeam?.is_verified === "rejected" ? "rejected" : "pending"));
+
+            // If it's a free event and user's documents are approved, auto-accept
+            if (isFreeEvent && isDocApproved) {
+                effectivePaymentVerification = "accepted";
+            }
 
             const isVerified = effectivePaymentVerification === "accepted";
             const eventKey = (p.event?.slug || p.event_id || "").toLowerCase();
@@ -88,6 +112,8 @@ const eventShowController = async (req, res) => {
             results.push({
                 event_id: p.event_id,
                 payment_verification: effectivePaymentVerification,
+                is_document_verified: matchingTeam?.is_document_verified || (isDocApproved ? "approved" : "pending"),
+                is_user_verified: Boolean(isUserAutoVerified),
                 payment_proof: effectivePaymentProof,
                 has_payment_proof: Boolean(effectivePaymentProof),
                 event: {
@@ -116,12 +142,20 @@ const eventShowController = async (req, res) => {
                 // Include non_competition events or bootcamp
                 const isEvent = t.competition?.type === "non_competition" || cId.includes("bootcamp") || cSlug.includes("bootcamp") || cTitle.includes("bootcamp");
                 if (isEvent) {
-                    const isVerified = t.is_verified === "approved";
+                    const isFreeEvent = t.competition?.price === 0;
+                    const isDocApproved = t.is_document_verified === "approved" || Boolean(isUserAutoVerified);
+                    let effectivePaymentVerification = t.is_verified === "approved" ? "accepted" : (t.is_verified === "rejected" ? "rejected" : "pending");
+                    if (isFreeEvent && isDocApproved) {
+                        effectivePaymentVerification = "accepted";
+                    }
+                    const isVerified = effectivePaymentVerification === "accepted";
                     const effectivePaymentProof = t.payment_proof?.url || null;
 
                     results.push({
                         event_id: t.competition_id,
-                        payment_verification: isVerified ? "accepted" : (t.is_verified === "rejected" ? "rejected" : "pending"),
+                        payment_verification: effectivePaymentVerification,
+                        is_document_verified: t.is_document_verified || (isDocApproved ? "approved" : "pending"),
+                        is_user_verified: Boolean(isUserAutoVerified),
                         payment_proof: effectivePaymentProof,
                         has_payment_proof: Boolean(effectivePaymentProof),
                         event: {
