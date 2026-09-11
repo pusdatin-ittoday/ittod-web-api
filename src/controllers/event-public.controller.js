@@ -120,6 +120,7 @@ const getEventByIdController = async (req, res) => {
                 guide_book_url: true,
                 logo_url: true,
                 submission_fields: true,
+                whatsapp_group_link: true,
                 timelines: {
                     orderBy: {
                         date: 'asc'
