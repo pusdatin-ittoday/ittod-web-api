@@ -115,8 +115,13 @@ const uploadEventPaymentService = async ({ user_id, payment_proof, event_id = "W
                     where: { id: existingTeam.id },
                     data: {
                         payment_proof_id: mediaId,
+                        is_document_verified: "approved",
                         is_verified: "pending",
                     },
+                });
+                await tx.team_member.updateMany({
+                    where: { team_id: existingTeam.id, user_id },
+                    data: { is_verified: false },
                 });
             } else {
                 const teamId = crypto.randomUUID();
@@ -147,7 +152,7 @@ const uploadEventPaymentService = async ({ user_id, payment_proof, event_id = "W
                             create: {
                                 user_id,
                                 role: "leader",
-                                is_verified: true,
+                                is_verified: false,
                             },
                         },
                     },
