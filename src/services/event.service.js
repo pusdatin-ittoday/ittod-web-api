@@ -216,7 +216,7 @@ const registerUserIntoEvent = async (
             });
 
             const isAutoVerified = !!(previouslyVerifiedTeam || previouslyVerifiedMember || previouslyVerifiedParticipant);
-            const isFreeEvent = eventExists?.price === 0;
+            const isFreeEvent = eventExists?.price === 0 || !eventExists?.price;
 
             const existingTeam = await tx.team.findFirst({
                 where: {
@@ -248,18 +248,18 @@ const registerUserIntoEvent = async (
                         team_name: teamName,
                         team_code,
                         max_member: 1,
-                        is_document_verified: isAutoVerified ? "approved" : "pending",
-                        is_verified: isAutoVerified ? (isFreeEvent ? "approved" : "pending") : "pending",
+                        is_document_verified: isFreeEvent || isAutoVerified ? "approved" : "pending",
+                        is_verified: isFreeEvent ? "approved" : (isAutoVerified ? "approved" : "pending"),
                         members: {
                             create: {
                                 user_id,
                                 role: "leader",
-                                is_verified: isAutoVerified,
+                                is_verified: isFreeEvent || isAutoVerified,
                             },
                         },
                     },
                 });
-            } else if (isAutoVerified) {
+            } else if (isAutoVerified || isFreeEvent) {
                 await tx.team.update({
                     where: { id: existingTeam.id },
                     data: {
@@ -287,11 +287,11 @@ const registerUserIntoEvent = async (
                     data: {
                         user_id,
                         event_id: actualEventId,
-                        payment_verification: isAutoVerified ? (isFreeEvent ? "accepted" : "pending") : "pending",
+                        payment_verification: isFreeEvent ? "accepted" : (isAutoVerified ? "accepted" : "pending"),
                         date_added: new Date(),
                     },
                 });
-            } else if (isAutoVerified && isFreeEvent && existingParticipant.payment_verification !== "accepted") {
+            } else if (isFreeEvent && existingParticipant.payment_verification !== "accepted") {
                 await tx.event_participant.update({
                     where: {
                         user_id_event_id: {

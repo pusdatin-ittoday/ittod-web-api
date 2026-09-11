@@ -233,6 +233,26 @@ eventRouter.post(
     validateFile,
     uploadBootcampPaymentController
 );
+const {
+    uploadEventPaymentController,
+} = require("../controllers/event-payment.controller");
+
+eventRouter.post(
+    "/api/event/payment",
+    isAuthenticated,
+    images.single("image"),
+    validateFile,
+    uploadEventPaymentController
+);
+
+eventRouter.post(
+    "/api/event/workshop/payment",
+    isAuthenticated,
+    images.single("image"),
+    validateFile,
+    uploadEventPaymentController
+);
+
 eventRouter.get(
     "/api/event/check-ipb-or-minetoday",
     isAuthenticated,
