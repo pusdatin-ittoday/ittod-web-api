@@ -27,6 +27,7 @@ Table user {
   team_members team_member [not null]
   user_feedbacks user_feedback [not null]
   identity user_identity
+  semnas_participants semnas_participant [not null]
 }
 
 Table user_identity {
@@ -89,6 +90,7 @@ Table event {
   staff event_staff [not null]
   timelines event_timeline [not null]
   teams team [not null]
+  semnas_participants semnas_participant [not null]
 }
 
 Table media {
@@ -286,6 +288,25 @@ Table competition_timeline {
   updated_at DateTime
 }
 
+Table semnas_participant {
+  id String [pk]
+  user_id String [not null]
+  event_id String [not null]
+  kenal_sentral_komputer Boolean [not null, default: false]
+  sumber_kenal_sentral String
+  kenal_acer Boolean [not null, default: false]
+  kenal_nvidia Boolean [not null, default: false]
+  kenal_microsoft Boolean [not null, default: false]
+  ig_follow_proof_key String
+  created_at DateTime [default: `now()`, not null]
+  user user [not null]
+  event event [not null]
+
+  indexes {
+    (user_id, event_id) [unique]
+  }
+}
+
 Table settings {
   key String [pk]
   value String
@@ -385,3 +406,7 @@ Ref: event_participant.user_id > user.id
 Ref: event_staff.event_id > event.id [delete: Cascade]
 
 Ref: event_staff.user_id > user_identity.id [delete: Cascade]
+
+Ref: semnas_participant.user_id > user.id
+
+Ref: semnas_participant.event_id > event.id
