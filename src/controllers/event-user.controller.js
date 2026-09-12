@@ -107,7 +107,13 @@ const eventShowController = async (req, res) => {
                 ? "accepted"
                 : (p.payment_verification || (matchingTeam?.is_verified === "rejected" ? "rejected" : "pending"));
 
-            if (isFreeEvent) {
+            const isSemnasEvent = (p.event?.slug || "").toLowerCase().includes("seminar") || 
+                                 (p.event?.title || "").toLowerCase().includes("seminar") || 
+                                 (p.event_id || "").toLowerCase().includes("seminar") || 
+                                 (p.event?.id || "").toLowerCase().includes("seminar");
+
+            // If it's a free event and user's documents are approved, auto-accept (except Seminar Nasional)
+            if (isFreeEvent && isDocApproved && !isSemnasEvent) {
                 effectivePaymentVerification = "accepted";
             }
 
@@ -150,10 +156,11 @@ const eventShowController = async (req, res) => {
                 // Include non_competition events or bootcamp
                 const isEvent = t.competition?.type === "non_competition" || cId.includes("bootcamp") || cSlug.includes("bootcamp") || cTitle.includes("bootcamp");
                 if (isEvent) {
+                    const isSemnasTeam = cId.includes("seminar") || cSlug.includes("seminar") || cTitle.includes("seminar");
                     const isFreeEvent = t.competition?.price === 0;
                     const isDocApproved = t.is_document_verified === "approved";
                     let effectivePaymentVerification = t.is_verified === "approved" ? "accepted" : (t.is_verified === "rejected" ? "rejected" : "pending");
-                    if (isFreeEvent) {
+                    if (isFreeEvent && isDocApproved && !isSemnasTeam) {
                         effectivePaymentVerification = "accepted";
                     }
                     const isVerified = effectivePaymentVerification === "accepted";

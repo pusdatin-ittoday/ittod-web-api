@@ -256,16 +256,20 @@ const registerUserIntoEvent = async (
                 },
             });
 
+            const isSemnasEvent = (actualEventId || "").toLowerCase().includes("seminar") || 
+                                 (eventExists?.slug || "").toLowerCase().includes("seminar") || 
+                                 (eventExists?.title || "").toLowerCase().includes("seminar");
+
             if (!existingParticipant) {
                 await tx.event_participant.create({
                     data: {
                         user_id,
                         event_id: actualEventId,
-                        payment_verification: isFreeEvent ? "accepted" : "pending",
+                        payment_verification: (isAutoVerified && !isSemnasEvent) ? (isFreeEvent ? "accepted" : "pending") : "pending",
                         date_added: new Date(),
                     },
                 });
-            } else if (isFreeEvent && existingParticipant.payment_verification !== "accepted") {
+            } else if (isAutoVerified && isFreeEvent && !isSemnasEvent && existingParticipant.payment_verification !== "accepted") {
                 await tx.event_participant.update({
                     where: {
                         user_id_event_id: {
