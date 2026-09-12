@@ -153,11 +153,17 @@ exports.registerUserIntoBootcamp = async ({
                 /@(apps\.)?ipb\.ac\.id$/i.test(userEmail);
             const canBeFree = isIPB;
 
-            // Check if the user has been verified previously in any team
+            // Check if the user has been verified previously in any competition team
             const previouslyVerified = await tx.team_member.findFirst({
                 where: {
                     user_id,
                     is_verified: true,
+                    kartu_id: { not: null },
+                    team: {
+                        competition: {
+                            type: "competition",
+                        },
+                    },
                 },
             });
             const isAutoVerified = !!previouslyVerified;

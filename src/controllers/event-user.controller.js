@@ -40,19 +40,26 @@ const eventShowController = async (req, res) => {
             },
         });
 
-        // Check if user has already been verified in any team / member / participant
+        // Check if user has already had documents verified in any competition team / member
         const isUserAutoVerified = await prisma.team.findFirst({
             where: {
                 members: { some: { user_id } },
-                OR: [
-                    { is_document_verified: "approved" },
-                    { is_verified: "approved" },
-                ],
+                is_document_verified: "approved",
+                competition: {
+                    type: "competition",
+                },
             },
         }) || await prisma.team_member.findFirst({
-            where: { user_id, is_verified: true },
-        }) || await prisma.event_participant.findFirst({
-            where: { user_id, payment_verification: "accepted" },
+            where: {
+                user_id,
+                is_verified: true,
+                kartu_id: { not: null },
+                team: {
+                    competition: {
+                        type: "competition",
+                    },
+                },
+            },
         });
 
         // Also fetch individual teams for this user to ensure payment proof and status are always found
@@ -92,14 +99,21 @@ const eventShowController = async (req, res) => {
 
             const effectivePaymentProof = p.payment_proof || matchingTeam?.payment_proof?.url || null;
             const isFreeEvent = p.event?.price === 0 || matchingTeam?.competition?.price === 0;
-            const isDocApproved = matchingTeam?.is_document_verified === "approved" || Boolean(isUserAutoVerified);
+            const isDocApproved = matchingTeam 
+                ? matchingTeam.is_document_verified === "approved" 
+                : isFreeEvent;
 
             let effectivePaymentVerification = (matchingTeam?.is_verified === "approved" || p.payment_verification === "accepted")
                 ? "accepted"
                 : (p.payment_verification || (matchingTeam?.is_verified === "rejected" ? "rejected" : "pending"));
 
-            // If it's a free event and user's documents are approved, auto-accept
-            if (isFreeEvent && isDocApproved) {
+            const isSemnasEvent = (p.event?.slug || "").toLowerCase().includes("seminar") || 
+                                 (p.event?.title || "").toLowerCase().includes("seminar") || 
+                                 (p.event_id || "").toLowerCase().includes("seminar") || 
+                                 (p.event?.id || "").toLowerCase().includes("seminar");
+
+            // If it's a free event and user's documents are approved, auto-accept (except Seminar Nasional)
+            if (isFreeEvent && isDocApproved && !isSemnasEvent) {
                 effectivePaymentVerification = "accepted";
             }
 
@@ -142,10 +156,11 @@ const eventShowController = async (req, res) => {
                 // Include non_competition events or bootcamp
                 const isEvent = t.competition?.type === "non_competition" || cId.includes("bootcamp") || cSlug.includes("bootcamp") || cTitle.includes("bootcamp");
                 if (isEvent) {
+                    const isSemnasTeam = cId.includes("seminar") || cSlug.includes("seminar") || cTitle.includes("seminar");
                     const isFreeEvent = t.competition?.price === 0;
-                    const isDocApproved = t.is_document_verified === "approved" || Boolean(isUserAutoVerified);
+                    const isDocApproved = t.is_document_verified === "approved";
                     let effectivePaymentVerification = t.is_verified === "approved" ? "accepted" : (t.is_verified === "rejected" ? "rejected" : "pending");
-                    if (isFreeEvent && isDocApproved) {
+                    if (isFreeEvent && isDocApproved && !isSemnasTeam) {
                         effectivePaymentVerification = "accepted";
                     }
                     const isVerified = effectivePaymentVerification === "accepted";

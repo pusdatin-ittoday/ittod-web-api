@@ -148,4 +148,85 @@ const semnasRegisterController = async (req, res) => {
     }
 };
 
-module.exports = { semnasRegisterController };
+/**
+ * POST /api/event/semnas/resubmit
+ * Kirim ulang bukti follow IG untuk pendaftaran Seminar Nasional yang ditolak.
+ */
+const semnasResubmitController = async (req, res) => {
+    try {
+        const userId = req.user.id;
+        const { event_id } = req.body;
+
+        if (!event_id) {
+            return res.status(400).json({ success: false, message: "event_id wajib diisi." });
+        }
+
+        if (!req.file) {
+            return res.status(400).json({ success: false, message: "Bukti follow Instagram wajib diunggah." });
+        }
+
+        // Resolve event (by id or slug)
+        const event = await prisma.event.findFirst({
+            where: {
+                OR: [{ id: event_id }, { slug: event_id }],
+                type: "non_competition",
+            },
+        });
+
+        if (!event) {
+            return res.status(404).json({ success: false, message: "Event Seminar Nasional tidak ditemukan." });
+        }
+
+        const participant = await prisma.event_participant.findFirst({
+            where: { user_id: userId, event_id: event.id },
+            select: { payment_verification: true },
+        });
+
+        if (!participant) {
+            return res.status(404).json({ success: false, message: "Pendaftaran Seminar Nasional tidak ditemukan." });
+        }
+
+        // Hanya pendaftaran yang ditolak yang boleh mengirim ulang
+        if (participant.payment_verification !== "rejected") {
+            return res.status(400).json({
+                success: false,
+                message: "Pengiriman ulang hanya tersedia untuk pendaftaran yang berstatus ditolak.",
+            });
+        }
+
+        const { buffer, originalname, mimetype } = req.file;
+        const result = await uploadFileToR2(buffer, originalname, mimetype);
+
+        await prisma.$transaction(async (tx) => {
+            await tx.$executeRawUnsafe(
+                `UPDATE semnas_participant SET ig_follow_proof_key = ? WHERE user_id = ? AND event_id = ?`,
+                result.key,
+                userId,
+                event.id,
+            );
+
+            await tx.event_participant.update({
+                where: {
+                    user_id_event_id: { user_id: userId, event_id: event.id },
+                },
+                data: {
+                    payment_proof: result.key,
+                    payment_verification: "pending",
+                },
+            });
+        });
+
+        return res.status(200).json({
+            success: true,
+            message: "Bukti follow Instagram berhasil dikirim ulang. Menunggu verifikasi panitia.",
+        });
+    } catch (err) {
+        console.error("Semnas Resubmit Error:", err);
+        if (err.status) {
+            return res.status(err.status).json({ success: false, message: err.message });
+        }
+        return res.status(500).json({ success: false, message: "Terjadi kesalahan server." });
+    }
+};
+
+module.exports = { semnasRegisterController, semnasResubmitController };

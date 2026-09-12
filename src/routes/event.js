@@ -233,6 +233,26 @@ eventRouter.post(
     validateFile,
     uploadBootcampPaymentController
 );
+const {
+    uploadEventPaymentController,
+} = require("../controllers/event-payment.controller");
+
+eventRouter.post(
+    "/api/event/payment",
+    isAuthenticated,
+    images.single("image"),
+    validateFile,
+    uploadEventPaymentController
+);
+
+eventRouter.post(
+    "/api/event/workshop/payment",
+    isAuthenticated,
+    images.single("image"),
+    validateFile,
+    uploadEventPaymentController
+);
+
 eventRouter.get(
     "/api/event/check-ipb-or-minetoday",
     isAuthenticated,
@@ -242,6 +262,7 @@ eventRouter.get(
 // Seminar Nasional — kuesioner + upload bukti follow IG (PDF)
 const {
     semnasRegisterController,
+    semnasResubmitController,
 } = require("../controllers/semnas.controller");
 
 const semnasUpload = multer({
@@ -261,6 +282,13 @@ eventRouter.post(
     isAuthenticated,
     semnasUpload.single("ig_follow_proof"),
     semnasRegisterController
+);
+
+eventRouter.post(
+    "/api/event/semnas/resubmit",
+    isAuthenticated,
+    semnasUpload.single("ig_follow_proof"),
+    semnasResubmitController
 );
 
 module.exports = eventRouter;
