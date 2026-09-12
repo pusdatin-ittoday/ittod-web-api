@@ -262,6 +262,7 @@ eventRouter.get(
 // Seminar Nasional — kuesioner + upload bukti follow IG (PDF)
 const {
     semnasRegisterController,
+    semnasResubmitController,
 } = require("../controllers/semnas.controller");
 
 const semnasUpload = multer({
@@ -281,6 +282,13 @@ eventRouter.post(
     isAuthenticated,
     semnasUpload.single("ig_follow_proof"),
     semnasRegisterController
+);
+
+eventRouter.post(
+    "/api/event/semnas/resubmit",
+    isAuthenticated,
+    semnasUpload.single("ig_follow_proof"),
+    semnasResubmitController
 );
 
 module.exports = eventRouter;
