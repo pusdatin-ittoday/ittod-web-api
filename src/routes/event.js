@@ -28,6 +28,7 @@ const {
 
 const {
     getCompetitionResultsController,
+    getAllCompetitionResultsController,
 } = require("../controllers/competition-results.controller");
 const prisma = require("../prisma");
 
@@ -208,6 +209,7 @@ eventRouter.get("/api/staging/trigger-finalist", async (req, res) => {
 });
 
 eventRouter.get("/api/events", getEventsController);
+eventRouter.get("/api/competitions/results", getAllCompetitionResultsController);
 eventRouter.get("/api/events/:id/results", getCompetitionResultsController);
 eventRouter.get("/api/events/:id", getEventByIdController);
 
@@ -257,6 +259,38 @@ eventRouter.get(
     "/api/event/check-ipb-or-minetoday",
     isAuthenticated,
     checkIPBOrMinetodayController
+);
+
+// Seminar Nasional — kuesioner + upload bukti follow IG (PDF)
+const {
+    semnasRegisterController,
+    semnasResubmitController,
+} = require("../controllers/semnas.controller");
+
+const semnasUpload = multer({
+    storage: multer.memoryStorage(),
+    limits: { fileSize: 5 * 1024 * 1024 }, // 5MB for PDF
+    fileFilter: (req, file, cb) => {
+        if (file.mimetype === "application/pdf" || file.mimetype.startsWith("image/")) {
+            cb(null, true);
+        } else {
+            cb(new Error("File harus berupa PDF atau gambar."), false);
+        }
+    },
+});
+
+eventRouter.post(
+    "/api/event/semnas/register",
+    isAuthenticated,
+    semnasUpload.single("ig_follow_proof"),
+    semnasRegisterController
+);
+
+eventRouter.post(
+    "/api/event/semnas/resubmit",
+    isAuthenticated,
+    semnasUpload.single("ig_follow_proof"),
+    semnasResubmitController
 );
 
 module.exports = eventRouter;

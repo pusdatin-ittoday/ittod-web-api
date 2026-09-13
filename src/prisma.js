@@ -45,6 +45,50 @@ const prisma = new PrismaClient();
     } catch (e) {
         console.error("Column check error (team.is_finalist):", e.message);
     }
+
+    try {
+        const eventCols = await prisma.$queryRawUnsafe(
+            "SELECT COLUMN_NAME FROM INFORMATION_SCHEMA.COLUMNS WHERE TABLE_SCHEMA = DATABASE() AND TABLE_NAME = 'event' AND COLUMN_NAME = 'finalist_timeline_id'"
+        );
+        if (!eventCols || eventCols.length === 0) {
+            await prisma.$executeRawUnsafe(
+                "ALTER TABLE `event` ADD COLUMN `finalist_timeline_id` VARCHAR(36) NULL, ADD COLUMN `winner_timeline_id` VARCHAR(36) NULL"
+            );
+            console.log("Added missing columns finalist_timeline_id and winner_timeline_id to event table.");
+        }
+    } catch (e) {
+        console.error("Column check error (event.finalist_timeline_id):", e.message);
+    }
+
+    // Auto-ensure semnas_participant table
+    try {
+        const semnasTable = await prisma.$queryRawUnsafe(
+            "SELECT TABLE_NAME FROM INFORMATION_SCHEMA.TABLES WHERE TABLE_SCHEMA = DATABASE() AND TABLE_NAME = 'semnas_participant'"
+        );
+        if (!semnasTable || semnasTable.length === 0) {
+            await prisma.$executeRawUnsafe(`
+                CREATE TABLE semnas_participant (
+                    id VARCHAR(36) NOT NULL PRIMARY KEY,
+                    user_id VARCHAR(255) NOT NULL,
+                    event_id VARCHAR(255) NOT NULL,
+                    kenal_sentral_komputer TINYINT(1) NOT NULL DEFAULT 0,
+                    sumber_kenal_sentral VARCHAR(255) NULL,
+                    kenal_acer TINYINT(1) NOT NULL DEFAULT 0,
+                    kenal_nvidia TINYINT(1) NOT NULL DEFAULT 0,
+                    kenal_microsoft TINYINT(1) NOT NULL DEFAULT 0,
+                    ig_follow_proof_key VARCHAR(255) NULL,
+                    created_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
+                    UNIQUE KEY semnas_participant_user_event (user_id, event_id),
+                    KEY semnas_participant_event_id_foreign (event_id),
+                    CONSTRAINT semnas_participant_user_id_foreign FOREIGN KEY (user_id) REFERENCES user(id),
+                    CONSTRAINT semnas_participant_event_id_foreign FOREIGN KEY (event_id) REFERENCES event(id)
+                )
+            `);
+            console.log("Created semnas_participant table.");
+        }
+    } catch (e) {
+        console.error("Table check error (semnas_participant):", e.message);
+    }
 })();
 
 module.exports = prisma;
