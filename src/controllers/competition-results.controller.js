@@ -43,6 +43,9 @@ async function checkRevealTime(competitionId, eventData = null) {
     let finalistTimelineId = null;
     let winnerTimelineId   = null;
 
+    let hasGlobalFinalistSetting = false;
+    let hasGlobalWinnerSetting   = false;
+
     // 1. Coba baca dari tabel settings global terlebih dahulu
     try {
         const globalSettings = await prisma.settings.findMany({
@@ -50,22 +53,35 @@ async function checkRevealTime(competitionId, eventData = null) {
                 key: { in: ["finalist_timeline_id", "winner_timeline_id"] }
             }
         });
-        finalistTimelineId = globalSettings.find(s => s.key === "finalist_timeline_id")?.value || null;
-        winnerTimelineId   = globalSettings.find(s => s.key === "winner_timeline_id")?.value || null;
+        const finalistSetting = globalSettings.find(s => s.key === "finalist_timeline_id");
+        const winnerSetting   = globalSettings.find(s => s.key === "winner_timeline_id");
+
+        if (finalistSetting !== undefined) {
+            hasGlobalFinalistSetting = true;
+            finalistTimelineId = finalistSetting.value || null;
+        }
+        if (winnerSetting !== undefined) {
+            hasGlobalWinnerSetting = true;
+            winnerTimelineId = winnerSetting.value || null;
+        }
     } catch (e) {
         // Ignored if settings query fails
     }
 
     // 2. Jika belum ada di settings, coba baca dari kolom event via raw SQL
-    if (!finalistTimelineId || !winnerTimelineId) {
+    if (!hasGlobalFinalistSetting || !hasGlobalWinnerSetting) {
         try {
             const rawEvent = await prisma.$queryRawUnsafe(
                 "SELECT finalist_timeline_id, winner_timeline_id FROM `event` WHERE id = ?",
                 competitionId
             );
             if (rawEvent && rawEvent.length > 0) {
-                if (!finalistTimelineId) finalistTimelineId = rawEvent[0].finalist_timeline_id;
-                if (!winnerTimelineId)   winnerTimelineId   = rawEvent[0].winner_timeline_id;
+                if (!hasGlobalFinalistSetting && rawEvent[0].finalist_timeline_id) {
+                    finalistTimelineId = rawEvent[0].finalist_timeline_id;
+                }
+                if (!hasGlobalWinnerSetting && rawEvent[0].winner_timeline_id) {
+                    winnerTimelineId = rawEvent[0].winner_timeline_id;
+                }
             }
         } catch (e) {
             // Ignored if column doesn't exist
@@ -78,8 +94,8 @@ async function checkRevealTime(competitionId, eventData = null) {
         if (chosenTimeline) {
             finalistRevealed = isTimelineReached(chosenTimeline.date);
         }
-    } else {
-        // Fallback ke keyword jika belum di-set eksplisit
+    } else if (!hasGlobalFinalistSetting) {
+        // Fallback ke keyword HANYA jika setting jadwal belum pernah diatur
         for (const tl of allTimelines) {
             const titleLower = (tl.title || "").toLowerCase();
             if (titleLower.includes(FINALIST_KEYWORD) && isTimelineReached(tl.date)) {
@@ -95,8 +111,8 @@ async function checkRevealTime(competitionId, eventData = null) {
         if (chosenTimeline) {
             championRevealed = isTimelineReached(chosenTimeline.date);
         }
-    } else {
-        // Fallback ke keyword jika belum di-set eksplisit
+    } else if (!hasGlobalWinnerSetting) {
+        // Fallback ke keyword HANYA jika setting jadwal belum pernah diatur
         for (const tl of allTimelines) {
             const titleLower = (tl.title || "").toLowerCase();
             if (titleLower.includes(CHAMPION_KEYWORD) && isTimelineReached(tl.date)) {
@@ -207,15 +223,18 @@ const getCompetitionResultsController = async (req, res) => {
             ? finalistTeams.filter((t) => t.rank !== null).map(formatTeam)
             : [];
 
+        // Juara hanya dianggap tayang jika jadwal tiba DAN ada tim yang sudah diatur sebagai juara
+        const isChampionActuallyRevealed = championRevealed && champions.length > 0;
+
         const finalists  = finalistTeams
-            .filter((t) => championRevealed ? t.rank === null : true)
+            .filter((t) => isChampionActuallyRevealed ? t.rank === null : true)
             .map(formatTeam);
 
         return res.status(200).json({
             success:            true,
             data: {
                 finalist_revealed:  finalistRevealed,
-                champion_revealed:  championRevealed,
+                champion_revealed:  isChampionActuallyRevealed,
                 is_individual:      event.participation_type === "individual",
                 finalists,
                 champions,
@@ -252,13 +271,13 @@ const getAllCompetitionResultsController = async (req, res) => {
 
         for (const comp of competitions) {
             const { finalistRevealed, championRevealed } = await checkRevealTime(comp.id);
-            if (finalistRevealed) anyFinalistRevealed = true;
-            if (championRevealed) anyChampionRevealed = true;
 
             let champions = [];
             let finalists = [];
 
             if (finalistRevealed) {
+                anyFinalistRevealed = true;
+
                 const finalistTeams = await prisma.team.findMany({
                     where: {
                         competition_id: comp.id,
@@ -313,10 +332,15 @@ const getAllCompetitionResultsController = async (req, res) => {
                     ? finalistTeams.filter((t) => t.rank !== null).map(formatTeam)
                     : [];
 
+                const isCompChampionRevealed = championRevealed && champions.length > 0;
+                if (isCompChampionRevealed) anyChampionRevealed = true;
+
                 finalists = finalistTeams
-                    .filter((t) => championRevealed ? t.rank === null : true)
+                    .filter((t) => isCompChampionRevealed ? t.rank === null : true)
                     .map(formatTeam);
             }
+
+            const isCompChampionRevealed = championRevealed && champions.length > 0;
 
             results.push({
                 id: comp.id,
@@ -327,7 +351,7 @@ const getAllCompetitionResultsController = async (req, res) => {
                 logo_url: comp.logo_url,
                 is_individual: comp.participation_type === "individual",
                 finalist_revealed: finalistRevealed,
-                champion_revealed: championRevealed,
+                champion_revealed: isCompChampionRevealed,
                 champions,
                 finalists,
             });
