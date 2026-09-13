@@ -81,6 +81,8 @@ Table event {
   max_noncompetition_participant Int
   max_member Int [not null, default: 3]
   whatsapp_group_link String
+  finalist_timeline_id String
+  winner_timeline_id String
   external_platform_link String
   logo_url String
   method String [not null, default: 'offline']

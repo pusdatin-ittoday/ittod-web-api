@@ -46,6 +46,20 @@ const prisma = new PrismaClient();
         console.error("Column check error (team.is_finalist):", e.message);
     }
 
+    try {
+        const eventCols = await prisma.$queryRawUnsafe(
+            "SELECT COLUMN_NAME FROM INFORMATION_SCHEMA.COLUMNS WHERE TABLE_SCHEMA = DATABASE() AND TABLE_NAME = 'event' AND COLUMN_NAME = 'finalist_timeline_id'"
+        );
+        if (!eventCols || eventCols.length === 0) {
+            await prisma.$executeRawUnsafe(
+                "ALTER TABLE `event` ADD COLUMN `finalist_timeline_id` VARCHAR(36) NULL, ADD COLUMN `winner_timeline_id` VARCHAR(36) NULL"
+            );
+            console.log("Added missing columns finalist_timeline_id and winner_timeline_id to event table.");
+        }
+    } catch (e) {
+        console.error("Column check error (event.finalist_timeline_id):", e.message);
+    }
+
     // Auto-ensure semnas_participant table
     try {
         const semnasTable = await prisma.$queryRawUnsafe(

@@ -101,6 +101,8 @@ model event {
   max_noncompetition_participant Int?
   max_member                     Int                      @default(3)
   whatsapp_group_link            String?                  @db.VarChar(255)
+  finalist_timeline_id           String?                  @db.VarChar(36)
+  winner_timeline_id             String?                  @db.VarChar(36)
   external_platform_link         String?                  @db.VarChar(255)
   logo_url                       String?                  @db.VarChar(255)
   method                         String                   @default("offline") @db.VarChar(255)

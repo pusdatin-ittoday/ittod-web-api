@@ -28,6 +28,7 @@ const {
 
 const {
     getCompetitionResultsController,
+    getAllCompetitionResultsController,
 } = require("../controllers/competition-results.controller");
 const prisma = require("../prisma");
 
@@ -208,6 +209,7 @@ eventRouter.get("/api/staging/trigger-finalist", async (req, res) => {
 });
 
 eventRouter.get("/api/events", getEventsController);
+eventRouter.get("/api/competitions/results", getAllCompetitionResultsController);
 eventRouter.get("/api/events/:id/results", getCompetitionResultsController);
 eventRouter.get("/api/events/:id", getEventByIdController);
 
