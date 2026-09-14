@@ -75,6 +75,11 @@ exports.registerUserIntoBootcamp = async ({
                     lockedEvent.max_noncompetition_participant;
 
             if (isEventFull) {
+                await tx.event.update({
+                    where: { id: resolvedEventId },
+                    data: { is_active: false },
+                }).catch(() => {});
+
                 throw {
                     status: 403,
                     message: "Bootcamp is full. Registration is not allowed.",
@@ -227,6 +232,17 @@ exports.registerUserIntoBootcamp = async ({
                     date_added: new Date(),
                 },
             });
+
+            if (
+                lockedEvent?.max_noncompetition_participant !== null &&
+                lockedEvent?.max_noncompetition_participant !== undefined &&
+                eventParticipantCount + 1 >= lockedEvent.max_noncompetition_participant
+            ) {
+                await tx.event.update({
+                    where: { id: resolvedEventId },
+                    data: { is_active: false },
+                }).catch(() => {});
+            }
 
             return {
                 message: "Successfully registered into bootcamp!",

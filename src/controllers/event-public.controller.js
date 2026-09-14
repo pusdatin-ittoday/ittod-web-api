@@ -13,7 +13,45 @@ const parseLocalDate = (dateStr) => {
     return new Date(cleaned);
 };
 
-const checkAndApplyAutoClose = (event) => {
+const checkAndApplyAutoClose = async (event) => {
+    // 1. Check if maximum participant limit is reached
+    if (
+        event.max_noncompetition_participant !== null &&
+        event.max_noncompetition_participant !== undefined &&
+        event.max_noncompetition_participant > 0
+    ) {
+        try {
+            const currentCount = await prisma.event_participant.count({
+                where: {
+                    event_id: event.id,
+                    payment_verification: { in: ['pending', 'accepted'] },
+                },
+            });
+
+            event.current_participants = currentCount;
+            event.remaining_quota = Math.max(0, event.max_noncompetition_participant - currentCount);
+
+            if (currentCount >= event.max_noncompetition_participant) {
+                if (event.is_active !== false) {
+                    event.is_active = false;
+                    await prisma.event.update({
+                        where: { id: event.id },
+                        data: { is_active: false },
+                    }).catch(err => console.error(`Error auto-syncing event ${event.id}:`, err));
+                }
+                return;
+            }
+        } catch (err) {
+            console.error(`Error checking participant count for event ${event.id}:`, err);
+            event.current_participants = null;
+            event.remaining_quota = null;
+        }
+    } else {
+        event.current_participants = null;
+        event.remaining_quota = null;
+    }
+
+    // 2. Check registration timeline dates
     if (!event.timelines) return;
     const regTimeline = event.timelines.find(t => t.is_registration === true || t.is_registration === 1);
     if (!regTimeline) return;
@@ -31,9 +69,9 @@ const checkAndApplyAutoClose = (event) => {
 
     if (event.is_active !== shouldBeActive) {
         event.is_active = shouldBeActive;
-        prisma.event.update({
+        await prisma.event.update({
             where: { id: event.id },
-            data: { is_active: shouldBeActive }
+            data: { is_active: shouldBeActive },
         }).catch(err => console.error(`Error auto-syncing event ${event.id}:`, err));
     }
 };
@@ -75,14 +113,16 @@ const getEventsController = async (req, res) => {
             }
         });
 
-        const formattedEvents = events.map(event => {
-            checkAndApplyAutoClose(event);
+        const formattedEvents = await Promise.all(events.map(async (event) => {
+            await checkAndApplyAutoClose(event);
             return {
                 ...event,
                 contact_person1: event.contact_person1,
                 contact_person2: event.contact_person2,
+                current_participants: event.current_participants ?? null,
+                remaining_quota: event.remaining_quota ?? null,
             };
-        });
+        }));
 
         return res.status(200).json({ success: true, data: formattedEvents });
     } catch (error) {
@@ -133,12 +173,14 @@ const getEventByIdController = async (req, res) => {
             return res.status(404).json({ success: false, error: "Event not found" });
         }
 
-        checkAndApplyAutoClose(event);
+        await checkAndApplyAutoClose(event);
 
         const formattedEvent = {
             ...event,
             contact_person1: event.contact_person1,
             contact_person2: event.contact_person2,
+            current_participants: event.current_participants ?? null,
+            remaining_quota: event.remaining_quota ?? null,
         };
 
         return res.status(200).json({ success: true, data: formattedEvent });
