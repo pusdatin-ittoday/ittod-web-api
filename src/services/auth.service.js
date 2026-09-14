@@ -81,8 +81,9 @@ exports.sendPasswordResetEmail = async email => {
         include: { identity: true },
     });
 
-    if (!user) {
-        throw { status: 404, message: "User not found" };
+    if (!user || !user.identity) {
+        // Return silently to prevent user enumeration
+        return;
     }
 
     const resetToken = crypto.randomBytes(32).toString("hex");

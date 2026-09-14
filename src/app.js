@@ -62,4 +62,19 @@ app.use((req, res, next) => {
 });
 app.use(routes);
 
+// Global Error Handler
+app.use((err, req, res, next) => {
+    console.error(`[ERROR] ${req.method} ${req.originalUrl}:`, err);
+    const status = err.status || err.statusCode || 500;
+    const isProduction = process.env.NODE_ENV === "production";
+    const message = status === 500 && isProduction
+        ? "Internal server error"
+        : (err.message || "An unexpected error occurred");
+
+    res.status(status).json({
+        success: false,
+        error: message,
+    });
+});
+
 module.exports = app;

@@ -28,8 +28,8 @@ uploadRouter.get(
 uploadRouter.post(
     "/api/images/",
     isAuthenticated,
-    validateFile,
     images.single("image"),
+    validateFile,
     uploadFileToBucket
 );
 
