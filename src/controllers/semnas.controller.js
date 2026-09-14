@@ -96,14 +96,19 @@ const semnasRegisterController = async (req, res) => {
             });
 
             const maxParticipants = lockedEvent?.max_noncompetition_participant;
-            if (maxParticipants !== null) {
-                const currentCount = await tx.event_participant.count({
+            let currentCount = 0;
+            if (maxParticipants !== null && maxParticipants !== undefined) {
+                currentCount = await tx.event_participant.count({
                     where: {
                         event_id: actualEventId,
                         payment_verification: { in: ["pending", "accepted"] },
                     },
                 });
                 if (currentCount >= maxParticipants) {
+                    await tx.event.update({
+                        where: { id: actualEventId },
+                        data: { is_active: false },
+                    }).catch(() => {});
                     throw { status: 403, message: "Kuota Seminar Nasional sudah penuh." };
                 }
             }
@@ -133,6 +138,13 @@ const semnasRegisterController = async (req, res) => {
                     payment_proof: igFollowProofKey || "uploaded",
                 },
             });
+
+            if (maxParticipants !== null && maxParticipants !== undefined && currentCount + 1 >= maxParticipants) {
+                await tx.event.update({
+                    where: { id: actualEventId },
+                    data: { is_active: false },
+                }).catch(() => {});
+            }
         });
 
         return res.status(201).json({

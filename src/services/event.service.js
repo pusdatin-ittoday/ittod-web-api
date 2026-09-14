@@ -132,9 +132,15 @@ const registerUserIntoEvent = async (
 
             const isEventFull =
                 maxParticipants !== null &&
+                maxParticipants !== undefined &&
                 eventParticipantCount >= maxParticipants;
 
             if (isEventFull) {
+                await tx.event.update({
+                    where: { id: actualEventId },
+                    data: { is_active: false },
+                }).catch(() => {});
+
                 throw {
                     status: 403,
                     message: "Event is full. Registration is not allowed.",
@@ -281,6 +287,16 @@ const registerUserIntoEvent = async (
                         payment_verification: "accepted",
                     },
                 });
+            }
+
+            if (maxParticipants !== null && maxParticipants !== undefined) {
+                const newCount = eventParticipantCount + 1;
+                if (newCount >= maxParticipants) {
+                    await tx.event.update({
+                        where: { id: actualEventId },
+                        data: { is_active: false },
+                    }).catch(() => {});
+                }
             }
         });
 

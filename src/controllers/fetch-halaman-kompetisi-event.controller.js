@@ -21,6 +21,7 @@ const fetchHalamanKompetisiEvent = async (req, res) => {
                 method: true,
                 max_noncompetition_participant: true,
                 logo_url: true,
+                is_active: true,
                 // Exclude: teams, participants, announcements, submissions, timelines
             },
         });
