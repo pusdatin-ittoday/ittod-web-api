@@ -10,8 +10,38 @@ passport.serializeUser((user, done) => {
 
 passport.deserializeUser(async (id, done) => {
     try {
-        const user = await prisma.user.findUnique({ where: { id } });
-        done(null, user);
+        const identity = await prisma.user_identity.findUnique({ 
+            where: { id },
+            include: { user: true }
+        });
+        if (identity) {
+            const user = {
+                id: identity.id,
+                email: identity.email,
+                role: identity.role,
+                is_verified: identity.is_verified,
+                full_name: identity.user?.full_name || "",
+                name: identity.user?.full_name || "",
+                phone_number: identity.user?.phone_number || "",
+                ...(identity.user || {}),
+            };
+            return done(null, user);
+        }
+
+        const user = await prisma.user.findUnique({ 
+            where: { id },
+            include: { identity: true }
+        });
+        if (user) {
+            return done(null, {
+                ...user,
+                name: user.full_name,
+                role: user.identity?.role || "user",
+                is_verified: user.identity?.is_verified ?? 1,
+            });
+        }
+
+        done(null, false);
     } catch (err) {
         console.error("Deserialization error:", err);
         done(err, null);
