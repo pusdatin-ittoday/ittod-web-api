@@ -11,11 +11,15 @@ const routes = require("./routes/index.js");
 const sessionConfig = require("./config/session.config.js");
 
 const app = express();
+app.set("trust proxy", 1);
+
 const defaultOrigins = [
     "https://ittoday.web.id",
     "https://admin.ittoday.web.id",
     "http://localhost:5173",
     "http://localhost:5174",
+    "http://127.0.0.1:5173",
+    "http://127.0.0.1:5174",
 ];
 
 const envOrigins = [
@@ -33,17 +37,7 @@ const allowedOrigins = Array.from(new Set([...defaultOrigins, ...envOrigins]));
 app.use(
     cors({
         methods: ["GET", "POST", "PUT", "DELETE", "PATCH", "OPTIONS"],
-        origin: (origin, callback) => {
-            if (!origin) return callback(null, true);
-            if (
-                allowedOrigins.includes(origin) ||
-                /^https:\/\/([a-z0-9-]+\.)*ittoday\.web\.id$/.test(origin) ||
-                origin.startsWith("http://localhost:")
-            ) {
-                return callback(null, true);
-            }
-            return callback(null, false);
-        },
+        origin: allowedOrigins,
         credentials: true,
     })
 );

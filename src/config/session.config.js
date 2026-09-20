@@ -5,6 +5,7 @@ if (!sessionSecret) {
     throw new Error("Missing SECRET_KEY_SESSION environment variable");
 }
 
+
 const isProduction = process.env.NODE_ENV === "production";
 
 module.exports = {
@@ -15,8 +16,9 @@ module.exports = {
     store: new PrismaSessionStore(),
     cookie: {
         httpOnly: true,
-        sameSite: "Lax",
+        sameSite: "lax",
         secure: isProduction,
         maxAge: 7 * 24 * 60 * 60 * 1000, // 7 days
     },
 };
+

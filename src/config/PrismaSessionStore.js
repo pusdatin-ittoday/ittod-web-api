@@ -24,6 +24,9 @@ class PrismaSessionStore extends session.Store {
             });
             callback(null);
         } catch (err) {
+            if (err.code === "P2025") {
+                return callback(null);
+            }
             callback(err);
         }
     }
