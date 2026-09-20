@@ -298,6 +298,7 @@ const getAllCompetitionResultsController = async (req, res) => {
                                 role: true,
                                 user: {
                                     select: {
+                                        id:           true,
                                         full_name:    true,
                                         nama_sekolah: true,
                                         pendidikan:   true,
@@ -320,6 +321,7 @@ const getAllCompetitionResultsController = async (req, res) => {
                     rank:         team.rank ?? null,
                     institution:  team.members?.[0]?.user?.nama_sekolah ?? null,
                     members:      (team.members || []).map((m) => ({
+                        user_id:      m.user?.id ?? null,
                         name:         m.user?.full_name ?? "–",
                         role:         m.role,
                         institution:  m.user?.nama_sekolah ?? null,
