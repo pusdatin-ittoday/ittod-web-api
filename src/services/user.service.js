@@ -105,8 +105,7 @@ const editUserProfile = async ({
                 isFieldFilled(updatedUser.id_instagram) &&
                 isFieldFilled(updatedUser.pendidikan) &&
                 isFieldFilled(updatedUser.nama_sekolah) &&
-                isFieldFilled(updatedUser.ktm_key) &&
-                isFieldFilled(updatedUser.twibbon_key)
+                isFieldFilled(updatedUser.ktm_key)
             );
 
             await tx.user.update({
