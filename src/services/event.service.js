@@ -174,8 +174,7 @@ const registerUserIntoEvent = async (
                 isFieldFilled(userData?.id_instagram) &&
                 isFieldFilled(userData?.pendidikan) &&
                 isFieldFilled(userData?.nama_sekolah) &&
-                isFieldFilled(userData?.ktm_key) &&
-                isFieldFilled(userData?.twibbon_key)
+                isFieldFilled(userData?.ktm_key)
             );
 
             if (!isComplete) {
